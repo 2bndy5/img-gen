@@ -1194,17 +1194,27 @@ checksum = "09e54e57b4c48b40f7aec75635392b12b3421fa26fe8b4332e63138ed278459c"
 name = "img-gen"
 version = "0.1.0"
 dependencies = [
- "colorgrad",
- "directories",
+ "img-gen-renderer",
+ "img-gen-spec",
+ "pyo3",
+ "pyo3-async-runtimes",
+ "reqwest",
+ "serde-saphyr",
+ "tokio",
+]
+
+[[package]]
+name = "img-gen-renderer"
+version = "0.1.0"
+dependencies = [
  "fontsource_downloader",
  "image",
+ "img-gen-spec",
  "parley",
  "pyo3",
  "pyo3-async-runtimes",
  "regex",
- "reqwest",
  "resvg",
- "serde",
  "serde-saphyr",
  "serde_json",
  "sha2",
@@ -1212,6 +1222,23 @@ dependencies = [
  "swash",
  "thiserror 2.0.18",
  "tokio",
+]
+
+[[package]]
+name = "img-gen-spec"
+version = "0.1.0"
+dependencies = [
+ "colorgrad",
+ "fontsource_downloader",
+ "image",
+ "parley",
+ "pyo3",
+ "regex",
+ "resvg",
+ "serde",
+ "serde-saphyr",
+ "serde_json",
+ "thiserror 2.0.18",
 ]
 
 [[package]]

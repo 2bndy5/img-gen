@@ -23,6 +23,7 @@ words:
   - Doherty
   - endfor
   - fontdb
+  - fontique
   - fontsource
   - fract
   - HWBA
@@ -40,6 +41,7 @@ words:
   - Nega
   - nextest
   - Palo
+  - peekable
   - Pixmap
   - proto
   - pyclass

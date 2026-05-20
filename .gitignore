@@ -192,6 +192,7 @@ debug/
 
 # coverage info
 lcov.info
+coverage.json
 
 # generated doc assets
 docs/preset_examples/

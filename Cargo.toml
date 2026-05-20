@@ -1,42 +1,10 @@
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-[package]
-name = "img-gen"
-version = "0.1.0"
+[workspace]
+resolver = "2"
+members = [
+	"crates/img-gen-spec",
+	"crates/img-gen-renderer",
+	"crates/img-gen",
+]
+
+[workspace.package]
 edition = "2024"
-
-[lib]
-name = "img_gen"
-crate-type = ["cdylib", "lib"]
-
-[dependencies]
-colorgrad = { version = "0.8.0", features = ["named-colors"] }
-directories = "6"
-image = "0.25.10"
-parley = "0.9.0"
-reqwest = { version = "0.13", features = ["charset", "http2", "system-proxy"] }
-regex = "1.12.3"
-resvg = "0.47.0"
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-serde-saphyr = "0.0.26"
-sha2 = "0.11.0"
-skrifa = "0.42.1"
-swash = "0.2.7"
-thiserror = "2.0"
-fontsource_downloader = "0.1.0"
-tokio = { version = "1.52.3", features = ["macros"], optional = true }
-pyo3 = { version = "0.28.3", optional = true, features = ["extension-module", "abi3-py310"] }
-pyo3-async-runtimes = { version = "0.28.0", features = ["tokio-runtime"], optional = true }
-
-[features]
-pyo3 = ["dep:pyo3", "dep:pyo3-async-runtimes", "tokio", "reqwest/default-tls"]
-tokio = ["dep:tokio"]
-
-[build-dependencies]
-reqwest = { version = "0.13", features = ["default-tls"] }
-tokio = { version = "1.52.3", features = ["macros", "rt"] }
-fontsource_downloader = "0.1.0"
-
-[dev-dependencies]
-reqwest = { version = "0.13", features = ["default-tls"] }
-tokio = { version = "1.52.3", features = ["macros", "rt-multi-thread"] }

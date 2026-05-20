@@ -1,0 +1,24 @@
+#![deny(
+    clippy::unwrap_used,
+    clippy::expect_used,
+    clippy::panic,
+    clippy::unimplemented,
+    clippy::todo
+)]
+
+pub use img_gen_spec::*;
+
+pub mod validators {
+    pub use img_gen_spec::{HEIGHT, WIDTH};
+}
+
+pub mod error;
+pub use error::{ImgGenRendererError, Result};
+
+pub mod external_resources;
+
+mod generator;
+pub use generator::{Generator, Image};
+
+#[cfg(feature = "pyo3")]
+mod python_binding;

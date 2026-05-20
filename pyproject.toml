@@ -17,6 +17,7 @@ dependencies = [
 ]
 
 [tool.maturin]
+manifest-path = "crates/img-gen/Cargo.toml"
 features = ["pyo3"]
 
 [tool.mypy]

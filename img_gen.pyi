@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Callable
 from enum import Enum
 
@@ -550,4 +551,4 @@ class Image:
 
 class Generator:
     def __init__(self, layout: Layout) -> None: ...
-    async def render(self) -> Image: ...
+    async def render(self, cache_root: Path | None = None) -> Image: ...

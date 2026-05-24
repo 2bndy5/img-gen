@@ -410,12 +410,11 @@ impl Renderer<'_> {
             return Ok(());
         }
         let query = to_font_query(font);
-        let downloaded_path = self.fontsource_client.download_font(&query).await?;
-        // let downloaded_bytes = fs::read(path).map_err(|source| IngGen::ReadFontFileFailed {
-        //     path: downloaded_path.to_path_buf(),
-        //     source,
-        // })?;
-        self.register_font_path(&downloaded_path)
+        let downloaded_paths = self.fontsource_client.download_font(&query).await?;
+        for p in &downloaded_paths {
+            self.register_font_path(p)?;
+        }
+        Ok(())
     }
 
     fn register_font_path(&mut self, path: &Path) -> Result<()> {

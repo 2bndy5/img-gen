@@ -711,15 +711,17 @@ dependencies = [
 
 [[package]]
 name = "fontsource_downloader"
-version = "0.1.0"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "87e4dcb3c2190fb930535fc9981cab31fda5749ffff1c08bf978a526b4e9705f"
+checksum = "ef5d23fd4e1ce1d0be45095f25b313251e3d92d827182baeb59bbb36ba571734"
 dependencies = [
  "directories",
+ "log",
  "reqwest",
  "serde",
  "serde_json",
  "thiserror 2.0.18",
+ "tokio",
 ]
 
 [[package]]
@@ -1192,7 +1194,7 @@ checksum = "09e54e57b4c48b40f7aec75635392b12b3421fa26fe8b4332e63138ed278459c"
 
 [[package]]
 name = "img-gen"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
  "img-gen-renderer",
  "img-gen-spec",
@@ -1205,7 +1207,7 @@ dependencies = [
 
 [[package]]
 name = "img-gen-renderer"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
  "fontsource_downloader",
  "image",
@@ -1226,7 +1228,7 @@ dependencies = [
 
 [[package]]
 name = "img-gen-spec"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
  "colorgrad",
  "fontsource_downloader",

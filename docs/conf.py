@@ -24,9 +24,10 @@ from img_gen import (
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = "image-generator"
+project = "img-gen"
 copyright = "2024, Brendan Doherty"
 author = "Brendan Doherty"
+REPO_URL = "https://github.com/2bndy5/img-gen"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -63,10 +64,10 @@ html_theme_options = {
         "edit": "material/file-edit-outline",
         # "logo": "material/image-edit",
     },
-    # "repo_url": urls["Source"],
-    # "repo_name": "Sphinx-Social-Cards",
-    # "site_url": html_baseurl,
-    # "edit_uri": "blob/main/docs",
+    "repo_url": REPO_URL,
+    "repo_name": "img-gen",
+    "site_url": "https://2bndy5.github.io/img-gen/",
+    "edit_uri": "blob/main/docs",
     "features": [
         "navigation.expand",
         # "navigation.tabs",
@@ -110,23 +111,28 @@ html_theme_options = {
             },
         },
     ],
-    # "social": [
-    #     {
-    #         "icon": "fontawesome/brands/github",
-    #         "link": "https://github.com/2bndy5/sphinx-social-cards",
-    #         "name": "Source on github.com",
-    #     },
-    #     {
-    #         "icon": "fontawesome/brands/python",
-    #         "link": "https://pypi.org/project/sphinx-social-cards/",
-    #     },
-    # ],
+    "social": [
+        {
+            "icon": "fontawesome/brands/github",
+            "link": REPO_URL,
+            "name": "Source on github.com",
+        },
+        {
+            "icon": "fontawesome/brands/python",
+            "link": "https://pypi.org/project/img-gen/",
+        },
+        {
+            "icon": "fontawesome/brands/rust",
+            "link": "https://crates.io/crates/img-gen",
+        },
+    ],
 }
 
 presets = {}
 preset_examples = Path(__file__).parent / "preset_examples"
 preset_examples.mkdir(parents=True, exist_ok=True)
 for p in dir(Presets):
+    # cycle through all the presets and generate example images for each
     if not p.startswith("_"):
         preset = getattr(Presets, p)
         presets[int(preset)] = p

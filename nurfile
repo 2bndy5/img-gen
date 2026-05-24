@@ -131,6 +131,7 @@ export alias "nur i" = nur install
 def "nur docs" [
     --open (-o) # Open the built docs in your browser
     --dirty (-d), # Do not rebuild local python dependencies
+    --clean (-c) # Clean previous docs build artifacts before building docs
 ] {
     mut uv_sync_opts = [uv sync --group docs]
     if not $dirty {
@@ -139,6 +140,9 @@ def "nur docs" [
     run-cmd  ...$uv_sync_opts
 
     let sphinx_cmd = [uv run sphinx-build docs docs/_build/html]
+    if $clean {
+        rm -r docs/_build/html
+    }
     run-cmd ...$sphinx_cmd
     if $open {
         start docs/_build/html/index.html

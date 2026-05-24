@@ -1,11 +1,17 @@
 [package]
 name = "img-gen-spec"
-version = "0.1.0"
-edition = "2024"
+description = "An API to create image generator specifications"
+version = "0.0.0"
+readme = "README.md"
+edition = { workspace = true }
+license = { workspace = true }
+authors = { workspace = true }
+repository = { workspace = true }
+homepage = { workspace = true }
 
 [dependencies]
 colorgrad = { version = "0.8.0", features = ["named-colors"] }
-fontsource_downloader = "0.1.0"
+fontsource_downloader = { workspace = true }
 image = "0.25.10"
 parley = "0.9.0"
 pyo3 = { version = "0.28.3", optional = true, features = ["extension-module", "abi3-py310"] }

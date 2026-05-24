@@ -210,6 +210,12 @@ impl<'de> Deserialize<'de> for Font {
     }
 }
 
+impl From<&Weight> for FsWeight {
+    fn from(value: &Weight) -> Self {
+        Self::from(*value)
+    }
+}
+
 impl From<Weight> for FsWeight {
     fn from(value: Weight) -> Self {
         match value {

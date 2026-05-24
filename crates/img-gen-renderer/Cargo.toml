@@ -1,10 +1,16 @@
 [package]
 name = "img-gen-renderer"
-version = "0.1.0"
-edition = "2024"
+description = "A library to render images from img-gen-specs"
+version = "0.0.0"
+readme = "README.md"
+edition = { workspace = true }
+license = { workspace = true }
+authors = { workspace = true }
+repository = { workspace = true }
+homepage = { workspace = true }
 
 [dependencies]
-fontsource_downloader = "0.1.0"
+fontsource_downloader = { workspace = true }
 image = "0.25.10"
 img-gen-spec = { path = "../img-gen-spec" }
 parley = "0.9.0"

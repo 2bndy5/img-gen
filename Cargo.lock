@@ -711,9 +711,9 @@ dependencies = [
 
 [[package]]
 name = "fontsource_downloader"
-version = "0.3.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ef5d23fd4e1ce1d0be45095f25b313251e3d92d827182baeb59bbb36ba571734"
+checksum = "2012461271e9bb87165c5151a28d5030bda807a8f63d8ab10ab4a7125143bcab"
 dependencies = [
  "directories",
  "log",

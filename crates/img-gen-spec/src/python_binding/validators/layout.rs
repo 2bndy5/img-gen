@@ -115,6 +115,16 @@ impl Layout {
         }
     }
 
+    /// Append a single `Layer` to the layout's list of layers.
+    pub fn append_layer(&mut self, layer: Layer) {
+        self.layers.push(layer);
+    }
+
+    /// Extend the layout's list of layers with an iterable of `Layer` objects.
+    pub fn extend_layers(&mut self, layers: Vec<Layer>) {
+        self.layers.extend(layers);
+    }
+
     /// Deserialize a `Layout` object from a YAML string.
     #[staticmethod]
     pub fn from_yaml_str(yaml_str: String) -> PyResult<Self> {

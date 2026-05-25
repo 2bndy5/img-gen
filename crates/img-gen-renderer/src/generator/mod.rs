@@ -72,6 +72,10 @@ pub struct Image {
 }
 
 impl Image {
+    /// Save the image to a file.
+    ///
+    /// Does not support SVG output.
+    /// The file format is inferred from the file extension in the given `name`.
     pub fn save(&self, name: &str) -> Result<()> {
         self.data
             .save(name)
@@ -81,6 +85,7 @@ impl Image {
             })
     }
 
+    /// Get a byte array of the image data.
     pub fn get_bytes(&'_ self) -> Result<Cow<'_, [u8]>> {
         let bytes: Vec<u8> = self
             .data
@@ -90,6 +95,7 @@ impl Image {
         Ok(Cow::Owned(bytes))
     }
 
+    /// Get the SHA256 hash of the image data as a hex string.
     pub fn get_sha256(&self) -> Result<String> {
         let mut hash_gen = Sha256::new();
         hash_gen.update(self.get_bytes()?);

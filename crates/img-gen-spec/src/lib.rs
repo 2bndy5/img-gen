@@ -9,9 +9,10 @@
 pub mod validators;
 pub use validators::{
     Background, Border, ColorGradient, ColorKind, ConicalGradient, Corners, Debug, Ellipse, Font,
-    HEIGHT, Icon, Layer, LayerOffset, Layout, Line, LineHeight, LinearGradient, Mask, Polygon,
-    PolygonSides, PreserveAspect, Presets, RadialGradient, Rectangle, Size, SolidColor, Spread,
-    Typography, TypographyAlign, WIDTH, Weight,
+    HEIGHT, Icon, IrregularPolygonSides, Layer, LayerOffset, Layout, Line, LineHeight,
+    LinearGradient, Mask, Polygon, PolygonSides, PreserveAspect, Presets, RadialGradient,
+    Rectangle, RegularPolygonSides, Size, SolidColor, Spread, Typography, TypographyAlign, WIDTH,
+    Weight,
 };
 
 pub mod error;

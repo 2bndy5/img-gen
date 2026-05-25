@@ -66,7 +66,7 @@ impl ConicalGradient {
     /// The given `x` and `y` values are the coordinate of the pixel in the `Layer`
     /// (relative to [`Layer::offset`](value@crate::Layer::offset)).
     pub fn get_color_at(&self, x: u32, y: u32) -> SolidColor {
-        let y_diff = (y as i64 - self.center.x as i64) as f32;
+        let y_diff = (y as i64 - self.center.y as i64) as f32;
         let x_diff = (x as i64 - self.center.x as i64) as f32;
         let mut angle = y_diff.atan2(x_diff).to_degrees() + self.angle;
         if angle >= 360.0 {

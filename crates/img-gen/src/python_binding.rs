@@ -1,10 +1,11 @@
+use img_gen_spec::{IrregularPolygonSides, RegularPolygonSides};
 use pyo3::prelude::*;
 
 use crate::{
     Background, Border, ColorGradient, ColorKind, ConicalGradient, Corners, Debug, Ellipse, Font,
     Generator, Icon, Image, Layer, LayerOffset, Layout, Line, LinearGradient, Mask, Polygon,
-    PreserveAspect, Presets, RadialGradient, Rectangle, Size, SolidColor, Spread, Typography,
-    TypographyAlign, Weight,
+    PolygonSides, PreserveAspect, Presets, RadialGradient, Rectangle, Size, SolidColor, Spread,
+    Typography, TypographyAlign, Weight,
 };
 
 /// This module exposes all the public Python API needed to generate images.
@@ -18,6 +19,9 @@ fn img_gen(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<Debug>()?;
     m.add_class::<Ellipse>()?;
     m.add_class::<Polygon>()?;
+    m.add_class::<PolygonSides>()?;
+    m.add_class::<RegularPolygonSides>()?;
+    m.add_class::<IrregularPolygonSides>()?;
     m.add_class::<Font>()?;
     m.add_class::<LayerOffset>()?;
     m.add_class::<Layer>()?;

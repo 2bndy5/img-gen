@@ -6,7 +6,6 @@ from img_gen import (
     Layout,
     Layer,
     ColorKind,
-    SolidColor,
     Size,
     Offset,
     Generator,
@@ -26,20 +25,21 @@ async def test_ellipse(tmp_path: Path, border_width: int):
             255 * (index in [1, 3]),
             255 * (index in [2, 3]),
         )
-        layer = Layer(
-            size=size,
-            offset=offset,
-            ellipse=Ellipse(
-                color=ColorKind.SolidColor(SolidColor(g, b, r, 127)),
-                border=None
-                if border_width == 0
-                else Border(
-                    ColorKind.SolidColor(SolidColor(r, g, b, 63)),
-                    width=border_width,
+        layout.append_layer(
+            Layer(
+                size=size,
+                offset=offset,
+                ellipse=Ellipse(
+                    color=ColorKind.solid_color(g, b, r, 127),
+                    border=None
+                    if border_width == 0
+                    else Border(
+                        ColorKind.solid_color(r, g, b, 63),
+                        width=border_width,
+                    ),
                 ),
-            ),
+            )
         )
-        layout.layers.append(layer)
     gen = Generator(layout)
     img = await gen.render()
     img.save(str(tmp_path / "test_ellipse.png"))

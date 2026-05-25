@@ -45,6 +45,7 @@ impl Image {
 
     /// Save the image data to a file.
     ///
+    /// Does not support SVG output.
     /// The image format is determined from the file extension in the given ``name``.
     #[pyo3(text_signature = "(name: str) -> None", name = "save")]
     pub fn save_py(&self, name: &str) -> PyResult<()> {

@@ -45,9 +45,7 @@ def basic_layout(
         ),
     )
     bg_layer = Layer(
-        background=Background(
-            color=ColorKind.SolidColor(SolidColor(255, 255, 255, 255))
-        )
+        background=Background(color=ColorKind.solid_color(255, 255, 255, 255))
     )
     layer = Layer(
         size=Size(layer_w, layer_h), offset=layer_offset, typography=typography
@@ -99,7 +97,7 @@ async def test_wrap_ellipsis(tmp_path: Path):
         ),
         border=Border(
             width=3,
-            color=ColorKind.SolidColor(SolidColor(255, 0, 0, 255)),
+            color=ColorKind.solid_color(255, 0, 0, 255),
         ),
     )
 

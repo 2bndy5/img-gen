@@ -9,19 +9,12 @@ from img_gen import (
     Size,
     Offset,
     Background,
-    LinearGradient,
-    RadialGradient,
-    ConicalGradient,
-    # Presets,
     Spread,
     ColorKind,
-    ColorGradient,
     Generator,
 )
 
-GRADIENT = ColorGradient(
-    [(0, "green"), (0.1, "red"), (0.5, "green"), (1, "blue")],
-)
+GRADIENT = [(0, "green"), (0.1, "red"), (0.5, "green"), (1, "blue")]
 
 
 @pytest.mark.asyncio
@@ -37,16 +30,20 @@ async def test_linear_gradient(spread: Spread, tmp_path: Path):
     ]
     layout = Layout(size=Size(width=500, height=500), layers=[])
     for index, domain in enumerate(gradient_domains):
-        layer = Layer(
-            size=Size(width=250, height=250),
-            offset=Offset(x=250 * index % 2, y=250 * int(index / 2)),
-            background=Background(
-                color=ColorKind.LinearGradient(
-                    LinearGradient(GRADIENT, spread=spread, **domain)
-                )
-            ),
+        layout.append_layer(
+            Layer(
+                size=Size(width=250, height=250),
+                offset=Offset(x=250 * (index % 2), y=250 * int(index / 2)),
+                background=Background(
+                    color=ColorKind.linear_gradient(
+                        start=domain["start"],
+                        end=domain["end"],
+                        colors=GRADIENT,
+                        spread=spread,
+                    )
+                ),
+            )
         )
-        layout.layers.append(layer)
     gen = Generator(layout)
     img = await gen.render()
     img.save(str(tmp_path / f"gradient_test_{str(spread)}.png"))
@@ -62,16 +59,19 @@ async def test_conical_gradient(tmp_path: Path):
     ]
     layout = Layout(size=Size(width=500, height=500), layers=[])
     for index, domain in enumerate(gradient_domains):
-        layer = Layer(
-            size=Size(width=250, height=250),
-            offset=Offset(x=250 * index % 2, y=250 * int(index / 2)),
-            background=Background(
-                color=ColorKind.ConicalGradient(
-                    ConicalGradient(GRADIENT, **domain)  # type: ignore
-                )
-            ),
+        layout.append_layer(
+            Layer(
+                size=Size(width=250, height=250),
+                offset=Offset(x=250 * (index % 2), y=250 * int(index / 2)),
+                background=Background(
+                    color=ColorKind.conical_gradient(
+                        center=cast(Offset, domain["center"]),
+                        angle=cast(float, domain["angle"]),
+                        colors=GRADIENT,
+                    )
+                ),
+            )
         )
-        layout.layers.append(layer)
     gen = Generator(layout)
     img = await gen.render()
     img_bytes = img.bytes
@@ -94,22 +94,21 @@ async def test_radial_gradient(spread: Spread, tmp_path: Path):
     ]
     layout = Layout(size=Size(width=500, height=500), layers=[])
     for index, domain in enumerate(gradient_domains):
-        layer = Layer(
-            size=Size(width=250, height=250),
-            offset=Offset(x=250 * index % 2, y=250 * int(index / 2)),
-            background=Background(
-                color=ColorKind.RadialGradient(
-                    RadialGradient(
-                        GRADIENT,
-                        spread=spread,
+        layout.append_layer(
+            Layer(
+                size=Size(width=250, height=250),
+                offset=Offset(x=250 * (index % 2), y=250 * int(index / 2)),
+                background=Background(
+                    color=ColorKind.radial_gradient(
                         center=Offset(x=125, y=125),
                         radius=125,
+                        colors=GRADIENT,
+                        spread=spread,
                         **cast(Mapping, domain),
                     )
-                )
-            ),
+                ),
+            )
         )
-        layout.layers.append(layer)
     gen = Generator(layout)
     img = await gen.render()
     img.save(str(tmp_path / f"gradient_test_{str(spread)}.png"))

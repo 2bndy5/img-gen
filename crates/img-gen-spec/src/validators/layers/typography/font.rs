@@ -246,7 +246,7 @@ mod tests {
     }
 
     #[test]
-    fn from_family_style_uses_legacy_weight_parsing() {
+    fn from_family_style_legacy() {
         let font = Font::from_family_style("Roboto".to_string(), Some("Bold Italic".to_string()));
 
         assert_eq!(font.family, "Roboto");
@@ -261,7 +261,7 @@ mod tests {
     }
 
     #[test]
-    fn weight_from_str_covers_all_match_arms() {
+    fn weight_from_str() {
         assert_eq!(Weight::from("thin"), Weight::Thin);
         assert_eq!(Weight::from("light"), Weight::Light);
         assert_eq!(Weight::from("regular"), Weight::Regular);
@@ -272,7 +272,7 @@ mod tests {
     }
 
     #[test]
-    fn deserialize_font_from_legacy_style_with_weight_and_style() {
+    fn deserialize_legacy_weight_and_style() {
         let font: Font = serde_saphyr::from_str(
             r#"
 family: Roboto
@@ -287,7 +287,7 @@ style: Bold Italic
     }
 
     #[test]
-    fn deserialize_font_from_legacy_style_with_weight_only() {
+    fn deserialize_legacy_weight_only() {
         let font: Font = serde_saphyr::from_str(
             r#"
 family: Roboto
@@ -301,7 +301,7 @@ style: 700
     }
 
     #[test]
-    fn deserialize_font_explicit_weight_takes_precedence() {
+    fn deserialize_legacy_weight_precedence() {
         let font: Font = serde_saphyr::from_str(
             r#"
 family: Roboto

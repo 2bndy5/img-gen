@@ -9,7 +9,6 @@ from img_gen import (
     Mask,
     Rectangle,
     Size,
-    SolidColor,
     Corners,
     Generator,
 )
@@ -21,7 +20,7 @@ def mk_mask(inverted: bool) -> Mask:
         offset=Offset(30, 30),
         invert=inverted,
         rectangle=Rectangle(
-            color=ColorKind.SolidColor(SolidColor(255, 255, 255, 255)),
+            color=ColorKind.solid_color(255, 255, 255, 255),
             radius=15.0,
             corners=[Corners.TopRight, Corners.BottomLeft],
             border=None,
@@ -33,9 +32,7 @@ def mk_layout(inverted: bool) -> Layout:
     layer = Layer(
         size=Size(100, 100),
         offset=Offset(0, 0),
-        background=Background(
-            color=ColorKind.SolidColor(SolidColor(r=0, g=0, b=255, a=255))
-        ),
+        background=Background(color=ColorKind.solid_color(r=0, g=0, b=255, a=255)),
         mask=mk_mask(inverted),
     )
     layout = Layout(

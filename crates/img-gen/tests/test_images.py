@@ -7,7 +7,6 @@ from img_gen import (
     Layout,
     Layer,
     ColorKind,
-    SolidColor,
     Size,
     Offset,
     Generator,
@@ -37,23 +36,22 @@ OVERALL_SIZE = Size(350, 250)
 async def test_background(image: Path, tmp_path: Path):
     layout = Layout(size=OVERALL_SIZE, layers=[])
     for index, (size, offset, aspect) in enumerate(zip(SIZES, OFFSETS, ASPECTS)):
-        layer = Layer(
-            size=size,
-            offset=offset,
-            background=Background(
-                image=str(image),
-                color=ColorKind.SolidColor(
-                    SolidColor(
+        layout.append_layer(
+            Layer(
+                size=size,
+                offset=offset,
+                background=Background(
+                    image=str(image),
+                    color=ColorKind.solid_color(
                         255 * (index in [0, 3]),
                         255 * (index in [1, 3]),
                         255 * (index in [2, 3]),
                         100,
-                    )
+                    ),
+                    preserve_aspect=aspect,
                 ),
-                preserve_aspect=aspect,
-            ),
+            )
         )
-        layout.layers.append(layer)
     gen = Generator(layout)
     img = await gen.render()
     img.save(str(tmp_path / f"img_test_{image.suffix.lstrip('.')}.png"))
@@ -64,23 +62,22 @@ async def test_background(image: Path, tmp_path: Path):
 async def test_icon(image: Path, tmp_path: Path):
     layout = Layout(size=OVERALL_SIZE, layers=[])
     for index, (size, offset, aspect) in enumerate(zip(SIZES, OFFSETS, ASPECTS)):
-        layer = Layer(
-            size=size,
-            offset=offset,
-            icon=Icon(
-                image=str(image),
-                color=ColorKind.SolidColor(
-                    SolidColor(
+        layout.append_layer(
+            Layer(
+                size=size,
+                offset=offset,
+                icon=Icon(
+                    image=str(image),
+                    color=ColorKind.solid_color(
                         255 * (index in [0, 3]),
                         255 * (index in [1, 3]),
                         255 * (index in [2, 3]),
                         127,
-                    )
+                    ),
+                    preserve_aspect=aspect,
                 ),
-                preserve_aspect=aspect,
-            ),
+            )
         )
-        layout.layers.append(layer)
     gen = Generator(layout)
     img = await gen.render()
     img.save(str(tmp_path / f"img_test_{image.suffix.lstrip('.')}.png"))

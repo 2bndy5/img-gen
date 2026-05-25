@@ -3,6 +3,7 @@ use std::num::NonZeroU32;
 use img_gen::{
     Border, Generator, Layer, LayerOffset, Layout, Polygon, PolygonSides, Size, SolidColor,
 };
+use img_gen_spec::{IrregularPolygonSides, RegularPolygonSides};
 
 #[tokio::test]
 async fn render() {
@@ -40,9 +41,15 @@ async fn render() {
     ];
     let sides = [
         Some(PolygonSides::default()),
-        PolygonSides::new(4),
-        PolygonSides::new(5),
-        PolygonSides::new(6),
+        RegularPolygonSides::new(4).map(Into::into),
+        RegularPolygonSides::new(5).map(Into::into),
+        IrregularPolygonSides::new(vec![
+            LayerOffset { x: 40, y: 20 },
+            LayerOffset { x: 190, y: 40 },
+            LayerOffset { x: 170, y: 180 },
+            LayerOffset { x: 20, y: 150 },
+        ])
+        .map(Into::into),
     ];
     let rotation = [90.0, 0.0, 0.0, -45.0];
 
@@ -65,7 +72,7 @@ async fn render() {
                 } else {
                     None
                 },
-                sides: sides[index].unwrap(),
+                sides: sides[index].clone().unwrap(),
                 rotation: rotation[index],
             }),
             ..Default::default()

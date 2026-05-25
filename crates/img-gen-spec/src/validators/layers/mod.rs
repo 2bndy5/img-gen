@@ -21,7 +21,7 @@ pub use colors::{
 };
 pub use ellipse::Ellipse;
 pub use icon::Icon;
-pub use polygon::{Polygon, PolygonSides};
+pub use polygon::{IrregularPolygonSides, Polygon, PolygonSides, RegularPolygonSides};
 pub use rectangle::{Corners, Rectangle};
 pub use size_offset::{HEIGHT, LayerOffset, Size, WIDTH};
 pub use typography::{Font, Line, LineHeight, Typography, TypographyAlign, Weight};

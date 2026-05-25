@@ -6,7 +6,6 @@ from img_gen import (
     Layout,
     Layer,
     ColorKind,
-    SolidColor,
     Corners,
     Size,
     Offset,
@@ -31,22 +30,23 @@ async def test_rectangle(tmp_path: Path, border_width: int):
             255 * (index in [1, 3]),
             255 * (index in [2, 3]),
         )
-        layer = Layer(
-            size=Size(200, 200),
-            offset=Offset(200 * index % 2, 200 * int(index / 2)),
-            rectangle=Rectangle(
-                color=ColorKind.SolidColor(SolidColor(g, b, r, 127)),
-                corners=corners,
-                radius=radius,
-                border=None
-                if border_width == 0
-                else Border(
-                    ColorKind.SolidColor(SolidColor(r, g, b, 63)),
-                    width=border_width,
+        layout.append_layer(
+            Layer(
+                size=Size(200, 200),
+                offset=Offset(200 * (index % 2), 200 * int(index / 2)),
+                rectangle=Rectangle(
+                    color=ColorKind.solid_color(g, b, r, 127),
+                    corners=corners,
+                    radius=radius,
+                    border=None
+                    if border_width == 0
+                    else Border(
+                        ColorKind.solid_color(r, g, b, 63),
+                        width=border_width,
+                    ),
                 ),
-            ),
+            )
         )
-        layout.layers.append(layer)
     gen = Generator(layout)
     img = await gen.render()
     img.save(str(tmp_path / "test_rectangle.png"))

@@ -189,3 +189,5 @@ def "nur pre-commit" [
     }
     run-cmd ...[uv, run, ...$args]
 }
+
+alias "nur pre" = nur pre-commit

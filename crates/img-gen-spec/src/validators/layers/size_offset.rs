@@ -10,7 +10,7 @@ use serde::Deserialize;
     feature = "pyo3",
     pyclass(name = "Offset", module = "img_gen", get_all, set_all, from_py_object)
 )]
-#[derive(Debug, Clone, Copy, Default, Deserialize)]
+#[derive(Debug, Clone, Copy, Default, Deserialize, Hash, Eq, PartialEq)]
 pub struct LayerOffset {
     /// The offset in pixels along the x-axis.
     pub x: i32,

@@ -38,3 +38,20 @@ pub struct Ellipse {
     #[serde(default, alias = "border-to-origin")]
     pub border_to_origin: bool,
 }
+
+#[cfg(test)]
+mod tests {
+    #![allow(clippy::unwrap_used)]
+
+    use super::*;
+
+    #[test]
+    fn deserialize_default_ellipse() {
+        let json = r#"{}"#;
+        let ellipse: Ellipse = serde_json::from_str(json).unwrap();
+        assert_eq!(ellipse.color.get_color_tuple_at(0, 0), (0, 0, 0, 0));
+        assert!(ellipse.border.is_none());
+        assert!(ellipse.arc.is_none());
+        assert!(!ellipse.border_to_origin);
+    }
+}

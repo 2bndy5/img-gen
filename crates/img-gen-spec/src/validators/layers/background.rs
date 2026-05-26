@@ -25,7 +25,7 @@ pub struct Background {
     /// - Material Design Icons (``material/{icon_slug}``)
     /// - Simple Icons (``simple/{icon_slug}``)
     /// - Octicons (``octicons/{icon_slug}``)
-    /// - Font Awesome Free (``fontawesome/{icon_slug}``)
+    /// - FontAwesome Free (``fontawesome/<brands|solid|regular>/{icon_slug}``)
     pub image: Option<String>,
     /// A color overlaid on top of the `image`.
     /// If no image is specified, then the layer is simple filled with this color.

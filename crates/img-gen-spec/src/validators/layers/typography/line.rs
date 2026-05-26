@@ -88,3 +88,42 @@ impl Default for Line {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    #![allow(clippy::unwrap_used)]
+
+    use super::*;
+
+    #[test]
+    fn test_line_height() {
+        assert!(LineHeight::new(1.0).is_some());
+        assert!(LineHeight::new(0.0).is_none());
+        assert!(LineHeight::new(-1.0).is_none());
+    }
+
+    #[test]
+    fn test_line_font_size() {
+        let line = Line {
+            amount: NonZeroI32::new(2).unwrap(),
+            height: LineHeight(1.5),
+        };
+        let err = line.get_font_size(0, Some(10)).unwrap_err();
+        assert!(matches!(err, ImgGenSpecError::InvalidLayerHeight));
+    }
+
+    #[test]
+    fn deserialize_bad_line_height() {
+        let json = r#"
+        {
+            "amount": 2,
+            "height": -1.0
+        }
+        "#;
+        let err = serde_json::from_str::<Line>(json).unwrap_err();
+        assert!(
+            err.to_string()
+                .contains("LineHeight must be greater than zero")
+        );
+    }
+}

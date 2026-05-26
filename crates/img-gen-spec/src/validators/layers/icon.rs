@@ -24,7 +24,7 @@ pub struct Icon {
     /// - Material Design Icons (``material/{icon_slug}``)
     /// - Simple Icons (``simple/{icon_slug}``)
     /// - Octicons (``octicons/{icon_slug}``)
-    /// - Font Awesome Free (``fontawesome/{icon_slug}``)
+    /// - FontAwesome Free (``fontawesome/<brands|solid|regular>/{icon_slug}``)
     pub image: String,
     /// A color used to replace the [`Icon::image`]'s original coloring.
     pub color: Option<ColorKind>,

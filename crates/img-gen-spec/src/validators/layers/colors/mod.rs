@@ -4,7 +4,7 @@ use pyo3::prelude::*;
 mod deserializing;
 mod solid;
 
-pub use solid::SolidColor;
+pub use solid::{SolidColor, TRANSPARENT};
 mod gradients;
 pub use gradients::{
     ColorGradient, ConicalGradient, LinearGradient, Presets, RadialGradient, Spread,
@@ -63,5 +63,9 @@ impl ColorKind {
             ColorKind::RadialGradient(gradient) => gradient.get_color_at(x, y).to_tuple(),
             ColorKind::ConicalGradient(gradient) => gradient.get_color_at(x, y).to_tuple(),
         }
+    }
+
+    pub(crate) fn transparent_default() -> Self {
+        Self::SolidColor(TRANSPARENT)
     }
 }

@@ -139,10 +139,12 @@ pub struct Polygon {
     /// The color used to fill the polygon.
     #[cfg(feature = "pyo3")]
     #[pyo3(get, set)]
+    #[serde(default = "ColorKind::transparent_default")]
     pub color: ColorKind,
 
     /// The color used to fill the polygon.
     #[cfg(not(feature = "pyo3"))]
+    #[serde(default = "ColorKind::transparent_default")]
     pub color: ColorKind,
 
     #[cfg(feature = "pyo3")]

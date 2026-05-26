@@ -410,13 +410,26 @@ class Polygon:
         rotation: float | None = 0.0,
     ) -> None: ...
 
+class Arc:
+    start: float
+    end: float
+    def __init__(
+        self,
+        start: float,
+        end: float,
+    ) -> None: ...
+
 class Ellipse:
     border: Border | None
     color: ColorKind
+    arc: Arc | None
+    border_to_origin: bool
     def __init__(
         self,
         color: ColorKind,
         border: Border | None = None,
+        arc: Arc | None = None,
+        border_to_origin: bool = False,
     ) -> None: ...
 
 class Weight(Enum):

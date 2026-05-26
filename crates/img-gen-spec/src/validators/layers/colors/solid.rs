@@ -18,6 +18,15 @@ pub struct SolidColor {
     inner: Color,
 }
 
+pub const TRANSPARENT: SolidColor = SolidColor {
+    inner: Color {
+        r: 0.0,
+        g: 0.0,
+        b: 0.0,
+        a: 0.0,
+    },
+};
+
 impl SolidColor {
     /// Instantiate a [`SolidColor`] object from the given color components:
     ///

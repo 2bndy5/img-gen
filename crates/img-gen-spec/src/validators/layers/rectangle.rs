@@ -77,7 +77,7 @@ pub struct Rectangle {
     pub border: Option<Border>,
 
     /// The color used to fill the rectangle.
-    #[serde(default)]
+    #[serde(default = "ColorKind::transparent_default")]
     pub color: ColorKind,
 
     /// The radius of the rendered [`Rectangle::corners`].

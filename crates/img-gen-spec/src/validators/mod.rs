@@ -1,9 +1,9 @@
 pub mod layers;
 pub use layers::{
-    Background, Border, ColorGradient, ColorKind, ConicalGradient, Corners, Ellipse, Font, HEIGHT,
-    Icon, IrregularPolygonSides, LayerOffset, Line, LineHeight, LinearGradient, Polygon,
+    Arc, Background, Border, ColorGradient, ColorKind, ConicalGradient, Corners, Ellipse, Font,
+    HEIGHT, Icon, IrregularPolygonSides, LayerOffset, Line, LineHeight, LinearGradient, Polygon,
     PolygonSides, PreserveAspect, Presets, RadialGradient, Rectangle, RegularPolygonSides, Size,
-    SolidColor, Spread, Typography, TypographyAlign, WIDTH, Weight,
+    SolidColor, Spread, TRANSPARENT, Typography, TypographyAlign, WIDTH, Weight,
 };
 
 mod layout;

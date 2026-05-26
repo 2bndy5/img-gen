@@ -17,9 +17,9 @@ use std::{fmt, num::NonZeroU32};
 pub use background::Background;
 pub use colors::{
     ColorGradient, ColorKind, ConicalGradient, LinearGradient, Presets, RadialGradient, SolidColor,
-    Spread,
+    Spread, TRANSPARENT,
 };
-pub use ellipse::Ellipse;
+pub use ellipse::{Arc, Ellipse};
 pub use icon::Icon;
 pub use polygon::{IrregularPolygonSides, Polygon, PolygonSides, RegularPolygonSides};
 pub use rectangle::{Corners, Rectangle};

@@ -85,6 +85,8 @@ pub enum ImgGenRendererError {
     },
     #[error("SVG '{path}' scaled to zero size")]
     SvgScaledToZeroSize { path: String },
+    #[error("Image not found: '{name}'")]
+    ImageNotFound { name: String },
 
     // Typography and font loading.
     #[error("Failed to read font file '{path}'")]

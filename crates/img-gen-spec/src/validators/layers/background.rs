@@ -16,6 +16,16 @@ use serde::Deserialize;
 #[derive(Debug, Clone, Default, Deserialize)]
 pub struct Background {
     /// A path to an image file.
+    ///
+    /// If the given image path does not exist or has no file extension, then
+    /// it will be treated as an SVG image.
+    ///
+    /// This also supports built-in SVG icons from the following icon packs:
+    ///
+    /// - Material Design Icons (``material/{icon_slug}``)
+    /// - Simple Icons (``simple/{icon_slug}``)
+    /// - Octicons (``octicons/{icon_slug}``)
+    /// - Font Awesome Free (``fontawesome/{icon_slug}``)
     pub image: Option<String>,
     /// A color overlaid on top of the `image`.
     /// If no image is specified, then the layer is simple filled with this color.

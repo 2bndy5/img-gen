@@ -291,3 +291,49 @@ async fn render_icon_svg() {
     let img = generator.render().await.unwrap();
     img.save("tests/out/test_icon[svg].png").unwrap();
 }
+
+#[tokio::test]
+async fn render_builtin_svg() {
+    let mut layout = Layout {
+        size: Size {
+            width: NonZeroU32::new(500),
+            height: NonZeroU32::new(500),
+        },
+        layers: vec![],
+        ..Default::default()
+    };
+    let layer_size = Size {
+        width: NonZeroU32::new(250),
+        height: NonZeroU32::new(250),
+    };
+    let icons = [
+        "material/cat",
+        "simple/rust",
+        "octicons/mark-github-16",
+        "fontawesome/solid/language",
+    ];
+    for (index, icon) in icons.iter().enumerate() {
+        let (r, g, b) = (
+            255 * [0, 1].contains(&index) as u8,
+            255 * [0, 2].contains(&index) as u8,
+            255 * [0, 3].contains(&index) as u8,
+        );
+        let layer = Layer {
+            size: Some(layer_size),
+            offset: LayerOffset {
+                x: 250 * (index as i32 % 2),
+                y: 250 * (index as i32 / 2),
+            },
+            icon: Some(Icon {
+                image: String::from(*icon),
+                color: Some(SolidColor::new(r, g, b, 127).into()),
+                preserve_aspect: PreserveAspect::On,
+            }),
+            ..Default::default()
+        };
+        layout.layers.push(layer);
+    }
+    let generator = Generator { layout };
+    let img = generator.render().await.unwrap();
+    img.save("tests/out/render_builtin_icons.png").unwrap();
+}

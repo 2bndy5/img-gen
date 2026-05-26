@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use image::{
     ImageReader, RgbaImage,
     imageops::{FilterType, overlay},
@@ -23,7 +25,7 @@ impl Renderer<'_> {
 
             // load image data
             if let Some(i) = &l.image {
-                img = Some(if i.as_str().ends_with(".svg") {
+                img = Some(if maybe_builtin_svg(i) {
                     self.load_svg(i.clone(), size, l.preserve_aspect)?
                 } else {
                     Self::load_image(i.clone(), size, l.preserve_aspect)?
@@ -56,7 +58,7 @@ impl Renderer<'_> {
     ) -> Result<()> {
         if let Some(l) = layer.icon.as_ref() {
             // load image data
-            let mut img = if l.image.as_str().ends_with(".svg") {
+            let mut img = if maybe_builtin_svg(l.image.as_str()) {
                 self.load_svg(l.image.clone(), size, l.preserve_aspect)?
             } else {
                 Self::load_image(l.image.clone(), size, l.preserve_aspect)?
@@ -130,11 +132,15 @@ impl Renderer<'_> {
         preserve_aspect: PreserveAspect,
     ) -> Result<RgbaImage> {
         let tree = {
-            let svg_data =
+            let svg_data = if PathBuf::from(&path).exists() {
                 std::fs::read(&path).map_err(|source| ImgGenRendererError::ReadSvgFailed {
                     path: path.clone(),
                     source,
-                })?;
+                })?
+            } else {
+                load_builtin_svg_pack(&path)?
+                    .ok_or_else(|| ImgGenRendererError::ImageNotFound { name: path.clone() })?
+            };
             Tree::from_data(&svg_data, &self.svg_options).map_err(|source| {
                 ImgGenRendererError::ParseSvgFailed {
                     path: path.clone(),
@@ -188,4 +194,30 @@ impl Renderer<'_> {
         overlay(&mut img, &svg, offset_x, offset_y);
         Ok(img)
     }
+}
+
+fn maybe_builtin_svg(name: &str) -> bool {
+    match PathBuf::from(name).extension() {
+        Some(ext) => ext.eq_ignore_ascii_case("svg"),
+        None => name
+            .split_once('/')
+            .map(|(icon_pkg, _)| {
+                matches!(icon_pkg, "material" | "simple" | "octicons" | "fontawesome")
+            })
+            .unwrap_or(false),
+    }
+}
+
+fn load_builtin_svg_pack(name: &str) -> Result<Option<Vec<u8>>> {
+    if let Some((icon_pkg, slug)) = name.split_once('/') {
+        let svg_str = match icon_pkg {
+            "material" => material_design_icons_pack::get_icon(slug).map(|v| v.svg),
+            "simple" => simple_icons_pack::get_icon(slug).map(|v| v.svg),
+            "octicons" => octicons_pack::get_icon(slug).map(|v| v.svg),
+            "fontawesome" => fontawesome_free_pack::get_icon(slug).map(|v| v.svg),
+            _ => None,
+        };
+        return Ok(svg_str.map(|s| s.as_bytes().to_vec()));
+    }
+    Ok(None)
 }

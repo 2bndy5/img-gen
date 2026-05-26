@@ -665,6 +665,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "fontawesome-free-pack"
+version = "7.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "731e90402ef577054c218cdfbc3a26c0226fec2f633ba4d859fdb3ece73af017"
+
+[[package]]
 name = "fontconfig-parser"
 version = "0.5.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1209,9 +1215,12 @@ dependencies = [
 name = "img-gen-renderer"
 version = "0.0.0"
 dependencies = [
+ "fontawesome-free-pack",
  "fontsource_downloader",
  "image",
  "img-gen-spec",
+ "material-design-icons-pack",
+ "octicons-pack",
  "parley",
  "pyo3",
  "pyo3-async-runtimes",
@@ -1220,6 +1229,7 @@ dependencies = [
  "serde-saphyr",
  "serde_json",
  "sha2",
+ "simple-icons-pack",
  "skrifa 0.42.1",
  "swash",
  "thiserror 2.0.18",
@@ -1459,6 +1469,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "112b39cec0b298b6c1999fee3e31427f74f676e4cb9879ed1a121b43661a4154"
 
 [[package]]
+name = "material-design-icons-pack"
+version = "7.4.47"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c3b6859e7550a46151bd4af1c3f487e4f2846532ccd65977d89f3b058fc61f08"
+
+[[package]]
 name = "maybe-rayon"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1650,6 +1666,12 @@ dependencies = [
  "bitflags",
  "objc2",
 ]
+
+[[package]]
+name = "octicons-pack"
+version = "19.27.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b519af53788f84861e75e4c2349adcf9f510c70198ef8b9acad3a793327fab08"
 
 [[package]]
 name = "once_cell"
@@ -2506,6 +2528,12 @@ checksum = "95890f873bec569a0362c235787f3aca6e1e887302ba4840839bcc6459c42da6"
 dependencies = [
  "quote",
 ]
+
+[[package]]
+name = "simple-icons-pack"
+version = "16.21.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "111023867ab285146edac2fdbdbef720f5bcc0a1ba42c908ae07f701951e5067"
 
 [[package]]
 name = "simplecss"

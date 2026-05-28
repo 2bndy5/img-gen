@@ -53,15 +53,21 @@ async fn render() {
     ];
     let rotation = [90.0, 0.0, 0.0, -45.0];
 
-    for index in 0..sizes.len() {
+    for (index, (((size, offset), sides), rotation)) in sizes
+        .into_iter()
+        .zip(offsets)
+        .zip(sides)
+        .zip(rotation)
+        .enumerate()
+    {
         let (r, g, b) = (
             255 * [0usize, 1].contains(&index) as u8,
             255 * [0usize, 2].contains(&index) as u8,
             255 * [0usize, 3].contains(&index) as u8,
         );
         let layer = Layer {
-            size: Some(sizes[index]),
-            offset: offsets[index],
+            size: Some(size),
+            offset,
             polygon: Some(Polygon {
                 color: SolidColor::new(g, b, r, 127).into(),
                 border: if index != 0 {
@@ -72,8 +78,8 @@ async fn render() {
                 } else {
                     None
                 },
-                sides: sides[index].clone().unwrap(),
-                rotation: rotation[index],
+                sides: sides.unwrap(),
+                rotation,
             }),
             ..Default::default()
         };

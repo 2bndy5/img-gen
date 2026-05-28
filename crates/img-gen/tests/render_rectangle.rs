@@ -45,15 +45,21 @@ async fn render() {
         Corners::ALL.to_vec(),
     ];
 
-    for index in 0..sizes.len() {
+    for (index, (((size, offset), radius), corners)) in sizes
+        .into_iter()
+        .zip(offsets)
+        .zip(radiuses)
+        .zip(corners)
+        .enumerate()
+    {
         let (r, g, b) = (
             255 * [0usize, 1].contains(&index) as u8,
             255 * [0usize, 2].contains(&index) as u8,
             255 * [0usize, 3].contains(&index) as u8,
         );
         let layer = Layer {
-            size: Some(sizes[index]),
-            offset: offsets[index],
+            size: Some(size),
+            offset,
             rectangle: Some(Rectangle {
                 color: SolidColor::new(g, b, r, 127).into(),
                 border: if index != 0 {
@@ -64,8 +70,8 @@ async fn render() {
                 } else {
                     None
                 },
-                radius: radiuses[index],
-                corners: corners[index].clone(),
+                radius,
+                corners,
             }),
             ..Default::default()
         };

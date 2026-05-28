@@ -5,30 +5,6 @@ pub enum ImgGenRendererError {
     #[error(transparent)]
     SpecError(#[from] img_gen_spec::ImgGenSpecError),
 
-    // Parsing and deserialization.
-    #[error("Parsing JSON failed")]
-    JsonParsingFailed {
-        #[from]
-        #[source]
-        source: serde_json::Error,
-    },
-    #[error("Parsing YAML failed")]
-    YamlParsingFailed {
-        #[from]
-        #[source]
-        source: serde_saphyr::Error,
-    },
-
-    // Validation.
-    #[error("Failed to parse Corner identifier from string: {value}")]
-    InvalidCornerIdentifier { value: String },
-    #[error("Layer height cannot be zero")]
-    InvalidLayerHeight,
-    #[error("Value '{value}' is not a valid CSS color ({reason})")]
-    InvalidCssColor { value: String, reason: String },
-    #[error("Failed to build color gradient: {reason}")]
-    InvalidGradientSpec { reason: String },
-
     // Rendering and geometry.
     #[error("{shape} bounds are too large; width and height must be less than i32::MAX / 4")]
     BoundsTooLarge { shape: &'static str },

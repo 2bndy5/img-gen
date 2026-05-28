@@ -1,8 +1,8 @@
 use super::{ConcreteSize, Renderer};
 use crate::{
-    Border, ColorKind, Font, ImgGenRendererError, Layer, LayerOffset, Line, Result,
-    TypographyAlign, external_resources::fontsource::to_font_query,
+    Border, ColorKind, Font, ImgGenRendererError, Layer, LayerOffset, Line, Result, TypographyAlign,
 };
+use fontsource_downloader::{FontQuery, QueryBuilder, Weight};
 use image::{RgbaImage, imageops::overlay};
 use parley::{
     Alignment, AlignmentOptions, GenericFamily, GlyphRun, Layout, LineHeight, OverflowWrap,
@@ -14,6 +14,14 @@ use swash::{
     scale::{Render, ScaleContext, Source, StrikeWith},
     zeno::{Format, Vector},
 };
+
+fn to_font_query(font: &Font) -> FontQuery {
+    QueryBuilder::new(&font.family)
+        .with_style(&font.style)
+        .with_weight(Weight::from(&font.weight))
+        .with_subset(&font.subset)
+        .build()
+}
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub(super) struct TextBrush {

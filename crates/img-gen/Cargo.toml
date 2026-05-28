@@ -14,24 +14,22 @@ name = "img_gen"
 crate-type = ["cdylib", "lib"]
 
 [dependencies]
-img-gen-renderer = { path = "../img-gen-renderer" }
-img-gen-spec = { path = "../img-gen-spec" }
-pyo3 = { version = "0.28.3", optional = true, features = ["extension-module", "abi3-py310"] }
-pyo3-async-runtimes = { version = "0.28.0", features = ["tokio-runtime"], optional = true }
-tokio = { version = "1.52.3", features = ["macros"], optional = true }
+img-gen-renderer = { path = "../img-gen-renderer", version = "0.0.0" }
+img-gen-spec = { path = "../img-gen-spec", version = "0.0.0" }
+pyo3 = { workspace = true, optional = true, features = ["extension-module", "abi3-py310"] }
 reqwest = { version = "0.13", optional = true, features = ["default-tls"] }
+tokio = { workspace = true, optional = true }
 
 [features]
 pyo3 = [
     "dep:pyo3",
-    "dep:pyo3-async-runtimes",
     "dep:tokio",
+    "dep:reqwest",
     "img-gen-spec/pyo3",
     "img-gen-renderer/pyo3",
-    "dep:reqwest",
 ]
 
 [dev-dependencies]
 reqwest = { version = "0.13", features = ["default-tls"] }
-serde-saphyr = "0.0.26"
-tokio = { version = "1.52.3", features = ["macros", "rt-multi-thread"] }
+serde-saphyr = { workspace = true }
+tokio = { workspace = true, features = ["rt-multi-thread"] }

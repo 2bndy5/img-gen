@@ -4,7 +4,7 @@ use img_gen::{
     Background, Generator, Icon, Layer, LayerOffset, Layout, PreserveAspect, Size, SolidColor,
 };
 
-fn make_layout(bg: Option<&str>, icon: Option<&str>) -> Layout {
+fn mk_layout(bg: Option<&str>, icon: Option<&str>) -> Layout {
     let mut layout = Layout {
         size: Size {
             width: NonZeroU32::new(300),
@@ -75,7 +75,7 @@ fn make_layout(bg: Option<&str>, icon: Option<&str>) -> Layout {
 
 #[tokio::test]
 async fn render_background_png() {
-    let layout = make_layout(Some("tests/message.png"), None);
+    let layout = mk_layout(Some("tests/message.png"), None);
     let generator = Generator::new(vec![PathBuf::from(".")], None).unwrap();
     let img = generator.render(layout).await.unwrap();
     img.save("tests/out/test_background[png].png").unwrap();
@@ -83,7 +83,7 @@ async fn render_background_png() {
 
 #[tokio::test]
 async fn render_background_svg() {
-    let layout = make_layout(Some("tests/message.svg"), None);
+    let layout = mk_layout(Some("tests/message.svg"), None);
     let generator = Generator::new(vec![PathBuf::from("tests/message.svg")], None).unwrap();
     let img = generator.render(layout).await.unwrap();
     img.save("tests/out/test_background[svg].png").unwrap();
@@ -91,7 +91,7 @@ async fn render_background_svg() {
 
 #[tokio::test]
 async fn render_icon_png() {
-    let layout = make_layout(None, Some("tests/message.png"));
+    let layout = mk_layout(None, Some("tests/message.png"));
     let generator = Generator::new(vec![], None).unwrap();
     let img = generator.render(layout).await.unwrap();
     img.save("tests/out/test_icon[png].png").unwrap();
@@ -99,7 +99,7 @@ async fn render_icon_png() {
 
 #[tokio::test]
 async fn render_icon_svg() {
-    let layout = make_layout(None, Some("tests/message.svg"));
+    let layout = mk_layout(None, Some("tests/message.svg"));
     let generator = Generator::new(vec![], None).unwrap();
     let img = generator.render(layout).await.unwrap();
     img.save("tests/out/test_icon[svg].png").unwrap();
@@ -149,4 +149,29 @@ async fn render_builtin_svg() {
     let generator = Generator::new(vec![], None).unwrap();
     let img = generator.render(layout).await.unwrap();
     img.save("tests/out/render_builtin_icons.png").unwrap();
+}
+
+#[tokio::test]
+async fn blank_bg() {
+    let layout = Layout {
+        size: Size {
+            width: NonZeroU32::new(250),
+            height: NonZeroU32::new(250),
+        },
+        layers: vec![Layer {
+            background: Some(Background::default()),
+            ..Default::default()
+        }],
+        debug: None,
+    };
+    let generator = Generator::new(vec![], None).unwrap();
+    generator.render(layout).await.unwrap();
+}
+
+#[tokio::test]
+async fn preserve_tall() {
+    let layout = mk_layout(Some("tests/asset_tall.png"), None);
+    let generator = Generator::new(vec![PathBuf::from(".")], None).unwrap();
+    let img = generator.render(layout).await.unwrap();
+    img.save("tests/out/test_preserve_tall.png").unwrap();
 }

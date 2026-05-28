@@ -10,23 +10,19 @@ impl Generator {
     /// Instantiate a `Generator` object for a given `layout`.
     #[new]
     #[pyo3(
-        text_signature = "(img_search_paths: list[Path] | None = None, cache_root: Path | None = None) -> Generator",
-        signature = (img_search_paths=None, cache_root=None)
+        text_signature = "(image_search_paths: list[Path| str] | None = None, cache_root: Path | str | None = None) -> Generator",
+        signature = (image_search_paths=None, cache_root=None)
     )]
     pub fn new_py(
-        img_search_paths: Option<Vec<PathBuf>>,
+        image_search_paths: Option<Vec<PathBuf>>,
         cache_root: Option<PathBuf>,
     ) -> PyResult<Self> {
-        Generator::new(img_search_paths.unwrap_or_default(), cache_root)
+        Generator::new(image_search_paths.unwrap_or_default(), cache_root)
             .map_err(|e| PyOSError::new_err(format!("{e:?}")))
     }
 
     /// Render the layout and return the `Image`.
-    #[pyo3(
-        name = "render",
-        text_signature = "(layout: Layout) -> Image",
-        signature = (layout)
-    )]
+    #[pyo3(name = "render", text_signature = "(layout: Layout) -> Image")]
     pub fn render_py<'py>(&self, py: Python<'py>, layout: Layout) -> PyResult<Bound<'py, PyAny>> {
         let this = self.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
@@ -50,9 +46,9 @@ impl Image {
     ///
     /// Does not support SVG output.
     /// The image format is determined from the file extension in the given ``name``.
-    #[pyo3(text_signature = "(name: str) -> None", name = "save")]
-    pub fn save_py(&self, name: &str) -> PyResult<()> {
-        self.save(name)
+    #[pyo3(text_signature = "(name: Path | str) -> None", name = "save")]
+    pub fn save_py(&self, name: PathBuf) -> PyResult<()> {
+        self.save(&name)
             .map_err(|e| PyOSError::new_err(e.to_string()))
     }
 

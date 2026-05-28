@@ -26,9 +26,9 @@ impl Renderer<'_> {
             // load image data
             if let Some(i) = &l.image {
                 img = Some(if maybe_builtin_svg(i) {
-                    self.load_svg(i.as_str(), size, l.preserve_aspect)?
+                    self.load_svg(i, size, l.preserve_aspect)?
                 } else {
-                    self.load_image(i.as_str(), size, l.preserve_aspect)?
+                    self.load_image(i, size, l.preserve_aspect)?
                 });
             }
 
@@ -58,10 +58,10 @@ impl Renderer<'_> {
     ) -> Result<()> {
         if let Some(l) = layer.icon.as_ref() {
             // load image data
-            let mut img = if maybe_builtin_svg(l.image.as_str()) {
-                self.load_svg(l.image.as_str(), size, l.preserve_aspect)?
+            let mut img = if maybe_builtin_svg(&l.image) {
+                self.load_svg(&l.image, size, l.preserve_aspect)?
             } else {
-                self.load_image(l.image.as_str(), size, l.preserve_aspect)?
+                self.load_image(&l.image, size, l.preserve_aspect)?
             };
 
             // colorize
@@ -205,7 +205,7 @@ impl Renderer<'_> {
         let mut img = RgbaImage::new(width, height);
         let offset_x = (width as i64 - pixmap.width() as i64) / 2;
         let offset_y = (height as i64 - pixmap.height() as i64) / 2;
-        let svg = RgbaImage::from_raw(pixmap.width(), pixmap.height(), Vec::from(pixmap.data()))
+        let svg = RgbaImage::from_raw(pixmap.width(), pixmap.height(), pixmap.data().to_vec())
             .ok_or(ImgGenRendererError::RasterBufferConversionFailed {
                 shape: "svg",
                 width: pixmap.width(),
@@ -240,4 +240,37 @@ fn load_builtin_svg_pack(name: &str) -> Result<Option<Vec<u8>>> {
         return Ok(svg_str.map(|s| s.as_bytes().to_vec()));
     }
     Ok(None)
+}
+
+#[cfg(test)]
+mod tests {
+    #![allow(clippy::unwrap_used)]
+
+    use std::collections::HashSet;
+
+    use fontsource_downloader::FontSourceClient;
+    use parley::{FontContext, LayoutContext};
+    use resvg::usvg::Options;
+    use swash::scale::ScaleContext;
+
+    use super::*;
+
+    #[test]
+    fn find_non_existent_image() {
+        let renderer = Renderer {
+            image_search_paths: &[PathBuf::from("tests")],
+            svg_options: Options::default(),
+            font_cx: FontContext::default(),
+            layout_cx: LayoutContext::default(),
+            scale_cx: ScaleContext::default(),
+            loaded_font_paths: HashSet::new(),
+            fontsource_client: &FontSourceClient::new().unwrap(),
+        };
+        assert!(renderer.find_image_path("nonexistent.png").is_none());
+    }
+
+    #[test]
+    fn non_builtin_svg() {
+        assert!(load_builtin_svg_pack("non-existent-svg").unwrap().is_none());
+    }
 }

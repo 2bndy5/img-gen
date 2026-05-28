@@ -55,6 +55,6 @@ impl PreserveAspect {
         text_signature = "(Literal['false', 'width', 'height', 'true']) -> PreserveAspect"
     )]
     pub fn from_string_py(value: String) -> PreserveAspect {
-        Self::from_string(value.as_str())
+        Self::from_string(&value)
     }
 }

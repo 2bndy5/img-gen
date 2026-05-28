@@ -5,7 +5,12 @@ use pyo3::prelude::*;
 use image::RgbaImage;
 use resvg::usvg::{Options, fontdb};
 use sha2::{Digest, Sha256};
-use std::{borrow::Cow, io::Read, path::PathBuf, sync::Arc};
+use std::{
+    borrow::Cow,
+    io::Read,
+    path::{Path, PathBuf},
+    sync::Arc,
+};
 
 use crate::{
     ImgGenRendererError, Layout, Result,
@@ -93,11 +98,12 @@ impl Image {
     ///
     /// Does not support SVG output.
     /// The file format is inferred from the file extension in the given `name`.
-    pub fn save(&self, name: &str) -> Result<()> {
+    pub fn save<P: AsRef<Path>>(&self, name: P) -> Result<()> {
+        let name = name.as_ref();
         self.data
             .save(name)
             .map_err(|source| ImgGenRendererError::SaveImageFailed {
-                path: name.to_string(),
+                path: name.to_string_lossy().into_owned(),
                 source,
             })
     }

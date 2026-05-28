@@ -10,25 +10,21 @@ repository = { workspace = true }
 homepage = { workspace = true }
 
 [dependencies]
+fontawesome-free-pack = "7.2.0"
 fontsource_downloader = { workspace = true }
 image = "0.25.10"
-img-gen-spec = { path = "../img-gen-spec" }
-parley = "0.9.0"
-regex = "1.12.3"
-resvg = "0.47.0"
-serde_json = "1.0"
-serde-saphyr = "0.0.26"
-sha2 = "0.11.0"
-skrifa = "0.42.1"
-swash = "0.2.7"
-thiserror = "2.0"
-pyo3 = { version = "0.28.3", optional = true, features = ["extension-module", "abi3-py310"] }
-pyo3-async-runtimes = { version = "0.28.0", features = ["tokio-runtime"], optional = true }
-tokio = { version = "1.52.3", features = ["macros"], optional = true }
-simple-icons-pack = "16.21.0"
-fontawesome-free-pack = "7.2.0"
-octicons-pack = "19.27.0"
+img-gen-spec = { path = "../img-gen-spec", version = "0.0.0" }
 material-design-icons-pack = "7.4.47"
+octicons-pack = "19.27.0"
+parley = { workspace = true }
+pyo3 = { workspace = true, optional = true }
+pyo3-async-runtimes = { version = "0.28.0", features = ["tokio-runtime"], optional = true }
+resvg = "0.47.0"
+sha2 = "0.11.0"
+simple-icons-pack = "16.21.0"
+swash = "0.2.7"
+thiserror = { workspace = true }
+tokio = { workspace = true, optional = true }
 
 [features]
 pyo3 = [

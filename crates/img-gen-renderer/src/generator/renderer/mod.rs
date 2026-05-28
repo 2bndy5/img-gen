@@ -109,14 +109,12 @@ impl<'a> Renderer<'a> {
             Transform::identity(),
             None,
         );
-        let mut body =
-            RgbaImage::from_raw(pixmap.width(), pixmap.height(), Vec::from(pixmap.data())).ok_or(
-                ImgGenRendererError::RasterBufferConversionFailed {
-                    shape: "shape",
-                    width: pixmap.width(),
-                    height: pixmap.height(),
-                },
-            )?;
+        let mut body = RgbaImage::from_raw(pixmap.width(), pixmap.height(), pixmap.data().to_vec())
+            .ok_or(ImgGenRendererError::RasterBufferConversionFailed {
+                shape: "shape",
+                width: pixmap.width(),
+                height: pixmap.height(),
+            })?;
         Self::colorize(layer_color, &mut body, true);
         overlay(canvas, &body, layer_offset.x.into(), layer_offset.y.into());
         if let Some(b) = border {
@@ -133,7 +131,7 @@ impl<'a> Renderer<'a> {
             )?;
             pixmap.stroke_path(&path, &paint, &stroke, Transform::identity(), None);
             let mut border =
-                RgbaImage::from_raw(pixmap.width(), pixmap.height(), Vec::from(pixmap.data()))
+                RgbaImage::from_raw(pixmap.width(), pixmap.height(), pixmap.data().to_vec())
                     .ok_or(ImgGenRendererError::RasterBufferConversionFailed {
                         shape: "shape border",
                         width: pixmap.width(),

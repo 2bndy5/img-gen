@@ -18,6 +18,7 @@ impl Renderer<'_> {
             }
             let bg = debug.color.clone();
             let fg = debug.get_foreground_color();
+            let fg_color = fg.clone().into();
             let layout_cs = ConcreteSize::from(&layout.size);
             if debug.grid {
                 for y in (debug.grid_step..layout_cs.height).step_by(debug.grid_step as usize) {
@@ -83,7 +84,7 @@ impl Renderer<'_> {
                 canvas,
                 layout_top_label,
                 RenderTextParams {
-                    color: &fg.clone().into(),
+                    color: &fg_color,
                     font_size,
                     max_width: layout_w as f32,
                     max_height: font_size.ceil() as u32,
@@ -135,7 +136,7 @@ impl Renderer<'_> {
                 canvas,
                 &layout_bottom_label,
                 RenderTextParams {
-                    color: &fg.clone().into(),
+                    color: &fg_color,
                     font_size,
                     max_width: layout_w as f32,
                     max_height: font_size.ceil() as u32,
@@ -202,7 +203,7 @@ impl Renderer<'_> {
                     canvas,
                     &top_label,
                     RenderTextParams {
-                        color: &fg.clone().into(),
+                        color: &fg_color,
                         font_size,
                         max_width: layer_cs.width as f32,
                         max_height: top_size.height,
@@ -260,7 +261,7 @@ impl Renderer<'_> {
                         canvas,
                         &bottom_label,
                         RenderTextParams {
-                            color: &fg.clone().into(),
+                            color: &fg_color,
                             font_size,
                             max_width: layer_cs.width as f32,
                             max_height: bottom_size.height,

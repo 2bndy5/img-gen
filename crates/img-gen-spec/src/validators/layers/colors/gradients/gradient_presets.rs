@@ -53,10 +53,7 @@ macro_rules! enumerate_specs {
 
             impl CreateGradient for $preset_name {
                 fn get_gradient(&self) -> Result<LinearGradient, GradientBuilderError> {
-                    let mut colors = vec![];
-                    for color in &self.colors {
-                        colors.push(color.as_str());
-                    }
+                    let colors: Vec<&str> = self.colors.iter().map(String::as_str).collect();
                     GradientBuilder::new().html_colors(&colors).domain(&self.domain).build::<LinearGradient>()
                 }
             }

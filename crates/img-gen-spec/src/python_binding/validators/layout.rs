@@ -128,12 +128,12 @@ impl Layout {
     /// Deserialize a `Layout` object from a YAML string.
     #[staticmethod]
     pub fn from_yaml_str(yaml_str: String) -> PyResult<Self> {
-        serde_saphyr::from_str(yaml_str.as_str()).map_err(|e| PyValueError::new_err(e.to_string()))
+        serde_saphyr::from_str(&yaml_str).map_err(|e| PyValueError::new_err(e.to_string()))
     }
 
     /// Deserialize a `Layout` object from a JSON string.
     #[staticmethod]
     pub fn from_json_str(yaml_str: String) -> PyResult<Self> {
-        serde_json::from_str(yaml_str.as_str()).map_err(|e| PyValueError::new_err(e.to_string()))
+        serde_json::from_str(&yaml_str).map_err(|e| PyValueError::new_err(e.to_string()))
     }
 }

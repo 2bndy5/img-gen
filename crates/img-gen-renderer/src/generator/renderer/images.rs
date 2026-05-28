@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use image::{
     ImageReader, RgbaImage,
@@ -74,15 +74,12 @@ impl Renderer<'_> {
         Ok(())
     }
 
-    fn find_image_path<'a>(&'a self, name: &'a str) -> Option<PathBuf> {
+    fn find_image_path<P: AsRef<Path>>(&self, name: P) -> Option<PathBuf> {
         for entry in self.image_search_paths {
-            if entry.is_file()
-                && let Some(path) = entry.to_str()
-                && path == name
-            {
+            if entry.is_file() && entry == name.as_ref() {
                 return Some(entry.to_path_buf());
             } else {
-                let path = entry.join(name);
+                let path = entry.join(&name);
                 if path.exists() {
                     return Some(path);
                 }
@@ -151,15 +148,16 @@ impl Renderer<'_> {
         preserve_aspect: PreserveAspect,
     ) -> Result<RgbaImage> {
         let tree = {
-            let svg_data = if PathBuf::from(&path).exists() {
-                std::fs::read(path).map_err(|source| ImgGenRendererError::ReadSvgFailed {
-                    path: path.to_string(),
-                    source,
-                })?
-            } else {
-                load_builtin_svg_pack(path)?.ok_or_else(|| ImgGenRendererError::ImageNotFound {
-                    name: path.to_string(),
-                })?
+            let svg_data = match load_builtin_svg_pack(path)? {
+                Some(data) => data,
+                None => {
+                    let svg_path = PathBuf::from(path).with_extension("svg");
+                    let p = self.find_image_path(&svg_path).unwrap_or(svg_path);
+                    std::fs::read(&p).map_err(|source| ImgGenRendererError::ReadSvgFailed {
+                        path: path.to_string(),
+                        source,
+                    })?
+                }
             };
             Tree::from_data(&svg_data, &self.svg_options).map_err(|source| {
                 ImgGenRendererError::ParseSvgFailed {

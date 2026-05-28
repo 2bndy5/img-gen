@@ -82,7 +82,7 @@ pub struct Rectangle {
 
     /// The radius of the rendered [`Rectangle::corners`].
     ///
-    /// The [`Generator`](struct@crate::Generator) will limit this value if it is
+    /// The renderer shall limit this value if it is
     /// greater than half the minimum of the rectangle's width or height
     /// (see [`Layer::size`](value@crate::Layer::size)).
     #[serde(default)]

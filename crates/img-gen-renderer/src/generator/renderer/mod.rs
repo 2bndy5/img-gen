@@ -27,11 +27,16 @@ pub struct Renderer<'a> {
     layout_cx: LayoutContext<typography::TextBrush>,
     scale_cx: ScaleContext,
     loaded_font_paths: HashSet<PathBuf>,
-    fontsource_client: FontSourceClient,
+    fontsource_client: &'a FontSourceClient,
+    image_search_paths: &'a [PathBuf],
 }
 
 impl<'a> Renderer<'a> {
-    pub fn new(options: Options<'a>, fontsource_client: FontSourceClient) -> Self {
+    pub fn new(
+        options: Options<'a>,
+        fontsource_client: &'a FontSourceClient,
+        image_search_paths: &'a [PathBuf],
+    ) -> Self {
         Renderer {
             svg_options: options,
             font_cx: FontContext::new(),
@@ -39,6 +44,7 @@ impl<'a> Renderer<'a> {
             scale_cx: ScaleContext::new(),
             loaded_font_paths: HashSet::new(),
             fontsource_client,
+            image_search_paths,
         }
     }
 

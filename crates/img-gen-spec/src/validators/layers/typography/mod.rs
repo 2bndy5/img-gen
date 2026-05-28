@@ -41,8 +41,6 @@ pub enum TypographyAlign {
 }
 
 /// An attribute to represent a [`Layer`](struct@crate::Layer)'s rendered text.
-///
-/// See [`LayerAttrKind::Typography`](type@crate::LayerAttrKind::Typography).
 #[cfg_attr(
     feature = "pyo3",
     pyclass(module = "img_gen", get_all, set_all, from_py_object)

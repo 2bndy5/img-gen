@@ -9,8 +9,6 @@ use super::{
 };
 
 /// An attribute to describe a [`Layer`]'s [`Mask`].
-///
-/// See [`LayerAttrKind::Mask`].
 #[cfg_attr(
     feature = "pyo3",
     pyclass(module = "img_gen", get_all, set_all, from_py_object)

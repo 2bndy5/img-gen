@@ -79,7 +79,7 @@ async fn render() {
         };
         layout.layers.push(layer);
     }
-    let generator = Generator { layout };
-    let img = generator.render().await.unwrap();
+    let generator = Generator::new(vec![], None).unwrap();
+    let img = generator.render(layout).await.unwrap();
     img.save("tests/out/test_polygon.png").unwrap();
 }

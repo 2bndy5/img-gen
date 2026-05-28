@@ -72,11 +72,8 @@ async fn render_shrink_to_fit() {
     };
 
     let layout = basic_layout(canvas_w, canvas_h, layer_w, layer_h, typography);
-    let generator = Generator { layout };
-    let img = generator
-        .render_with_cache_root(Some(support::typography_font_cache_root()))
-        .await
-        .unwrap();
+    let generator = Generator::new(vec![], Some(support::typography_font_cache_root())).unwrap();
+    let img = generator.render(layout).await.unwrap();
 
     img.save("tests/out/test_typography_shrink_to_fit.png")
         .unwrap();
@@ -137,11 +134,8 @@ async fn render_wrap_with_ellipsis() {
     };
 
     let layout = basic_layout(600, 400, layer_w, layer_h, typography);
-    let generator = Generator { layout };
-    let img = generator
-        .render_with_cache_root(Some(support::typography_font_cache_root()))
-        .await
-        .unwrap();
+    let generator = Generator::new(vec![], Some(support::typography_font_cache_root())).unwrap();
+    let img = generator.render(layout).await.unwrap();
 
     img.save("tests/out/test_typography_wrap_ellipsis.png")
         .unwrap();
@@ -166,11 +160,8 @@ async fn render_center() {
     };
 
     let layout = basic_layout(canvas_w, canvas_h, layer_w, layer_h, typography);
-    let generator = Generator { layout };
-    let img = generator
-        .render_with_cache_root(Some(support::typography_font_cache_root()))
-        .await
-        .unwrap();
+    let generator = Generator::new(vec![], Some(support::typography_font_cache_root())).unwrap();
+    let img = generator.render(layout).await.unwrap();
 
     img.save("tests/out/test_typography_center.png").unwrap();
 }
@@ -195,11 +186,8 @@ async fn render_end_bottom() {
     };
 
     let layout = basic_layout(canvas_w, canvas_h, layer_w, layer_h, typography);
-    let generator = Generator { layout };
-    let img = generator
-        .render_with_cache_root(Some(support::typography_font_cache_root()))
-        .await
-        .unwrap();
+    let generator = Generator::new(vec![], Some(support::typography_font_cache_root())).unwrap();
+    let img = generator.render(layout).await.unwrap();
     img.save("tests/out/test_typography_end_bottom.png")
         .unwrap();
 }

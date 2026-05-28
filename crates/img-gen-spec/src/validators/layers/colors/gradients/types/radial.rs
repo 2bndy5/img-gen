@@ -286,7 +286,7 @@ impl RadialGradient {
         self.clamp_focal_point();
     }
 
-    /// A helper function to [`Generator::render()`](fn@crate::Generator::render) behavior.
+    /// A helper function for renderers to get the color at a certain point.
     ///
     /// The given `x` and `y` values are the coordinate of the pixel in the `Layer`
     /// (relative to [`Layer::offset`](value@crate::Layer::offset)).

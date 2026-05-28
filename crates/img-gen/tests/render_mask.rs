@@ -52,7 +52,8 @@ fn mk_layout(inverted: bool) -> Layout {
 async fn render_mask() {
     let layout = mk_layout(false);
 
-    let img = Generator { layout }.render().await.unwrap();
+    let generator = Generator::new(vec![], None).unwrap();
+    let img = generator.render(layout).await.unwrap();
     assert_eq!(img.data.get_pixel(50, 50).0[3], 255);
     assert_eq!(img.data.get_pixel(10, 10).0[3], 0);
     img.save("tests/out/test_mask.png").unwrap();
@@ -62,7 +63,8 @@ async fn render_mask() {
 async fn render_mask_inverted() {
     let layout = mk_layout(true);
 
-    let img = Generator { layout }.render().await.unwrap();
+    let generator = Generator::new(vec![], None).unwrap();
+    let img = generator.render(layout).await.unwrap();
     assert_eq!(img.data.get_pixel(50, 50).0[3], 0);
     assert_eq!(img.data.get_pixel(10, 10).0[3], 255);
     img.save("tests/out/test_mask_inverted.png").unwrap();

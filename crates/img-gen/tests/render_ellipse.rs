@@ -63,8 +63,8 @@ async fn render() {
 
         layout.layers.push(layer);
     }
-    let generator = Generator { layout };
-    let img = generator.render().await.unwrap();
+    let generator = Generator::new(vec![], None).unwrap();
+    let img = generator.render(layout).await.unwrap();
     img.save("tests/out/test_ellipse.png").unwrap();
 }
 
@@ -114,7 +114,7 @@ async fn render_arcs() {
             ..Default::default()
         });
     }
-    let generator = Generator { layout };
-    let img = generator.render().await.unwrap();
+    let generator = Generator::new(vec![], None).unwrap();
+    let img = generator.render(layout).await.unwrap();
     img.save("tests/out/test_ellipse_arcs.png").unwrap();
 }

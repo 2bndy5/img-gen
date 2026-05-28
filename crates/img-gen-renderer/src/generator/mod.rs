@@ -3,9 +3,9 @@ use fontsource_downloader::FontSourceClient;
 use pyo3::prelude::*;
 
 use image::RgbaImage;
-use resvg::usvg::Options;
+use resvg::usvg::{Options, fontdb};
 use sha2::{Digest, Sha256};
-use std::{borrow::Cow, io::Read, path::PathBuf};
+use std::{borrow::Cow, io::Read, path::PathBuf, sync::Arc};
 
 use crate::{
     ImgGenRendererError, Layout, Result,
@@ -17,46 +17,63 @@ use renderer::Renderer;
 /// A class to represent an image generator.
 ///
 /// The given `Layout` describes how to generate the `Image`.
+///
+/// This struct caches the font database and font source client to avoid
+/// re-initializing them on every `render()` call.
 #[cfg_attr(feature = "pyo3", pyclass(module = "img_gen", from_py_object))]
 #[derive(Clone)]
 pub struct Generator {
-    pub layout: Layout,
+    pub image_search_paths: Vec<PathBuf>,
+    fontdb: Arc<fontdb::Database>,
+    fontsource_client: FontSourceClient,
+    pub cache_root: PathBuf,
 }
 
 impl Generator {
-    /// Render the `Image` described by the `Generator`'s `Layout`.
-    pub async fn render(&self) -> Result<Image> {
-        self.render_with_cache_root(None).await
+    /// Create a new `Generator` with the given image search paths.
+    ///
+    /// This initializes the font database (loading system fonts and fonts from the current directory)
+    /// and font source client once. These are cached and reused across all subsequent renders.
+    pub fn new(image_search_paths: Vec<PathBuf>, cache_root: Option<PathBuf>) -> Result<Self> {
+        let mut fontdb = fontdb::Database::new();
+        fontdb.load_system_fonts();
+
+        let (cache_root, fontsource_client) = if let Some(cache_root) = cache_root {
+            let client = FontSourceClient::with_cache_root(&cache_root)?;
+            (cache_root, client)
+        } else {
+            let client = FontSourceClient::new()?;
+            let cache_root = client.cache_root().to_path_buf();
+            (cache_root, client)
+        };
+
+        Ok(Generator {
+            image_search_paths,
+            fontdb: Arc::new(fontdb),
+            fontsource_client,
+            cache_root,
+        })
     }
 
-    /// Render while overriding the font cache root directory for this call.
-    pub async fn render_with_cache_root(&self, cache_root: Option<PathBuf>) -> Result<Image> {
+    /// Render the `Image` described by the `Generator`'s `Layout`.
+    pub async fn render(&self, layout: Layout) -> Result<Image> {
         let mut canvas = RgbaImage::new(
-            self.layout.size.width.unwrap_or(WIDTH).get(),
-            self.layout.size.height.unwrap_or(HEIGHT).get(),
+            layout.size.width.unwrap_or(WIDTH).get(),
+            layout.size.height.unwrap_or(HEIGHT).get(),
         );
-        let mut opt = Options {
-            // Get file's absolute directory.
-            // resources_dir: std::fs::canonicalize(&path)
-            //     .ok()
-            //     .and_then(|p| p.parent().map(|p| p.to_path_buf())),
+
+        // Create Options from the cached fontdb. This is cheap since we're just
+        // cloning Arcs and reusing the pre-loaded font database.
+        let opt = Options {
+            fontdb: self.fontdb.clone(),
             ..Default::default()
         };
 
-        opt.fontdb_mut().load_system_fonts();
-        opt.fontdb_mut().load_fonts_dir(".");
-
-        let fontsource_downloader = if let Some(root) = cache_root {
-            FontSourceClient::with_cache_root(root)
-        } else {
-            FontSourceClient::new()
-        }?;
-
-        let mut renderer = Renderer::new(opt, fontsource_downloader);
-        for layer in &self.layout.layers {
+        let mut renderer = Renderer::new(opt, &self.fontsource_client, &self.image_search_paths);
+        for layer in &layout.layers {
             renderer.render_layer(layer, &mut canvas).await?;
         }
-        renderer.render_debug(&self.layout, &mut canvas).await?;
+        renderer.render_debug(&layout, &mut canvas).await?;
         Ok(Image { data: canvas })
     }
 }

@@ -6,8 +6,6 @@ use pyo3::prelude::*;
 use serde::Deserialize;
 
 /// An attribute to describe a [`Layer`](struct@crate::Layer)'s [`Icon`].
-///
-/// See [`LayerAttrKind::Icon`](type@crate::LayerAttrKind::Icon).
 #[cfg_attr(
     feature = "pyo3",
     pyclass(module = "img_gen", get_all, set_all, from_py_object)
@@ -16,7 +14,7 @@ use serde::Deserialize;
 pub struct Icon {
     /// A path to an image file.
     ///
-    /// If the given image path does not exist or has no file extension, then
+    /// If the given image path has no file extension, then
     /// it will be treated as an SVG image.
     ///
     /// This also supports built-in SVG icons from the following icon packs:
@@ -25,6 +23,10 @@ pub struct Icon {
     /// - Simple Icons (``simple/{icon_slug}``)
     /// - Octicons (``octicons/{icon_slug}``)
     /// - FontAwesome Free (``fontawesome/<brands|solid|regular>/{icon_slug}``)
+    ///
+    /// Otherwise, the image file's path is resolved via a search through the list of
+    /// ``image_search_paths`` provided to the ``Generator`` (in `img_gen_renderer` crate),
+    /// which defaults to the current working directory if unspecified or an empty list.
     pub image: String,
     /// A color used to replace the [`Icon::image`]'s original coloring.
     pub color: Option<ColorKind>,

@@ -1,3 +1,4 @@
+from img_gen import Spread
 from pathlib import Path
 import pytest
 from img_gen import ColorKind
@@ -14,8 +15,8 @@ from img_gen import (
     Debug,
     Font,
     Generator,
-    SolidColor,
     Weight,
+    Presets,
 )
 
 CACHE_ROOT = Path(__file__).parent / "out" / "test_cache"
@@ -39,14 +40,11 @@ def basic_layout(
         layers=[],
         debug=Debug(
             enable=True,
-            color=SolidColor(85, 35, 0, 255),
             grid=False,
             grid_step=50,
         ),
     )
-    bg_layer = Layer(
-        background=Background(color=ColorKind.solid_color(255, 255, 255, 255))
-    )
+    bg_layer = Layer(background=Background(color=ColorKind.solid_color(0, 0, 0, 255)))
     layer = Layer(
         size=Size(layer_w, layer_h), offset=layer_offset, typography=typography
     )
@@ -55,7 +53,7 @@ def basic_layout(
 
 
 @pytest.mark.asyncio
-async def test_shrink_fit(tmp_path: Path):
+async def test_shrink_to_fit(tmp_path: Path):
     """`overflow = true`: font is shrunk until all text fits within the layer"""
     layer_w = 200
     layer_h = 60
@@ -64,13 +62,15 @@ async def test_shrink_fit(tmp_path: Path):
 
     typography = Typography(
         "All of this text must fit inside the small layer without being cut off.",
+        color=ColorKind.solid_color(255, 255, 255, 255),
         align=TypographyAlign.StartTop,
         line=Line(3, 1.0),
         overflow=True,  # shrink font to fit
     )
 
     layout = basic_layout(canvas_w, canvas_h, layer_w, layer_h, typography)
-    img = await Generator(layout).render(CACHE_ROOT)
+    generator = Generator(cache_root=CACHE_ROOT)
+    img = await generator.render(layout)
     img.save(str(tmp_path / "test_typography_shrink_to_fit.png"))
 
 
@@ -81,10 +81,26 @@ async def test_wrap_ellipsis(tmp_path: Path):
     rendered output stays within the layer height."""
     layer_w = 550
     layer_h = 350
+    canvas_w = 600
+    canvas_h = 400
+    gradient_start = Offset(
+        x=0,
+        y=int(layer_h / 2),
+    )
+    gradient_end = Offset(
+        x=int(layer_w / 2),
+        y=int(layer_h / 2),
+    )
 
     typography = Typography(
         "This sentence is intentionally very long so that it definitely overflows the small \
          layer height and must be truncated with an ellipsis at the end.",
+        color=ColorKind.linear_gradient(
+            gradient_start,
+            gradient_end,
+            preset=Presets.MillenniumPine,
+            spread=Spread.Reflect,
+        ),
         align=TypographyAlign.StartTop,
         line=Line(5, 1.2),
         overflow=False,  # wrap + ellipsis
@@ -96,13 +112,19 @@ async def test_wrap_ellipsis(tmp_path: Path):
             subset="latin",
         ),
         border=Border(
-            width=3,
-            color=ColorKind.solid_color(255, 0, 0, 255),
+            width=2,
+            color=ColorKind.linear_gradient(
+                gradient_start,
+                gradient_end,
+                preset=Presets.FabledSunset,
+                spread=Spread.Reflect,
+            ),
         ),
     )
 
-    layout = basic_layout(600, 400, layer_w, layer_h, typography)
-    img = await Generator(layout).render(CACHE_ROOT)
+    layout = basic_layout(canvas_w, canvas_h, layer_w, layer_h, typography)
+    generator = Generator(cache_root=CACHE_ROOT)
+    img = await generator.render(layout)
     img.save(str(tmp_path / "test_typography_wrap_ellipsis.png"))
 
 
@@ -116,13 +138,14 @@ async def test_center(tmp_path: Path):
     typography = Typography(
         "Center\nthis\ntext.",
         align=TypographyAlign.CenterCenter,
+        color=ColorKind.solid_color(255, 255, 255, 255),
         line=Line(3, 1.0),
         overflow=True,  # shrink font to fit
     )
 
     layout = basic_layout(canvas_w, canvas_h, layer_w, layer_h, typography)
-    img = await Generator(layout).render()
-
+    generator = Generator(cache_root=CACHE_ROOT)
+    img = await generator.render(layout)
     img.save(str(tmp_path / "test_typography_center.png"))
 
 
@@ -135,14 +158,15 @@ async def test_end_bottom(tmp_path: Path):
 
     typography = Typography(
         "This\nstarts at the `EndBottom`.",
+        color=ColorKind.solid_color(255, 255, 255, 255),
         align=TypographyAlign.EndBottom,
         line=Line(3, 1.0),
         overflow=True,  # shrink font to fit
     )
     layout = basic_layout(canvas_w, canvas_h, layer_w, layer_h, typography)
 
-    img = await Generator(layout).render(CACHE_ROOT)
-
+    generator = Generator(cache_root=CACHE_ROOT)
+    img = await generator.render(layout)
     img.save(str(tmp_path / "test_typography_end_bottom.png"))
 
 

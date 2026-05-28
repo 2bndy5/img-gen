@@ -26,9 +26,9 @@ impl Renderer<'_> {
             // load image data
             if let Some(i) = &l.image {
                 img = Some(if maybe_builtin_svg(i) {
-                    self.load_svg(i.clone(), size, l.preserve_aspect)?
+                    self.load_svg(i.as_str(), size, l.preserve_aspect)?
                 } else {
-                    Self::load_image(i.clone(), size, l.preserve_aspect)?
+                    self.load_image(i.as_str(), size, l.preserve_aspect)?
                 });
             }
 
@@ -59,9 +59,9 @@ impl Renderer<'_> {
         if let Some(l) = layer.icon.as_ref() {
             // load image data
             let mut img = if maybe_builtin_svg(l.image.as_str()) {
-                self.load_svg(l.image.clone(), size, l.preserve_aspect)?
+                self.load_svg(l.image.as_str(), size, l.preserve_aspect)?
             } else {
-                Self::load_image(l.image.clone(), size, l.preserve_aspect)?
+                self.load_image(l.image.as_str(), size, l.preserve_aspect)?
             };
 
             // colorize
@@ -74,19 +74,38 @@ impl Renderer<'_> {
         Ok(())
     }
 
+    fn find_image_path<'a>(&'a self, name: &'a str) -> Option<PathBuf> {
+        for entry in self.image_search_paths {
+            if entry.is_file()
+                && let Some(path) = entry.to_str()
+                && path == name
+            {
+                return Some(entry.to_path_buf());
+            } else {
+                let path = entry.join(name);
+                if path.exists() {
+                    return Some(path);
+                }
+            }
+        }
+        None
+    }
+
     fn load_image(
-        path: String,
+        &self,
+        path: &str,
         size: ConcreteSize,
         preserve_aspect: PreserveAspect,
     ) -> Result<RgbaImage> {
-        let mut buf = ImageReader::open(path.clone())
+        let resolved_path = self.find_image_path(path).unwrap_or(PathBuf::from(path));
+        let mut buf = ImageReader::open(&resolved_path)
             .map_err(|source| ImgGenRendererError::OpenImageFailed {
-                path: path.clone(),
+                path: path.to_string(),
                 source,
             })?
             .decode()
             .map_err(|source| ImgGenRendererError::DecodeImageFailed {
-                path: path.clone(),
+                path: path.to_string(),
                 source,
             })?;
         let width = size.width;
@@ -127,23 +146,24 @@ impl Renderer<'_> {
 
     fn load_svg(
         &self,
-        path: String,
+        path: &str,
         size: ConcreteSize,
         preserve_aspect: PreserveAspect,
     ) -> Result<RgbaImage> {
         let tree = {
             let svg_data = if PathBuf::from(&path).exists() {
-                std::fs::read(&path).map_err(|source| ImgGenRendererError::ReadSvgFailed {
-                    path: path.clone(),
+                std::fs::read(path).map_err(|source| ImgGenRendererError::ReadSvgFailed {
+                    path: path.to_string(),
                     source,
                 })?
             } else {
-                load_builtin_svg_pack(&path)?
-                    .ok_or_else(|| ImgGenRendererError::ImageNotFound { name: path.clone() })?
+                load_builtin_svg_pack(path)?.ok_or_else(|| ImgGenRendererError::ImageNotFound {
+                    name: path.to_string(),
+                })?
             };
             Tree::from_data(&svg_data, &self.svg_options).map_err(|source| {
                 ImgGenRendererError::ParseSvgFailed {
-                    path: path.clone(),
+                    path: path.to_string(),
                     source,
                 }
             })?
@@ -176,7 +196,9 @@ impl Renderer<'_> {
             }
         };
         let mut pixmap = Pixmap::new((og_width * scale_x) as u32, (og_height * scale_y) as u32)
-            .ok_or(ImgGenRendererError::SvgScaledToZeroSize { path: path.clone() })?;
+            .ok_or(ImgGenRendererError::SvgScaledToZeroSize {
+                path: path.to_string(),
+            })?;
         resvg::render(
             &tree,
             Transform::from_scale(scale_x, scale_y),

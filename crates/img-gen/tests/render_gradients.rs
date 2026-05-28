@@ -51,8 +51,8 @@ async fn linear_gradient(spread: Spread) {
         };
         layout.layers.push(layer);
     }
-    let generator = Generator { layout };
-    let img = generator.render().await.unwrap();
+    let generator = Generator::new(vec![], None).unwrap();
+    let img = generator.render(layout).await.unwrap();
     img.save(format!("tests/out/linear_gradient[{}].png", spread).as_str())
         .unwrap();
 }
@@ -116,8 +116,8 @@ async fn radial_gradient(spread: Spread) {
         layout.layers.push(layer);
     }
 
-    let generator = Generator { layout };
-    let img = generator.render().await.unwrap();
+    let generator = Generator::new(vec![], None).unwrap();
+    let img = generator.render(layout).await.unwrap();
     img.save(format!("tests/out/radial_gradient[{}].png", spread).as_str())
         .unwrap();
 }
@@ -174,7 +174,7 @@ async fn conical_gradient() {
         };
         layout.layers.push(layer);
     }
-    let generator = Generator { layout };
-    let img = generator.render().await.unwrap();
+    let generator = Generator::new(vec![], None).unwrap();
+    let img = generator.render(layout).await.unwrap();
     img.save("tests/out/conical_gradient.png").unwrap();
 }

@@ -47,5 +47,6 @@ def mk_layout(inverted: bool) -> Layout:
 async def test_mask(tmp_path: Path, inverted: bool):
     layout = mk_layout(inverted)
 
-    img = await Generator(layout).render()
+    gen = Generator()
+    img = await gen.render(layout)
     img.save(str(tmp_path / "test_mask.png"))

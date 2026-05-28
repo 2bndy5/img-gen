@@ -52,8 +52,8 @@ async def test_background(image: Path, tmp_path: Path):
                 ),
             )
         )
-    gen = Generator(layout)
-    img = await gen.render()
+    gen = Generator()
+    img = await gen.render(layout)
     img.save(str(tmp_path / f"img_test_{image.suffix.lstrip('.')}.png"))
 
 
@@ -78,6 +78,6 @@ async def test_icon(image: Path, tmp_path: Path):
                 ),
             )
         )
-    gen = Generator(layout)
-    img = await gen.render()
+    gen = Generator()
+    img = await gen.render(layout)
     img.save(str(tmp_path / f"img_test_{image.suffix.lstrip('.')}.png"))

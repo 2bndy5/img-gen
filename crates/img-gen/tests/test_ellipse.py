@@ -41,8 +41,8 @@ async def test_ellipse(tmp_path: Path, border_width: int):
                 ),
             )
         )
-    gen = Generator(layout)
-    img = await gen.render()
+    gen = Generator()
+    img = await gen.render(layout)
     img.save(str(tmp_path / "test_ellipse.png"))
 
 
@@ -77,6 +77,6 @@ async def test_ellipse_arcs(tmp_path: Path):
                 ),
             )
         )
-    gen = Generator(layout)
-    img = await gen.render()
+    gen = Generator()
+    img = await gen.render(layout)
     img.save(str(tmp_path / "test_ellipse_arcs.png"))

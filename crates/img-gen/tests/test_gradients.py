@@ -44,8 +44,8 @@ async def test_linear_gradient(spread: Spread, tmp_path: Path):
                 ),
             )
         )
-    gen = Generator(layout)
-    img = await gen.render()
+    gen = Generator()
+    img = await gen.render(layout)
     img.save(str(tmp_path / f"gradient_test_{str(spread)}.png"))
 
 
@@ -72,8 +72,8 @@ async def test_conical_gradient(tmp_path: Path):
                 ),
             )
         )
-    gen = Generator(layout)
-    img = await gen.render()
+    gen = Generator()
+    img = await gen.render(layout)
     img_bytes = img.bytes
     assert isinstance(img_bytes, bytes)
     img_hash = hashlib.sha256(img_bytes).hexdigest()
@@ -109,6 +109,6 @@ async def test_radial_gradient(spread: Spread, tmp_path: Path):
                 ),
             )
         )
-    gen = Generator(layout)
-    img = await gen.render()
+    gen = Generator()
+    img = await gen.render(layout)
     img.save(str(tmp_path / f"gradient_test_{str(spread)}.png"))

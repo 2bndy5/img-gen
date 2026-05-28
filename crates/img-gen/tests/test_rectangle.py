@@ -47,6 +47,6 @@ async def test_rectangle(tmp_path: Path, border_width: int):
                 ),
             )
         )
-    gen = Generator(layout)
-    img = await gen.render()
+    gen = Generator()
+    img = await gen.render(layout)
     img.save(str(tmp_path / "test_rectangle.png"))

@@ -9,25 +9,28 @@ use std::{borrow::Cow, path::PathBuf};
 impl Generator {
     /// Instantiate a `Generator` object for a given `layout`.
     #[new]
-    #[pyo3(text_signature = "(layout: Layout) -> Generator")]
-    pub fn new(layout: Layout) -> Self {
-        Generator { layout }
+    #[pyo3(
+        text_signature = "(img_search_paths: list[Path] | None = None, cache_root: Path | None = None) -> Generator",
+        signature = (img_search_paths=None, cache_root=None)
+    )]
+    pub fn new_py(
+        img_search_paths: Option<Vec<PathBuf>>,
+        cache_root: Option<PathBuf>,
+    ) -> PyResult<Self> {
+        Generator::new(img_search_paths.unwrap_or_default(), cache_root)
+            .map_err(|e| PyOSError::new_err(format!("{e:?}")))
     }
 
     /// Render the layout and return the `Image`.
     #[pyo3(
         name = "render",
-        text_signature = "(cache_root: Path | None = None) -> Image",
-        signature = (cache_root=None)
+        text_signature = "(layout: Layout) -> Image",
+        signature = (layout)
     )]
-    pub fn render_py<'py>(
-        &self,
-        py: Python<'py>,
-        cache_root: Option<PathBuf>,
-    ) -> PyResult<Bound<'py, PyAny>> {
+    pub fn render_py<'py>(&self, py: Python<'py>, layout: Layout) -> PyResult<Bound<'py, PyAny>> {
         let this = self.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            this.render_with_cache_root(cache_root)
+            this.render(layout)
                 .await
                 .map_err(|e| PyOSError::new_err(format!("{e:?}")))
         })

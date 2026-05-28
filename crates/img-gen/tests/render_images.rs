@@ -71,8 +71,8 @@ async fn render_background_png() {
         ],
         debug: None,
     };
-    let generator = Generator { layout };
-    let img = generator.render().await.unwrap();
+    let generator = Generator::new(vec![], None).unwrap();
+    let img = generator.render(layout).await.unwrap();
     img.save("tests/out/test_background[png].png").unwrap();
 }
 
@@ -143,8 +143,8 @@ async fn render_background_svg() {
         ],
         debug: None,
     };
-    let generator = Generator { layout };
-    let img = generator.render().await.unwrap();
+    let generator = Generator::new(vec![], None).unwrap();
+    let img = generator.render(layout).await.unwrap();
     img.save("tests/out/test_background[svg].png").unwrap();
 }
 
@@ -215,8 +215,8 @@ async fn render_icon_png() {
         ],
         debug: None,
     };
-    let generator = Generator { layout };
-    let img = generator.render().await.unwrap();
+    let generator = Generator::new(vec![], None).unwrap();
+    let img = generator.render(layout).await.unwrap();
     img.save("tests/out/test_icon[png].png").unwrap();
 }
 
@@ -287,8 +287,8 @@ async fn render_icon_svg() {
         ],
         debug: None,
     };
-    let generator = Generator { layout };
-    let img = generator.render().await.unwrap();
+    let generator = Generator::new(vec![], None).unwrap();
+    let img = generator.render(layout).await.unwrap();
     img.save("tests/out/test_icon[svg].png").unwrap();
 }
 
@@ -333,7 +333,7 @@ async fn render_builtin_svg() {
         };
         layout.layers.push(layer);
     }
-    let generator = Generator { layout };
-    let img = generator.render().await.unwrap();
+    let generator = Generator::new(vec![], None).unwrap();
+    let img = generator.render(layout).await.unwrap();
     img.save("tests/out/render_builtin_icons.png").unwrap();
 }

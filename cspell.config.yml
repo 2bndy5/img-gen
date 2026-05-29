@@ -21,7 +21,9 @@ words:
   - consts
   - Deque
   - Doherty
+  - elif
   - endfor
+  - fontconfig
   - fontdb
   - fontique
   - fontsource
@@ -32,6 +34,7 @@ words:
   - Inei
   - intersphinx
   - Itmeo
+  - libfontconfig
   - Malinka
   - manylinux
   - maturin

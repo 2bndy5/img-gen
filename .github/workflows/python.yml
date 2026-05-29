@@ -81,6 +81,7 @@ jobs:
                 elif command -v dnf &> /dev/null; then
                   echo "Detected Fedora/RHEL system. Installing via dnf..."
                   sudo dnf install -y fontconfig-devel
+                fi
                 ;;
             esac
           # spell-checker: enable
@@ -128,6 +129,7 @@ jobs:
             elif command -v dnf &> /dev/null; then
               echo "Detected Fedora/RHEL system. Installing via dnf..."
               sudo dnf install -y fontconfig-devel
+            fi
       - name: Upload wheels
         uses: actions/upload-artifact@v5
         with:
@@ -230,6 +232,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: cargo binstall -y nur
+      - name: Install fontconfig
+        if: runner.os == 'Linux'
+        run: |-
+          sudo apt-get update
+          sudo apt-get install libfontconfig1-dev
       - name: Run tests
         run: nur test py
 

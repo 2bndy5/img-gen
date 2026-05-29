@@ -32,11 +32,16 @@ jobs:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
+      - run: rustup update --no-self-update
       - name: Cache cargo artifacts
         uses: actions/cache@v5.0.5 # zizmor: ignore[cache-poisoning]
         with:
           path: "~/.cargo"
           key: cargo-lint-${{ hashFiles('Cargo.lock') }}
+      - name: Install fontconfig
+        run: |-
+          sudo apt-get update
+          sudo apt-get install libfontconfig1-dev
       - run: cargo clippy --all-features -- -D warnings
       - run: cargo fmt --check
 

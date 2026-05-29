@@ -24,6 +24,7 @@ features = ["pyo3"]
 files = ["img_gen.pyi", "tests/**/*.py"]
 
 [tool.pytest.ini_options]
+# spell-checker: disable-next-line
 minversion = "6.0"
 addopts = "-vv --durations=5"
 

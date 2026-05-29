@@ -119,6 +119,7 @@ impl Renderer<'_> {
             } else {
                 // Full ellipse as before.
                 let path = PathBuilder::from_oval(
+                    // spell-checker: disable-next-line
                     Rect::from_xywh(
                         inset,
                         inset,

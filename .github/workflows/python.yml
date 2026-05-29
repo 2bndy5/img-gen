@@ -3,16 +3,20 @@
 #
 #    maturin generate-ci github
 #
-name: build
+name: Python
 
 on:
   push:
     branches: [main]
-    tags: ['v*']
+    tags: ['img-gen-py/v*']
   pull_request:
     branches: [main]
 
 permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' && !startsWith(github.ref, 'refs/tags/') }}
 
 jobs:
   linux:
@@ -43,9 +47,32 @@ jobs:
         uses: PyO3/maturin-action@86b9d133d34bc1b40018696f782949dac11bd380 # v1.49.4
         with:
           target: ${{ matrix.platform.target }}
-          args: --release --out dist --find-interpreter
+          # Use the zig toolchain for all targets except ppc64le.
+          # Note, this is meant to avoid build errors in aws-lc-sys crate, which compiles C code.
+          # For using reqwest v0.13 with `default-tls` feature.
+          args: >-
+            --release --out dist --find-interpreter
+            ${{ matrix.platform.target != 'ppc64le' && '--zig' || ''}}
           sccache: ${{ !startsWith(github.ref, 'refs/tags/v') }} # zizmor: ignore[cache-poisoning]
           manylinux: auto
+          # here we either install the ppc64le compiler/toolchain or install zig on all others
+          # spell-checker: disable
+          before-script-linux: |
+            case "${{ matrix.platform.target }}" in
+              ppc64le)
+                apt-get update
+                apt-get install -y \
+                  pkg-config \
+                  gcc-powerpc64le-linux-gnu \
+                  g++-powerpc64le-linux-gnu \
+                  binutils-powerpc64le-linux-gnu \
+                  libc6-dev-ppc64el-cross
+                ;;
+              *)
+                pip install ziglang
+                ;;
+            esac
+          # spell-checker: enable
       - name: Upload wheels
         uses: actions/upload-artifact@v5
         with:
@@ -158,11 +185,36 @@ jobs:
         with:
           name: wheels-sdist
           path: dist
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - run: rustup update
+      - uses: actions/setup-python@v6
+        id: python-setup
+        with:
+          python-version: 3.x
+      - uses: astral-sh/setup-uv@5a7eac68fb9809dea845d802897dc5c723910fa3 # v7.1.3
+        with:
+          python-version: ${{ steps.python-setup.outputs.python-version }}
+      - uses: cargo-bins/cargo-binstall@ae04fb5e853ae6cd3ad7de4a1d554a8b646d12aa # v1.15.11
+      - name: Install nur
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: cargo binstall -y nur
+      - name: Run tests
+        run: nur test py
 
   release:
     name: Release
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: startsWith(github.ref, 'refs/tags/img-gen-py/v')
     needs: [linux, musllinux, windows, macos, sdist]
     permissions:
       id-token: write
@@ -176,3 +228,21 @@ jobs:
         uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # v1.13.0
         with:
           skip-existing: true
+
+  check-dist:
+    needs: [linux, musllinux, windows, macos, sdist]
+    if: ${{ !startsWith(github.ref, 'refs/tags/img-gen-py/v') }}
+    name: Check package dist
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v6
+        with:
+          pattern: wheels-*
+          path: dist
+          merge-multiple: true
+      - uses: actions/setup-python@v6
+        with:
+          python-version: 3.x
+      - name: Check distributions
+        # spell-checker: disable-next-line
+        run: pipx twine check dist/*

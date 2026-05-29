@@ -1,41 +1,4 @@
-
-
-def --wrapped run-cmd [...cmd: string] {
-    let app = if (
-        ($cmd | first) == 'cargo'
-        or ($cmd | first) == 'yarn'
-    ) {
-        ($cmd | first 2) | str join ' '
-    } else if ($cmd | first) == 'uv' {
-        mut sub_cmd = $cmd.1
-        if ($sub_cmd == 'run') {
-            # filter out options to `uv run`
-            mut is_opt = false
-            for arg in ($cmd | skip 2) {
-                if ($arg | str starts-with '--') {
-                    $is_opt = true
-                } else if $is_opt {
-                    # does not begin with '--' but the previous arg did.
-                    # toggle flag off and skip this arg
-                    $is_opt = false
-                } else {
-                    # found the `uv run <command>`
-                    $sub_cmd = $arg
-                    break
-                }
-            }
-            $sub_cmd
-        } else {
-            ($cmd | first 2) | str join ' '
-        }
-    } else {
-        ($cmd | first)
-    }
-    print $"(ansi blue)\nRunning(ansi reset) ($cmd | str join ' ')"
-    let elapsed = timeit {|| ^($cmd | first) ...($cmd | skip 1)}
-    print $"(ansi magenta)($app) took ($elapsed)(ansi reset)"
-}
-
+use ".github/common.nu" run-cmd
 
 # Test Python binding.
 #

@@ -26,6 +26,7 @@ words:
   - fontique
   - fontsource
   - fract
+  - hustcer
   - HWBA
   - imageops
   - Inei
@@ -34,8 +35,6 @@ words:
   - Malinka
   - manylinux
   - maturin
-  - minijinja
-  - minversion
   - musllinux
   - mypy
   - Nega
@@ -43,7 +42,7 @@ words:
   - Palo
   - peekable
   - Pixmap
-  - proto
+  - pkgs
   - pyclass
   - pymethods
   - pymodule
@@ -66,15 +65,11 @@ words:
   - skrifa
   - staticmethod
   - struct
-  - tera
   - thiserror
-  - timeit
-  - tlsv
   - toctree
   - usvg
   - venv
   - webgradients
-  - xywh
   - zizmor
 ignorePaths:
   - node_modules/**

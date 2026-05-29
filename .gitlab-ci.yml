@@ -26,6 +26,7 @@ test:cargo:
       # Get host target
       host=$(rustc -vV | grep '^host:' | cut -d' ' -f2)
       # Download binary and install to $HOME/.cargo/bin
+      # spell-checker: disable-next-line
       curl --proto '=https' --tlsv1.2 -fsSL https://github.com/taiki-e/cargo-llvm-cov/releases/latest/download/cargo-llvm-cov-$host.tar.gz | tar xzf - -C "${CARGO_HOME:-~/.cargo}/bin"
   script:
     - rustc --version && cargo --version  # Print version info for debugging

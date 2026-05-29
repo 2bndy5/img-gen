@@ -53,12 +53,12 @@ const COMMON_EXCLUDES = [
 
 const PkgPaths = {
     'img-gen': {
-        include: ['crates/img-gen/**/*']
+        include: ['crates/**/*']
         exclude: [...$COMMON_EXCLUDES]
-        path: 'img-gen'
+        path: 'crates/img-gen'
     },
     'img-gen-py': {
-        include: []
+        include: ['crates/**/*']
         exclude: [...$COMMON_EXCLUDES]
         path: 'crates/img-gen'
     },
@@ -70,6 +70,7 @@ const PkgPaths = {
     'img-gen-renderer': {
         include: ['crates/img-gen-renderer/**/*']
         exclude: [...$COMMON_EXCLUDES]
+        path: 'crates/img-gen-renderer'
     },
 }
 
@@ -87,9 +88,7 @@ export def get-changed-pkgs [] {
         let pkg = $row.column0
         let paths = $row.column1
         print $"Checking changes for ($pkg)..."
-        let has_changed = if ($paths.include | is-empty) {
-            true
-        } else {
+        let has_changed = if ($paths.include | is-empty) { true } else {
             $changed_files | any {|file| $paths.include | each {|p| glob $p | any {|g| $g == $file}}}
         }
         print $"  Has changes: ($has_changed)"

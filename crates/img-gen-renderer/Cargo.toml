@@ -10,6 +10,7 @@ repository = { workspace = true }
 homepage = { workspace = true }
 
 [dependencies]
+directories = "6.0"
 fontawesome-free-pack = "7.2.0"
 fontsource_downloader = { workspace = true }
 image = "0.25.10"

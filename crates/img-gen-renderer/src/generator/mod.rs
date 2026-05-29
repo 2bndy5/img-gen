@@ -1,3 +1,4 @@
+use directories::ProjectDirs;
 use fontsource_downloader::FontSourceClient;
 #[cfg(feature = "pyo3")]
 use pyo3::prelude::*;
@@ -42,14 +43,15 @@ impl Generator {
     pub fn new(image_search_paths: Vec<PathBuf>, cache_root: Option<PathBuf>) -> Result<Self> {
         let fontdb = fontdb::Database::new();
 
-        let (cache_root, fontsource_client) = if let Some(cache_root) = cache_root {
-            let client = FontSourceClient::with_cache_root(&cache_root)?;
-            (cache_root, client)
-        } else {
-            let client = FontSourceClient::new()?;
-            let cache_root = client.cache_root().to_path_buf();
-            (cache_root, client)
-        };
+        let cache_root = cache_root
+            .or_else(|| {
+                // Keep font downloads under img-gen's app cache by default.
+                ProjectDirs::from("", "2bndy5", "img-gen")
+                    .map(|dirs| dirs.cache_dir().to_path_buf())
+            })
+            .unwrap_or_else(|| PathBuf::from(".img-gen-cache"));
+
+        let fontsource_client = FontSourceClient::with_cache_root(&cache_root)?;
 
         Ok(Generator {
             image_search_paths,

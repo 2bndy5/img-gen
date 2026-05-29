@@ -1,5 +1,6 @@
 mod debug;
 mod ellipse;
+pub(super) mod fonts;
 mod images;
 mod mask;
 mod polygon;
@@ -172,11 +173,11 @@ impl<'a> Renderer<'a> {
         canvas: &mut RgbaImage,
     ) -> Result<()> {
         // Render layer attributes in order of priority.
-        self.render_background(layer, size, canvas)?;
+        self.render_background(layer, size, canvas).await?;
         self.render_rectangle(layer, size, canvas)?;
         self.render_ellipse(layer, size, canvas)?;
         self.render_polygon(layer, size, canvas)?;
-        self.render_icon(layer, size, canvas)?;
+        self.render_icon(layer, size, canvas).await?;
         self.render_typography(layer, size, canvas).await?;
         Ok(())
     }

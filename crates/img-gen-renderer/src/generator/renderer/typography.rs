@@ -1,27 +1,18 @@
-use super::{ConcreteSize, Renderer};
+use super::{ConcreteSize, Renderer, fonts::to_font_query};
 use crate::{
     Border, ColorKind, Font, ImgGenRendererError, Layer, LayerOffset, Line, Result, TypographyAlign,
 };
-use fontsource_downloader::{FontQuery, QueryBuilder, Weight};
 use image::{RgbaImage, imageops::overlay};
 use parley::{
     Alignment, AlignmentOptions, GenericFamily, GlyphRun, Layout, LineHeight, OverflowWrap,
     PositionedLayoutItem, StyleProperty, TextWrapMode, fontique::Blob,
 };
 use resvg::tiny_skia::Color;
-use std::{collections::VecDeque, fs, path::Path};
+use std::{collections::VecDeque, fs, path::Path, sync::Arc};
 use swash::{
     scale::{Render, ScaleContext, Source, StrikeWith},
     zeno::{Format, Vector},
 };
-
-fn to_font_query(font: &Font) -> FontQuery {
-    QueryBuilder::new(&font.family)
-        .with_style(&font.style)
-        .with_weight(Weight::from(&font.weight))
-        .with_subset(&font.subset)
-        .build()
-}
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub(super) struct TextBrush {
@@ -425,7 +416,7 @@ impl Renderer<'_> {
         Ok(())
     }
 
-    fn register_font_path(&mut self, path: &Path) -> Result<()> {
+    pub(super) fn register_font_path(&mut self, path: &Path) -> Result<()> {
         let canonical_path = fs::canonicalize(path).unwrap_or_else(|_| path.to_path_buf());
         if self.loaded_font_paths.contains(&canonical_path) {
             return Ok(());
@@ -439,7 +430,8 @@ impl Renderer<'_> {
         })?;
         self.font_cx
             .collection
-            .register_fonts(Blob::from(font_data), None);
+            .register_fonts(Blob::from(font_data.clone()), None);
+        Arc::make_mut(&mut self.svg_options.fontdb).load_font_data(font_data);
         self.loaded_font_paths.insert(canonical_path);
         Ok(())
     }

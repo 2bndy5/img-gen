@@ -106,7 +106,6 @@ async fn render_wrap_with_ellipsis() {
         },
         overflow: false, // wrap + ellipsis
         font: Font {
-            // spell-checker: disable-next-line
             family: "Playfair Display".to_string(),
             weight: Weight::Regular,
             style: "normal".to_string(),

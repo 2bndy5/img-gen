@@ -23,7 +23,7 @@ words:
   - Doherty
   - elif
   - endfor
-  - fontconfig
+  - Fira
   - fontdb
   - fontique
   - fontsource
@@ -46,6 +46,7 @@ words:
   - peekable
   - Pixmap
   - pkgs
+  - Playfair
   - pyclass
   - pymethods
   - pymodule
@@ -57,6 +58,7 @@ words:
   - Retrowave
   - rgba
   - Roboto
+  - roxmltree
   - rustc
   - rustup
   - saphyr
@@ -73,6 +75,7 @@ words:
   - usvg
   - venv
   - webgradients
+  - xmltree
   - zizmor
 ignorePaths:
   - node_modules/**
@@ -83,3 +86,4 @@ ignorePaths:
   - env/**
   - .gitignore
   - .gitattributes
+  - crates/img-gen/tests/asset-webfont.svg

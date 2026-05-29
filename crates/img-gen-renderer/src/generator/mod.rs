@@ -37,11 +37,10 @@ pub struct Generator {
 impl Generator {
     /// Create a new `Generator` with the given image search paths.
     ///
-    /// This initializes the font database (loading system fonts and fonts from the current directory)
-    /// and font source client once. These are cached and reused across all subsequent renders.
+    /// This initializes the shared font database and font source client once.
+    /// Both are cached in-memory and reused across all subsequent renders.
     pub fn new(image_search_paths: Vec<PathBuf>, cache_root: Option<PathBuf>) -> Result<Self> {
-        let mut fontdb = fontdb::Database::new();
-        fontdb.load_system_fonts();
+        let fontdb = fontdb::Database::new();
 
         let (cache_root, fontsource_client) = if let Some(cache_root) = cache_root {
             let client = FontSourceClient::with_cache_root(&cache_root)?;

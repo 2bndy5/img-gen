@@ -105,7 +105,6 @@ async def test_wrap_ellipsis(tmp_path: Path):
         line=Line(5, 1.2),
         overflow=False,  # wrap + ellipsis
         font=Font(
-            # spell-checker: disable-next-line
             family="Playfair Display",
             weight=Weight.Regular,
             style="normal",

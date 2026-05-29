@@ -1,4 +1,7 @@
-use std::path::{Path, PathBuf};
+use std::{
+    collections::HashSet,
+    path::{Path, PathBuf},
+};
 
 use image::{
     ImageReader, RgbaImage,
@@ -6,7 +9,7 @@ use image::{
 };
 use resvg::{
     tiny_skia::{Pixmap, Transform},
-    usvg::Tree,
+    usvg::{Tree, roxmltree},
 };
 
 use crate::{ImgGenRendererError, Layer, PreserveAspect, Result};
@@ -14,8 +17,8 @@ use crate::{ImgGenRendererError, Layer, PreserveAspect, Result};
 use super::{ConcreteSize, Renderer};
 
 impl Renderer<'_> {
-    pub fn render_background(
-        &self,
+    pub async fn render_background(
+        &mut self,
         layer: &Layer,
         size: ConcreteSize,
         canvas: &mut RgbaImage,
@@ -26,7 +29,7 @@ impl Renderer<'_> {
             // load image data
             if let Some(i) = &l.image {
                 img = Some(if maybe_builtin_svg(i) {
-                    self.load_svg(i, size, l.preserve_aspect)?
+                    self.load_svg(i, size, l.preserve_aspect).await?
                 } else {
                     self.load_image(i, size, l.preserve_aspect)?
                 });
@@ -50,8 +53,8 @@ impl Renderer<'_> {
         Ok(())
     }
 
-    pub fn render_icon(
-        &self,
+    pub async fn render_icon(
+        &mut self,
         layer: &Layer,
         size: ConcreteSize,
         canvas: &mut RgbaImage,
@@ -59,7 +62,7 @@ impl Renderer<'_> {
         if let Some(l) = layer.icon.as_ref() {
             // load image data
             let mut img = if maybe_builtin_svg(&l.image) {
-                self.load_svg(&l.image, size, l.preserve_aspect)?
+                self.load_svg(&l.image, size, l.preserve_aspect).await?
             } else {
                 self.load_image(&l.image, size, l.preserve_aspect)?
             };
@@ -141,8 +144,30 @@ impl Renderer<'_> {
         Ok(img)
     }
 
-    fn load_svg(
-        &self,
+    async fn prefetch_svg_fonts<'a>(
+        &mut self,
+        svg_data: &'a str,
+        path: &str,
+    ) -> Result<(roxmltree::Document<'a>, HashSet<String>)> {
+        let (doc, families) = super::fonts::extract_fonts_from_svg(svg_data).map_err(|source| {
+            ImgGenRendererError::ParseSvgXmlFailed {
+                path: path.to_string(),
+                source,
+            }
+        })?;
+        for family in &families {
+            let font = crate::Font::from_family_style(family.to_string(), None);
+            let query = super::fonts::to_font_query(&font);
+            let downloaded_paths = self.fontsource_client.download_font(&query).await?;
+            for path in &downloaded_paths {
+                self.register_font_path(path)?;
+            }
+        }
+        Ok((doc, families))
+    }
+
+    async fn load_svg(
+        &mut self,
         path: &str,
         size: ConcreteSize,
         preserve_aspect: PreserveAspect,
@@ -153,13 +178,16 @@ impl Renderer<'_> {
                 None => {
                     let svg_path = PathBuf::from(path).with_extension("svg");
                     let p = self.find_image_path(&svg_path).unwrap_or(svg_path);
-                    std::fs::read(&p).map_err(|source| ImgGenRendererError::ReadSvgFailed {
-                        path: path.to_string(),
-                        source,
+                    &std::fs::read_to_string(&p).map_err(|source| {
+                        ImgGenRendererError::ReadSvgFailed {
+                            path: path.to_string(),
+                            source,
+                        }
                     })?
                 }
             };
-            Tree::from_data(&svg_data, &self.svg_options).map_err(|source| {
+            let (svg_doc, _font_families) = self.prefetch_svg_fonts(svg_data, path).await?;
+            Tree::from_xmltree(&svg_doc, &self.svg_options).map_err(|source| {
                 ImgGenRendererError::ParseSvgFailed {
                     path: path.to_string(),
                     source,
@@ -228,7 +256,7 @@ fn maybe_builtin_svg(name: &str) -> bool {
     }
 }
 
-fn load_builtin_svg_pack(name: &str) -> Result<Option<Vec<u8>>> {
+fn load_builtin_svg_pack(name: &str) -> Result<Option<&str>> {
     if let Some((icon_pkg, slug)) = name.split_once('/') {
         let svg_str = match icon_pkg {
             "material" => material_design_icons_pack::get_icon(slug).map(|v| v.svg),
@@ -237,7 +265,7 @@ fn load_builtin_svg_pack(name: &str) -> Result<Option<Vec<u8>>> {
             "fontawesome" => fontawesome_free_pack::get_icon(slug).map(|v| v.svg),
             _ => None,
         };
-        return Ok(svg_str.map(|s| s.as_bytes().to_vec()));
+        return Ok(svg_str);
     }
     Ok(None)
 }

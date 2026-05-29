@@ -19,7 +19,8 @@ octicons-pack = "19.27.0"
 parley = { workspace = true }
 pyo3 = { workspace = true, optional = true }
 pyo3-async-runtimes = { version = "0.28.0", features = ["tokio-runtime"], optional = true }
-resvg = "0.47.0"
+# spell-checker: disable-next-line
+resvg = { version = "0.47.0", default-features = false, features = ["text", "memmap-fonts", "raster-images"] }
 sha2 = "0.11.0"
 simple-icons-pack = "16.21.0"
 swash = "0.2.7"

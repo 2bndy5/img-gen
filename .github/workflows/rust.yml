@@ -38,10 +38,6 @@ jobs:
         with:
           path: "~/.cargo"
           key: cargo-lint-${{ hashFiles('Cargo.lock') }}
-      - name: Install fontconfig
-        run: |-
-          sudo apt-get update
-          sudo apt-get install libfontconfig1-dev
       - run: cargo clippy --all-features -- -D warnings
       - run: cargo fmt --check
 
@@ -58,10 +54,6 @@ jobs:
         with:
           path: "~/.cargo"
           key: cargo-doc-${{ hashFiles('Cargo.lock') }}
-      - name: Install fontconfig
-        run: |-
-          sudo apt-get update
-          sudo apt-get install libfontconfig1-dev
       - run: cargo doc --no-deps ${PACKAGES}
       - name: Upload docs as artifact
         uses: actions/upload-artifact@v7
@@ -88,10 +80,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: cargo binstall -y cargo-nextest cargo-llvm-cov nur
-      - name: Install fontconfig
-        run: |-
-          sudo apt-get update
-          sudo apt-get install libfontconfig1-dev
       - name: Run tests
         run: nur test
       - name: Generate coverage report
@@ -155,10 +143,6 @@ jobs:
         uses: rust-lang/crates-io-auth-action@bbd81622f20ce9e2dd9622e3218b975523e45bbe # v1.0.4
         if: startsWith(github.ref, 'refs/tags/') && startsWith(github.ref_name, matrix.pkg)
         id: auth
-      - name: Install fontconfig
-        run: |-
-          sudo apt-get update
-          sudo apt-get install libfontconfig1-dev
       - name: Publish crate ${{ steps.translate.outputs.pkg }}
         if: startsWith(github.ref, 'refs/tags/') && startsWith(github.ref_name, matrix.pkg)
         env:
@@ -179,10 +163,6 @@ jobs:
         with:
           persist-credentials: false
       - run: rustup update --no-self-update
-      - name: Install fontconfig
-        run: |-
-          sudo apt-get update
-          sudo apt-get install libfontconfig1-dev
       - name: Package crate ${{ matrix.pkg }} (dry run)
         env:
           PKG_NAME: ${{ matrix.pkg }}

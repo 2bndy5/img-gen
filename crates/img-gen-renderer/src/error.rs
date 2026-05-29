@@ -59,6 +59,12 @@ pub enum ImgGenRendererError {
         #[source]
         source: resvg::usvg::Error,
     },
+    #[error("Failed to parse SVG XML in '{path}'")]
+    ParseSvgXmlFailed {
+        path: String,
+        #[source]
+        source: resvg::usvg::roxmltree::Error,
+    },
     #[error("SVG '{path}' scaled to zero size")]
     SvgScaledToZeroSize { path: String },
     #[error("Image not found: '{name}'")]

@@ -4,6 +4,8 @@ use img_gen::{
     Background, Generator, Icon, Layer, LayerOffset, Layout, PreserveAspect, Size, SolidColor,
 };
 
+mod support;
+
 fn mk_layout(bg: Option<&str>, icon: Option<&str>) -> Layout {
     let mut layout = Layout {
         size: Size {
@@ -87,6 +89,18 @@ async fn render_background_svg() {
     let generator = Generator::new(vec![PathBuf::from("tests/message.svg")], None).unwrap();
     let img = generator.render(layout).await.unwrap();
     img.save("tests/out/test_background[svg].png").unwrap();
+}
+
+#[tokio::test]
+async fn render_svg_webfont_text() {
+    let layout = mk_layout(None, Some("asset-webfont.svg"));
+    let generator = Generator::new(
+        vec![PathBuf::from("tests")],
+        Some(support::typography_font_cache_root()),
+    )
+    .unwrap();
+    let img = generator.render(layout).await.unwrap();
+    img.save("tests/out/test_svg_webfont_text.png").unwrap();
 }
 
 #[tokio::test]

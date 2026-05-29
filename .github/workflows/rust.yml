@@ -5,7 +5,7 @@ on:
     branches: [main]
     tags:
       - "img-gen/v*"
-      - "img-gen-specs/v*"
+      - "img-gen-spec/v*"
       - "img-gen-renderer/v*"
     paths:
       - crates/**
@@ -172,7 +172,7 @@ jobs:
     name: Check package dist ${{ matrix.pkg }}
     strategy:
       matrix:
-        pkg: [img-gen, img-gen-specs, img-gen-renderer]
+        pkg: [img-gen, img-gen-spec, img-gen-renderer]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6

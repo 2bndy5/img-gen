@@ -20,7 +20,7 @@ on:
           - img-gen-js
           - img-gen-py
           - img-gen-renderer
-          - img-gen-specs
+          - img-gen-spec
       component:
         description: The version component to increase
         type: choice

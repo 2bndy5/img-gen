@@ -1,6 +1,6 @@
 [package]
 name = "img-gen-renderer"
-description = "A library to render images from img-gen-specs"
+description = "A library to render images from img-gen-spec"
 version = "0.0.0"
 readme = "README.md"
 edition = { workspace = true }

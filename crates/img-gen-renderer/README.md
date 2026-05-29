@@ -2,7 +2,7 @@
 
 A crate to generate images from a deterministic data structure.
 
-See [img-gen-specs] about how to build the deterministic data structure that
+See [img-gen-spec] about how to build the deterministic data structure that
 this library uses.
 
 ## Example
@@ -15,7 +15,7 @@ use img_gen_renderer::Generator;
 
 #[tokio::main]
 async fn main() {
-    // see img-gen-specs for proper example of building a Layout
+    // see img-gen-spec for proper example of building a Layout
     let layout = img_gen_specs::Layout{
         debug: img_gen_specs::Debug {
             enabled: true,
@@ -40,4 +40,4 @@ like downloading fonts or external images, while rendering an image.
 
 The cache location can be explicitly specified (see `Generator` API docs).
 
-[img-gen-specs]: https://crates.io/crates/img-gen-specs
+[img-gen-spec]: https://crates.io/crates/img-gen-spec

@@ -62,10 +62,10 @@ const PkgPaths = {
         exclude: [...$COMMON_EXCLUDES]
         path: 'crates/img-gen'
     },
-    'img-gen-specs': {
-        include: ['crates/img-gen-specs/**/*']
+    'img-gen-spec': {
+        include: ['crates/img-gen-spec/**/*']
         exclude: [...$COMMON_EXCLUDES]
-        path: 'crates/img-gen-specs'
+        path: 'crates/img-gen-spec'
     },
     'img-gen-renderer': {
         include: ['crates/img-gen-renderer/**/*']

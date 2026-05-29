@@ -246,4 +246,4 @@ jobs:
           python-version: 3.x
       - name: Check distributions
         # spell-checker: disable-next-line
-        run: pipx twine check dist/*
+        run: pipx run twine check dist/*

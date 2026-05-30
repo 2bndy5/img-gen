@@ -16,16 +16,20 @@ use img_gen_renderer::Generator;
 #[tokio::main]
 async fn main() {
     // see img-gen-spec for proper example of building a Layout
-    let layout = img_gen_specs::Layout{
-        debug: img_gen_specs::Debug {
+    let layout = img_gen_spec::Layout{
+        debug: img_gen_spec::Debug {
             enabled: true,
             ..Default::default()
         },
         ..Default::default()
     };
 
-    let generator = Generator { layout };
-    let img = generator.render().await.unwrap();
+    // add any external images paths (file or dir) here
+    let image_search_paths = vec![];
+    let cache_root = None; // using default cache dir
+    let generator = Generator::new(image_search_paths, cache_root).unwrap();
+
+    let img = generator.render(layout).await.unwrap();
 
     // now do whatever you want with the image data
     let img_hash = img.get_sha256().unwrap();
@@ -35,8 +39,8 @@ async fn main() {
 
 ## Cache-enabled
 
-This library's `Generator` struct employ a cache to reduce repeated HTTP requests,
-like downloading fonts or external images, while rendering an image.
+This library's `Generator` struct employs a cache to reduce repeated HTTP requests,
+when downloading fonts (and their metadata), while rendering an image.
 
 The cache location can be explicitly specified (see `Generator` API docs).
 

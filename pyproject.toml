@@ -6,6 +6,7 @@ build-backend = "maturin"
 name = "img-gen"
 requires-python = ">=3.10"
 license = "MIT"
+readme = "README.md"
 classifiers = [
     "Programming Language :: Rust",
     "Programming Language :: Python :: Implementation :: CPython",
@@ -19,6 +20,8 @@ dependencies = [
 [tool.maturin]
 manifest-path = "crates/img-gen/Cargo.toml"
 features = ["pyo3"]
+include = ["crates/img-gen/tests/*.py", "LICENSE"]
+exclude = ["crates/img-gen/tests/*.rs"]
 
 [tool.mypy]
 files = ["img_gen.pyi", "tests/**/*.py"]

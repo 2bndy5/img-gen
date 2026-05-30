@@ -8,9 +8,8 @@ license = { workspace = true }
 authors = { workspace = true }
 repository = { workspace = true }
 homepage = { workspace = true }
-exclude = [
-    "tests/*.py",
-]
+exclude = ["tests/*.py"]
+
 [lib]
 name = "img_gen"
 crate-type = ["cdylib", "lib"]

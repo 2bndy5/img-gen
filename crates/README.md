@@ -12,7 +12,7 @@ The engine used to generate images from a given specification (`Layout`).
 
 ## `img-gen`
 
-A convenience crate that rexport public-facing API from both\
+A convenience crate that re-exports public-facing API from both
 `img-gen-spec` and `img-gen-renderer` crates.
 
 This crate also facilitates the python binding distributed as

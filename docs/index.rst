@@ -34,9 +34,9 @@ Most of this documentation focuses on the specification because the rendering AP
     )
 
     # Create a generator
-    gen = Generator(layout)
+    generator = Generator()
     # Generate the image
-    image = asyncio.run(gen.render())
+    image = asyncio.run(generator.render(layout))
 
     # Save the image to a file
     image.save(f"{image.sha256}.png")

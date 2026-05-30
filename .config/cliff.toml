@@ -28,8 +28,10 @@ body = """
 
         > {{ message }}
     {%- endif %}
-{% else -%}
+{% elif previous.timestamp -%}
     ## [{{ UNRELEASED }}] - {{ previous.timestamp | date(format="%Y-%m-%d") }} to present
+{% else -%}
+    ## [{{ UNRELEASED }}]
 {% endif -%}
 
 {% for group, commits in commits | group_by(attribute="group") %}
@@ -45,18 +47,23 @@ body = """
     {% endfor %}
 {% endfor -%}
 
-{% set first_commit = previous.version -%}
-{%- set last_commit = "HEAD" -%}
 {% if version -%}
+    {#- Use the current version tag as the latest commit -#}
     {%- set last_commit = version -%}
-    {%- if not previous.version -%}
-        {#- If this is the first versioned release, use the initial commit -#}
-        {%- set first_commit = init_commit -%}
-    {%- endif -%}
-{%- endif %}
+{%- else -%}
+    {#- Otherwise, just call it HEAD -#}
+    {%- set last_commit = "HEAD" -%}
+{%- endif -%}
+{%- if not previous.version -%}
+    {#- If this is the first versioned release, use the initial commit -#}
+    {%- set first_commit = init_commit -%}
+{%- else -%}
+    {#- Otherwise, use the previous version tag as the starting point -#}
+    {%- set first_commit = previous.version -%}
+{%- endif -%}
 [{{ this_version }}]: {{ self::remote_url() }}/compare/{{ first_commit }}...{{ last_commit }}
 
-Full commit diff: [`{% if previous.version -%}
+Full commit diff: [`{% if not previous.version -%}
     {{ first_commit }}
 {%- else -%}
     {{ init_commit | truncate(length=7, end="") }}
@@ -126,32 +133,18 @@ commit_parsers = [
     { field = "group", pattern = "delete", group = "<!-- 3 --> 🗑️ Removed" },
     { field = "group", pattern = "security", group = "<!-- 5 --> 🔐 Security" },
     { field = "group", pattern = "refactor", group = "<!-- 9 --> 🗨️ Changed" },
-    # Next we have filters for unconventional commit messages
-    { message = "^[a|A]dd", group = "<!-- 1 --> 🚀 Added" },
-    { message = "^.*: [s|S]upport", group = "<!-- 1 --> 🚀 Added" },
-    { message = "^.*: [a|A]dd", group = "<!-- 1 --> 🚀 Added" },
-    { message = "^.*: [d|D]eprecated", group = "<!-- 2 --> 🚫 Deprecated" },
-    { message = "^.*: [r|R]emove", group = "<!-- 3 --> 🗑️ Removed" },
-    { message = "^.*: [d|D]elete", group = "<!-- 3 --> 🗑️ Removed" },
-    { message = "^[f|F]ix", group = "<!-- 4 --> 🛠️ Fixed" },
-    { message = "^.*: [f|F]ix", group = "<!-- 4 --> 🛠️ Fixed" },
-    { message = "^.*: [s|S]ecure", group = "<!-- 5 --> 🔐 Security" },
-    { message = "^.*: [s|S]ecurity", group = "<!-- 5 --> 🔐 Security" },
-    { message = "[d|D]oc", group = "<!-- 8 --> 📝 Documentation" },
-    { message = "[d|D]ocs", group = "<!-- 8 --> 📝 Documentation" },
-    { message = "[d|D]ocumentation", group = "<!-- 8 --> 📝 Documentation" },
     # anything left after not being caught by filters above gets put in the "Changed" section
-    { message = "[r|R]efactor", group = "<!-- 9 --> 🗨️ Changed" },
     { field = "github.pr_labels", pattern = ".*", group = "<!-- 9 --> 🗨️ Changed" },
     { message = "^.*", group = "<!-- 9 --> 🗨️ Changed" },
 ]
 # filter out the commits that are not matched by commit parsers
 filter_commits = true
 # sort the tags topologically
+# spell-checker: disable-next-line
 topo_order = false
 # sort the commits inside sections by oldest/newest order
 sort_commits = "oldest"
 
-# [remote.github]
-# owner = "cpp-linter"
-# repo = "cpp-linter-rs"
+[remote.github]
+owner = "2bndy5"
+repo = "img-gen"

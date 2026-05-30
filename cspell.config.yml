@@ -23,6 +23,7 @@ words:
   - Doherty
   - elif
   - endfor
+  - endmacro
   - Fira
   - fontdb
   - fontique
@@ -38,11 +39,13 @@ words:
   - Malinka
   - manylinux
   - maturin
+  - mkdocs
   - musllinux
   - mypy
   - Nega
   - nextest
   - Palo
+  - pathlib
   - peekable
   - Pixmap
   - pkgs
@@ -86,4 +89,5 @@ ignorePaths:
   - env/**
   - .gitignore
   - .gitattributes
-  - crates/img-gen/tests/asset-webfont.svg
+  - "**/.svg"
+  - crates/*/CHANGELOG.md

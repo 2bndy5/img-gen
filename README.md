@@ -32,20 +32,21 @@ from pathlib import Path
 # configure loggers before importing this lib
 from img_gen import Layout, Generator
 
-generator = Generator(
-    # add any external image paths (file or dir) here
-    external_resource_paths=[],
-    cache_root=None,  # use default cache dir
-)
+async def main():
+    generator = Generator(
+        # add any external image/font paths (file or dir) here
+        external_resource_paths=[],
+        cache_root=None,  # use default cache dir
+    )
 
-layout = Layout.from_yaml_str(yaml_str)
-yaml_str = Path("example-layout.yml").read_text(encoding="utf-8")
+    layout = Layout.from_yaml_str(yaml_str)
+    yaml_str = Path("example-layout.yml").read_text(encoding="utf-8")
 
-# Generator.render() is async
-img = asyncio.run(generator.render(layout))
+    # Generator.render() is async
+    img = await generator.render(layout)
 
-img_hash = img.sha256
-img.save(f"{img_hash}.png")
+    img_hash = img.sha256
+    img.save(f"{img_hash}.png")
 ```
 
 ### Rust
@@ -56,7 +57,7 @@ use serde::Deserialize;
 
 #[tokio::main]
 async fn main() {
-    let external_resource_paths = vec![]; // not using custom/external images
+    let external_resource_paths = vec![]; // not using external images/fonts
     let cache_root = None; // use default value
     let generator = Generator::new(external_resource_paths, cache_root).unwrap();
 

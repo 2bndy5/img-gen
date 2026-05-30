@@ -26,17 +26,17 @@ Most of this documentation focuses on the specification because the rendering AP
     import asyncio
     from img_gen import Generator, Layout, Debug
 
+    async def main():
+        # Define the layout of the image
+        layout = Layout(
+            # nothing fancy, just an empty layout with debug outlines drawn
+            debug=Debug(enable=True),
+        )
 
-    # Define the layout of the image
-    layout = Layout(
-        # nothing fancy, just an empty layout with debug outlines drawn
-        debug=Debug(enable=True),
-    )
+        # Create a generator
+        generator = Generator()
+        # Generate the image
+        image = await generator.render(layout)
 
-    # Create a generator
-    generator = Generator()
-    # Generate the image
-    image = asyncio.run(generator.render(layout))
-
-    # Save the image to a file
-    image.save(f"{image.sha256}.png")
+        # Save the image to a file
+        image.save(f"{image.sha256}.png")

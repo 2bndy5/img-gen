@@ -124,55 +124,65 @@ html_theme_options = {
     ],
 }
 
-presets = {}
-preset_examples = Path(__file__).parent / "preset_examples"
-preset_examples.mkdir(parents=True, exist_ok=True)
-generator = Generator()
-for p in dir(Presets):
-    # cycle through all the presets and generate example images for each
-    if not p.startswith("_"):
-        preset = getattr(Presets, p)
-        presets[int(preset)] = p
-        preset_example_img = preset_examples / f"{p}.png"
-        if not preset_example_img.exists():
-            print("Generating", str(preset_example_img))
-            layout = Layout(
-                size=Size(256 * 3, 256),
-                layers=[
-                    Layer(
-                        size=Size(256, 256),
-                        ellipse=Ellipse(
-                            color=ColorKind.radial_gradient(
-                                preset=preset,
-                                center=Offset(128, 128),
-                                radius=128,
-                            )
-                        ),
-                    ),
-                    Layer(
-                        size=Size(256, 256),
-                        offset=Offset(x=256),
-                        background=Background(
-                            color=ColorKind.linear_gradient(
-                                preset=preset,
-                                start=Offset(y=128),
-                                end=Offset(256, 128),
-                            )
-                        ),
-                    ),
-                    Layer(
-                        size=Size(256, 256),
-                        offset=Offset(x=512),
-                        ellipse=Ellipse(
-                            color=ColorKind.conical_gradient(
-                                preset=preset,
-                                center=Offset(128, 128),
-                            )
-                        ),
-                    ),
-                ],
-            )
-            img = asyncio.run(generator.render(layout))
-            img.save(str(preset_example_img))
 
-jinja_contexts = {"presets": {"presets": sorted(presets.items())}}
+async def generate_preset_examples() -> dict[int, str]:
+    """Generate example images for each preset
+
+    Return a mapping of preset int value to preset name.
+    """
+    presets = {}
+    preset_examples = Path(__file__).parent / "preset_examples"
+    preset_examples.mkdir(parents=True, exist_ok=True)
+    generator = Generator()
+    for p in dir(Presets):
+        # cycle through all the presets and generate example images for each
+        if not p.startswith("_"):
+            preset = getattr(Presets, p)
+            presets[int(preset)] = p
+            preset_example_img = preset_examples / f"{p}.png"
+            if not preset_example_img.exists():
+                print("Generating", str(preset_example_img))
+                layout = Layout(
+                    size=Size(256 * 3, 256),
+                    layers=[
+                        Layer(
+                            size=Size(256, 256),
+                            ellipse=Ellipse(
+                                color=ColorKind.radial_gradient(
+                                    preset=preset,
+                                    center=Offset(128, 128),
+                                    radius=128,
+                                )
+                            ),
+                        ),
+                        Layer(
+                            size=Size(256, 256),
+                            offset=Offset(x=256),
+                            background=Background(
+                                color=ColorKind.linear_gradient(
+                                    preset=preset,
+                                    start=Offset(y=128),
+                                    end=Offset(256, 128),
+                                )
+                            ),
+                        ),
+                        Layer(
+                            size=Size(256, 256),
+                            offset=Offset(x=512),
+                            ellipse=Ellipse(
+                                color=ColorKind.conical_gradient(
+                                    preset=preset,
+                                    center=Offset(128, 128),
+                                )
+                            ),
+                        ),
+                    ],
+                )
+                img = await generator.render(layout)
+                img.save(str(preset_example_img))
+    return presets
+
+
+jinja_contexts = {
+    "presets": {"presets": sorted(asyncio.run(generate_preset_examples()).items())}
+}

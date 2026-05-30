@@ -98,7 +98,7 @@ export def get-changed-pkgs [] {
             $changed_files | any {|file| $paths.exclude | any {|p| ($file | path expand) in (glob $p)}}
         }
         print $"  Has excluded changes: ($has_excluded_change)"
-        if $has_changed and not $has_excluded_change {
+        if $has_changed {
             print $" Package ($pkg) has relevant changes"
             $pkgs = $pkgs | append $pkg
         }

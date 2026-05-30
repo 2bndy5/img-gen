@@ -8,7 +8,7 @@ name: Python
 on:
   push:
     branches: [main]
-    tags: ['img-gen-py/v*']
+    tags: ["img-gen-py/v*"]
   pull_request:
     branches: [main]
 
@@ -229,6 +229,46 @@ jobs:
         uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # v1.13.0
         with:
           skip-existing: true
+
+  docs:
+    name: Build docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: 3.x
+      - uses: cargo-bins/cargo-binstall@ae04fb5e853ae6cd3ad7de4a1d554a8b646d12aa # v1.15.11
+      - name: Install nur
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: cargo binstall -y nur
+      - name: Install uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+      - name: Build docs
+        run: nur docs
+      - name: Upload docs
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: docs/_build_html
+
+  deploy-docs:
+    name: Deploy docs
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    needs: docs
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy-pages.outputs.page_url }}
+    permissions:
+      pages: write # to deploy to Pages
+      id-token: write # to verify the deployment originates from an appropriate source
+    steps:
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v5
+        id: deploy-pages
 
   check-dist:
     needs: [linux, musllinux, windows, macos, sdist]

@@ -29,8 +29,8 @@ use renderer::Renderer;
 #[cfg_attr(feature = "pyo3", pyclass(module = "img_gen", from_py_object))]
 #[derive(Clone)]
 pub struct Generator {
-    /// Search paths used to resolve input images and SVG assets.
-    pub image_search_paths: Vec<PathBuf>,
+    /// Search paths used to resolve input images, SVG files, or font files.
+    pub external_resource_paths: Vec<PathBuf>,
     fontdb: Arc<fontdb::Database>,
     fontsource_client: FontSourceClient,
     /// The root directory used for renderer cache data such as downloaded fonts.
@@ -42,7 +42,7 @@ impl Generator {
     ///
     /// This initializes the shared font database and font source client once.
     /// Both are cached in-memory and reused across all subsequent renders.
-    pub fn new(image_search_paths: Vec<PathBuf>, cache_root: Option<PathBuf>) -> Result<Self> {
+    pub fn new(external_resource_paths: Vec<PathBuf>, cache_root: Option<PathBuf>) -> Result<Self> {
         let fontdb = fontdb::Database::new();
 
         let cache_root = cache_root
@@ -56,7 +56,7 @@ impl Generator {
         let fontsource_client = FontSourceClient::with_cache_root(&cache_root)?;
 
         Ok(Generator {
-            image_search_paths,
+            external_resource_paths,
             fontdb: Arc::new(fontdb),
             fontsource_client,
             cache_root,
@@ -77,7 +77,8 @@ impl Generator {
             ..Default::default()
         };
 
-        let mut renderer = Renderer::new(opt, &self.fontsource_client, &self.image_search_paths);
+        let mut renderer =
+            Renderer::new(opt, &self.fontsource_client, &self.external_resource_paths);
         for layer in &layout.layers {
             renderer.render_layer(layer, &mut canvas).await?;
         }

@@ -190,3 +190,36 @@ async fn render_end_bottom() {
     img.save("tests/out/test_typography_end_bottom.png")
         .unwrap();
 }
+
+/// Verify that a font is loaded from a local file when [`Font::path`] is set
+/// and the file can be found in the [`Generator`]'s `external_resource_paths`.
+#[tokio::test]
+async fn render_local_font_path() {
+    let typography = Typography {
+        content: "Loaded from local file".to_string(),
+        font: Font {
+            family: "Noto Sans".to_string(),
+            // Relative path resolved via external_resource_paths.
+            path: Some("noto-sans-latin-400-normal.ttf".to_string()),
+            ..Font::default()
+        },
+        line: Line {
+            amount: NonZeroI32::new(1).unwrap(),
+            height: LineHeight::new(1.0).unwrap(),
+        },
+        overflow: true,
+        color: SolidColor::from_string("black").unwrap().into(),
+        ..Default::default()
+    };
+
+    let layout = basic_layout(300, 60, 280, 40, typography);
+    // Pass the tests directory so "noto-sans-latin-400-normal.ttf" resolves.
+    let generator = Generator::new(
+        vec![std::path::PathBuf::from("tests")],
+        Some(support::typography_font_cache_root()),
+    )
+    .unwrap();
+    let img = generator.render(layout).await.unwrap();
+    img.save("tests/out/test_typography_local_font.png")
+        .unwrap();
+}

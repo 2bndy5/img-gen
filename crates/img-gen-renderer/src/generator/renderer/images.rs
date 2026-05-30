@@ -1,7 +1,4 @@
-use std::{
-    collections::HashSet,
-    path::{Path, PathBuf},
-};
+use std::{collections::HashSet, path::PathBuf};
 
 use image::{
     ImageReader, RgbaImage,
@@ -77,27 +74,15 @@ impl Renderer<'_> {
         Ok(())
     }
 
-    fn find_image_path<P: AsRef<Path>>(&self, name: P) -> Option<PathBuf> {
-        for entry in self.image_search_paths {
-            if entry.is_file() && entry == name.as_ref() {
-                return Some(entry.to_path_buf());
-            } else {
-                let path = entry.join(&name);
-                if path.exists() {
-                    return Some(path);
-                }
-            }
-        }
-        None
-    }
-
     fn load_image(
         &self,
         path: &str,
         size: ConcreteSize,
         preserve_aspect: PreserveAspect,
     ) -> Result<RgbaImage> {
-        let resolved_path = self.find_image_path(path).unwrap_or(PathBuf::from(path));
+        let resolved_path = self
+            .find_ext_resource_path(path)
+            .unwrap_or(PathBuf::from(path));
         let mut buf = ImageReader::open(&resolved_path)
             .map_err(|source| ImgGenRendererError::OpenImageFailed {
                 path: path.to_string(),
@@ -177,7 +162,7 @@ impl Renderer<'_> {
                 Some(data) => data,
                 None => {
                     let svg_path = PathBuf::from(path).with_extension("svg");
-                    let p = self.find_image_path(&svg_path).unwrap_or(svg_path);
+                    let p = self.find_ext_resource_path(&svg_path).unwrap_or(svg_path);
                     &std::fs::read_to_string(&p).map_err(|source| {
                         ImgGenRendererError::ReadSvgFailed {
                             path: path.to_string(),
@@ -273,29 +258,7 @@ fn load_builtin_svg_pack(name: &str) -> Result<Option<&str>> {
 #[cfg(test)]
 mod tests {
     #![allow(clippy::unwrap_used)]
-
-    use std::collections::HashSet;
-
-    use fontsource_downloader::FontSourceClient;
-    use parley::{FontContext, LayoutContext};
-    use resvg::usvg::Options;
-    use swash::scale::ScaleContext;
-
     use super::*;
-
-    #[test]
-    fn find_non_existent_image() {
-        let renderer = Renderer {
-            image_search_paths: &[PathBuf::from("tests")],
-            svg_options: Options::default(),
-            font_cx: FontContext::default(),
-            layout_cx: LayoutContext::default(),
-            scale_cx: ScaleContext::default(),
-            loaded_font_paths: HashSet::new(),
-            fontsource_client: &FontSourceClient::new().unwrap(),
-        };
-        assert!(renderer.find_image_path("nonexistent.png").is_none());
-    }
 
     #[test]
     fn non_builtin_svg() {

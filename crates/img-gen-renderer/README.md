@@ -25,9 +25,9 @@ async fn main() {
     };
 
     // add any external images paths (file or dir) here
-    let image_search_paths = vec![];
+    let external_resource_paths = vec![];
     let cache_root = None; // using default cache dir
-    let generator = Generator::new(image_search_paths, cache_root).unwrap();
+    let generator = Generator::new(external_resource_paths, cache_root).unwrap();
 
     let img = generator.render(layout).await.unwrap();
 

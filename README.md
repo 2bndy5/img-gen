@@ -34,7 +34,7 @@ from img_gen import Layout, Generator
 
 generator = Generator(
     # add any external image paths (file or dir) here
-    image_search_paths=[],
+    external_resource_paths=[],
     cache_root=None,  # use default cache dir
 )
 
@@ -56,9 +56,9 @@ use serde::Deserialize;
 
 #[tokio::main]
 async fn main() {
-    let image_search_paths = vec![]; // not using custom/external images
+    let external_resource_paths = vec![]; // not using custom/external images
     let cache_root = None; // use default value
-    let generator = Generator::new(image_search_paths, cache_root).unwrap();
+    let generator = Generator::new(external_resource_paths, cache_root).unwrap();
 
     // using safer/newer yaml deserializing crate `serde_saphyr`
     let yaml_str = std::fs::read("example-layout.yml").unwrap();

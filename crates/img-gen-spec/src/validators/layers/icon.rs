@@ -25,7 +25,7 @@ pub struct Icon {
     /// - FontAwesome Free (``fontawesome/<brands|solid|regular>/{icon_slug}``)
     ///
     /// Otherwise, the image file's path is resolved via a search through the list of
-    /// ``image_search_paths`` provided to the ``Generator`` (in `img_gen_renderer` crate),
+    /// ``external_resource_paths`` provided to the ``Generator`` (in `img_gen_renderer` crate),
     /// which defaults to the current working directory if unspecified or an empty list.
     pub image: String,
     /// A color used to replace the [`Icon::image`]'s original coloring.

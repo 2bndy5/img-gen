@@ -29,14 +29,14 @@ pub struct Renderer<'a> {
     scale_cx: ScaleContext,
     loaded_font_paths: HashSet<PathBuf>,
     fontsource_client: &'a FontSourceClient,
-    image_search_paths: &'a [PathBuf],
+    external_resource_paths: &'a [PathBuf],
 }
 
 impl<'a> Renderer<'a> {
     pub fn new(
         options: Options<'a>,
         fontsource_client: &'a FontSourceClient,
-        image_search_paths: &'a [PathBuf],
+        external_resource_paths: &'a [PathBuf],
     ) -> Self {
         Renderer {
             svg_options: options,
@@ -45,7 +45,7 @@ impl<'a> Renderer<'a> {
             scale_cx: ScaleContext::new(),
             loaded_font_paths: HashSet::new(),
             fontsource_client,
-            image_search_paths,
+            external_resource_paths,
         }
     }
 
@@ -181,6 +181,23 @@ impl<'a> Renderer<'a> {
         self.render_typography(layer, size, canvas).await?;
         Ok(())
     }
+
+    pub(super) fn find_ext_resource_path<P: AsRef<std::path::Path>>(
+        &self,
+        name: P,
+    ) -> Option<PathBuf> {
+        for entry in self.external_resource_paths {
+            if entry.is_file() && entry == name.as_ref() {
+                return Some(entry.to_path_buf());
+            } else {
+                let path = entry.join(&name);
+                if path.exists() {
+                    return Some(path);
+                }
+            }
+        }
+        None
+    }
 }
 
 #[derive(Copy, Clone)]
@@ -225,5 +242,32 @@ impl From<&Size> for ConcreteSize {
             width: value.width.unwrap_or(WIDTH).get(),
             height: value.height.unwrap_or(HEIGHT).get(),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    #![allow(clippy::unwrap_used)]
+
+    use super::Renderer;
+    use std::{collections::HashSet, path::PathBuf};
+
+    use fontsource_downloader::FontSourceClient;
+    use parley::{FontContext, LayoutContext};
+    use resvg::usvg::Options;
+    use swash::scale::ScaleContext;
+
+    #[test]
+    fn find_non_existent_image() {
+        let renderer = Renderer {
+            external_resource_paths: &[PathBuf::from("tests")],
+            svg_options: Options::default(),
+            font_cx: FontContext::default(),
+            layout_cx: LayoutContext::default(),
+            scale_cx: ScaleContext::default(),
+            loaded_font_paths: HashSet::new(),
+            fontsource_client: &FontSourceClient::new().unwrap(),
+        };
+        assert!(renderer.find_ext_resource_path("nonexistent.png").is_none());
     }
 }

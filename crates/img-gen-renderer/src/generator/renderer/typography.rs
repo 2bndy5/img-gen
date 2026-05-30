@@ -395,8 +395,10 @@ impl Renderer<'_> {
     }
 
     async fn ensure_font_available(&mut self, font: &Font) -> Result<()> {
-        if let Some(path) = font.path_buf() {
-            self.register_font_path(&path)?;
+        if let Some(path) = font.path_buf()
+            && let Some(resolved) = self.find_ext_resource_path(&path)
+        {
+            self.register_font_path(&resolved)?;
             return Ok(());
         }
 

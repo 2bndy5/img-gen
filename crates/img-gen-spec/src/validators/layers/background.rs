@@ -26,7 +26,7 @@ pub struct Background {
     /// - FontAwesome Free (``fontawesome/<brands|solid|regular>/{icon_slug}``)
     ///
     /// Otherwise, the image file's path is resolved via a search through the list of
-    /// ``image_search_paths`` provided to the ``Generator`` (in `img_gen_renderer` crate),
+    /// ``external_resource_paths`` provided to the ``Generator`` (in `img_gen_renderer` crate),
     /// which defaults to the current working directory if unspecified or an empty list.
     pub image: Option<String>,
     /// A color overlaid on top of the `image`.

@@ -614,7 +614,7 @@ class Image:
 class Generator:
     def __init__(
         self,
-        image_search_paths: list[Path | str] | None = None,
+        external_resource_paths: list[Path | str] | None = None,
         cache_root: Path | str | None = None,
     ) -> None: ...
     async def render(self, layout: Layout) -> Image: ...

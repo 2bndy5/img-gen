@@ -10,14 +10,14 @@ impl Generator {
     /// Instantiate a `Generator` object for a given `layout`.
     #[new]
     #[pyo3(
-        text_signature = "(image_search_paths: list[Path| str] | None = None, cache_root: Path | str | None = None) -> Generator",
-        signature = (image_search_paths=None, cache_root=None)
+        text_signature = "(external_resource_paths: list[Path| str] | None = None, cache_root: Path | str | None = None) -> Generator",
+        signature = (external_resource_paths=None, cache_root=None)
     )]
     pub fn new_py(
-        image_search_paths: Option<Vec<PathBuf>>,
+        external_resource_paths: Option<Vec<PathBuf>>,
         cache_root: Option<PathBuf>,
     ) -> PyResult<Self> {
-        Generator::new(image_search_paths.unwrap_or_default(), cache_root)
+        Generator::new(external_resource_paths.unwrap_or_default(), cache_root)
             .map_err(|e| PyOSError::new_err(format!("{e:?}")))
     }
 

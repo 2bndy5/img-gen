@@ -161,4 +161,5 @@ jobs:
           persist-credentials: false
       - run: rustup update --no-self-update
       - name: Package crates (dry run)
-        run: cargo publish --workspace --dry-run # zizmor: ignore[use-trusted-publishing]
+        # zizmor: ignore[use-trusted-publishing]
+        run: cargo publish --workspace --dry-run

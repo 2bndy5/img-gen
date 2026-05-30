@@ -202,6 +202,7 @@ jobs:
         with:
           python-version: 3.x
       - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        # zizmor: ignore[cache-poisoning]
         with:
           python-version: ${{ steps.python-setup.outputs.python-version }}
       - uses: cargo-bins/cargo-binstall@aaa84a43aec4955a42c5ffc65d258961e39f276e # v1.19.1
@@ -246,6 +247,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: cargo binstall -y nur
       - name: Install uv
+        # zizmor: ignore[cache-poisoning]
         uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
       - name: Build docs
         run: nur docs

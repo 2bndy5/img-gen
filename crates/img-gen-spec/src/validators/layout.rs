@@ -1,7 +1,10 @@
 #[cfg(feature = "pyo3")]
 use pyo3::prelude::*;
 
-use serde::Deserialize;
+use serde::{
+    Deserialize, Deserializer,
+    de::{self, MapAccess, Visitor},
+};
 
 use super::{
     SolidColor,
@@ -80,19 +83,15 @@ pub struct Layer {
     feature = "pyo3",
     pyclass(module = "img_gen", set_all, get_all, from_py_object)
 )]
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct Debug {
     /// A flag to enable or disable the debug output.
-    #[serde(default)]
     pub enable: bool,
     /// A flag to control if the debug output shall show a grid of points over the layout.
-    #[serde(default = "Debug::default_grid")]
     pub grid: bool,
     /// The space between points on the debug output's grid.
-    #[serde(default = "Debug::default_grid_step")]
     pub grid_step: u32,
     /// The color used to outline debug output.
-    #[serde(default = "Debug::default_color")]
     pub color: SolidColor,
 }
 
@@ -150,6 +149,62 @@ impl Debug {
     }
 }
 
+impl<'de> Deserialize<'de> for Debug {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        struct DebugVisitor;
+
+        impl<'de> Visitor<'de> for DebugVisitor {
+            type Value = Debug;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+                formatter.write_str("a boolean or a debug config object")
+            }
+
+            fn visit_bool<E: de::Error>(self, v: bool) -> Result<Debug, E> {
+                Ok(if v {
+                    Debug {
+                        enable: true,
+                        ..Debug::default()
+                    }
+                } else {
+                    Debug::default()
+                })
+            }
+
+            fn visit_map<A: MapAccess<'de>>(self, mut map: A) -> Result<Debug, A::Error> {
+                let mut enable = None;
+                let mut grid = None;
+                let mut grid_step = None;
+                let mut color = None;
+
+                while let Some(key) = map.next_key::<std::borrow::Cow<str>>()? {
+                    match key.as_ref() {
+                        "enable" => enable = Some(map.next_value()?),
+                        "grid" => grid = Some(map.next_value()?),
+                        "grid_step" => grid_step = Some(map.next_value()?),
+                        "color" => color = Some(map.next_value()?),
+                        unknown => {
+                            return Err(de::Error::unknown_field(
+                                unknown,
+                                &["enable", "grid", "grid_step", "color"],
+                            ));
+                        }
+                    }
+                }
+
+                Ok(Debug {
+                    enable: enable.unwrap_or(false),
+                    grid: grid.unwrap_or_else(Debug::default_grid),
+                    grid_step: grid_step.unwrap_or_else(Debug::default_grid_step),
+                    color: color.unwrap_or_else(Debug::default_color),
+                })
+            }
+        }
+
+        deserializer.deserialize_any(DebugVisitor)
+    }
+}
+
 impl Default for Debug {
     fn default() -> Self {
         Self {
@@ -178,4 +233,76 @@ pub struct Layout {
 
     /// An optional `Debug` attribute can be used to show the constraints of the `Layout`'s `layers`.
     pub debug: Option<Debug>,
+}
+
+#[cfg(test)]
+mod tests {
+    #![allow(clippy::unwrap_used)]
+
+    use super::Debug;
+
+    fn assert_all_defaults(d: &Debug) {
+        assert_eq!(d.grid, Debug::default_grid());
+        assert_eq!(d.grid_step, Debug::default_grid_step());
+        assert_eq!(d.color.to_tuple(), Debug::default_color().to_tuple());
+    }
+
+    #[test]
+    fn debug_bool_true() {
+        let d: Debug = serde_saphyr::from_str("true").unwrap();
+        assert!(d.enable);
+        assert_all_defaults(&d);
+    }
+
+    #[test]
+    fn debug_bool_false() {
+        let d: Debug = serde_saphyr::from_str("false").unwrap();
+        assert!(!d.enable);
+        assert_all_defaults(&d);
+    }
+
+    #[test]
+    fn debug_map_full() {
+        let yaml = "enable: true\ngrid: false\ngrid_step: 50\ncolor: \"blue\"\n";
+        let d: Debug = serde_saphyr::from_str(yaml).unwrap();
+        assert!(d.enable);
+        assert!(!d.grid);
+        assert_eq!(d.grid_step, 50);
+        assert_eq!(d.color.to_tuple(), (0, 0, 255, 255));
+    }
+
+    #[test]
+    fn debug_map_defaults() {
+        let d: Debug = serde_saphyr::from_str("{}").unwrap();
+        assert!(!d.enable);
+        assert_all_defaults(&d);
+    }
+
+    #[test]
+    fn debug_map_unknown_field() {
+        let result: Result<Debug, _> = serde_saphyr::from_str("unknown_key: true\n");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn debug_invalid_type() {
+        // Passing an integer triggers the unimplemented visitor path, which calls expecting()
+        let result: Result<Debug, _> = serde_saphyr::from_str("42");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn debug_foreground_dark_color() {
+        // Black (0,0,0): all channels <= 0.03928 threshold -> component / 12.92 path (L111)
+        // Luminance = 0 <= 0.451 -> white foreground
+        let d: Debug = serde_saphyr::from_str("color: \"black\"\n").unwrap();
+        assert_eq!(d.get_foreground_color().to_tuple(), (255, 255, 255, 255));
+    }
+
+    #[test]
+    fn debug_foreground_bright_color() {
+        // White (255,255,255): luminance ~= 1.0 > 0.451 -> black foreground (L130)
+        let d: Debug = serde_saphyr::from_str("color: \"white\"\n").unwrap();
+        assert_eq!(d.get_foreground_color().to_tuple(), (0, 0, 0, 255));
+    }
 }

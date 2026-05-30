@@ -52,7 +52,7 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: 3.x
-      - uses: cargo-bins/cargo-binstall@f8ce4d55b131f4a1e373b8747ca6b6a54133ae5a # v1.18.0
+      - uses: cargo-bins/cargo-binstall@aaa84a43aec4955a42c5ffc65d258961e39f276e # v1.19.1
       - run: cargo binstall -y git-cliff
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -109,7 +109,7 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
           persist-credentials: false
-      - uses: cargo-bins/cargo-binstall@f8ce4d55b131f4a1e373b8747ca6b6a54133ae5a # v1.18.0
+      - uses: cargo-bins/cargo-binstall@aaa84a43aec4955a42c5ffc65d258961e39f276e # v1.19.1
       - run: cargo binstall -y git-cliff
         env:
           GITHUB_TOKEN: ${{ github.token }}

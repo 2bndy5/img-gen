@@ -9,6 +9,13 @@ authors = { workspace = true }
 repository = { workspace = true }
 homepage = { workspace = true }
 exclude = ["tests/*.py"]
+keywords = [
+    "image",
+    "generation",
+    "specification",
+    "renderer",
+]
+categories = ["multimedia", "multimedia::images"]
 
 [lib]
 name = "img_gen"

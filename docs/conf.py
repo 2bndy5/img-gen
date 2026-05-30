@@ -33,6 +33,7 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.intersphinx",
     "sphinx_jinja",
+    "myst_parser",
 ]
 
 intersphinx_mapping = {

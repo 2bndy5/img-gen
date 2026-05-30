@@ -3,7 +3,9 @@
 #
 # 1. Bump version number in appropriate Cargo.toml manifest.
 #
-#    This step requires `cargo-edit` installed.
+#    This step requires `cargo-edit` installed unless
+#    releasing a binding package. In case of binding package, the version is
+#    determined by the version of the img-gen crate, so no actual bumping is done.
 #
 # 2. Updates the appropriate CHANGELOG.md
 #
@@ -60,7 +62,7 @@ const PkgPaths = {
     'img-gen-py': {
         include: ['crates/**/*']
         exclude: [...$COMMON_EXCLUDES]
-        path: 'crates/img-gen'
+        path: 'docs/changelogs/img-gen-py.md'
     },
     'img-gen-spec': {
         include: ['crates/img-gen-spec/**/*']
@@ -119,6 +121,13 @@ export def is-in-ci [] {
     $env | get --optional CI | default 'false' | (($in == 'true') or ($in == true))
 }
 
+# Determine if the given package is a FFI binding package.
+#
+# Binding packages have special treatment about version bumping and changelog generation.
+def is-binding-pkg [pkg: string] {
+    ($pkg | str ends-with '-py') or ($pkg | str ends-with '-js')
+}
+
 # Bump the version per the given component name (major, minor, patch)
 #
 # This function also updates known occurrences of the old version spec to
@@ -127,9 +136,21 @@ export def bump-version [
     pkg: string, # The crate name to bump in respective Cargo.toml manifests
     component: string, # The version component to bump
 ] {
+    if (is-binding-pkg $pkg) {
+        # The Python package version is determined by the version of the img-gen crate,
+        # so we just need to return the img-gen crate version instead.
+        let ver = open (
+            $PkgPaths
+            | get 'img-gen'
+            | get path
+            | path expand
+            | path join 'Cargo.toml'
+        ) | get package | get version
+        return $ver
+    }
     mut args = ['-p', $pkg, '--bump', $component]
     if (not (is-in-ci)) {
-        $args = $args | append '--dry-run'
+        $args = $args | append ['--dry-run']
     }
     let result = cargo 'set-version' ...$args | complete
     if ($result.exit_code != 0) {
@@ -174,9 +195,6 @@ export def gen-changes [
 
     mut args = [
         '--config' $"($config_path | path join 'cliff.toml')"
-        '--tag-pattern' $"($pkg)/*"
-        '--workdir' $path
-        '--repository' (pwd)
     ]
     if (($tag | str length) > 0) {
         $args = $args | append ['--tag', $tag]
@@ -188,7 +206,9 @@ export def gen-changes [
         ]
         {out_path: ($out_path | path relative-to (pwd)), log_prefix: 'Generated'}
     } else {
-        let out_path = $path | path expand | path join 'CHANGELOG.md'
+        let out_path = if (($path | path type) == "file") { $path } else {
+            $path | path expand | path join 'CHANGELOG.md'
+        }
         $args = $args | append [--output $out_path]
         {out_path: ($out_path | path relative-to (pwd)), log_prefix: 'Updated'}
     }
@@ -198,7 +218,10 @@ export def gen-changes [
     if (($paths | get 'exclude' | length) > 0) {
         $args = $args | append ['--exclude-path', ...($paths | get 'exclude')]
     }
-    run-cmd 'git-cliff' ...$args
+    let args = $args # make args immutable (to use in `with-env` block below)
+    with-env {GIT_CLIFF_TAG: $tag} {
+        run-cmd 'git-cliff' ...$args
+    }
     print ($prompt | format pattern '{log_prefix} {out_path}')
 }
 

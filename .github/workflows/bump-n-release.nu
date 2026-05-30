@@ -75,8 +75,10 @@ const PkgPaths = {
 }
 
 export def get-changed-pkgs [] {
+    let head_ref = $env | get --optional HEAD_REF | default 'HEAD'
+    let base_ref = $env | get --optional BASE_REF | default 'HEAD~1'
     let changed_files = (
-        git 'diff' '--name-only' 'HEAD~1' 'HEAD'
+        (^git diff --name-only $base_ref $head_ref)
         | lines
         | str trim
         | where {not ($in | str starts-with ".")}
@@ -89,11 +91,11 @@ export def get-changed-pkgs [] {
         let paths = $row.column1
         print $"Checking changes for ($pkg)..."
         let has_changed = if ($paths.include | is-empty) { true } else {
-            $changed_files | any {|file| $paths.include | each {|p| glob $p | any {|g| $g == $file}}}
+            $changed_files | any {|file| $paths.include | any {|p| ($file | path expand) in (glob $p)}}
         }
         print $"  Has changes: ($has_changed)"
         let has_excluded_change = if ($paths.exclude | is-empty) { false } else {
-            $changed_files | any {|file| $paths.exclude | each {|p| glob $p | any {|g| $g == $file}}}
+            $changed_files | any {|file| $paths.exclude | any {|p| ($file | path expand) in (glob $p)}}
         }
         print $"  Has excluded changes: ($has_excluded_change)"
         if $has_changed and not $has_excluded_change {

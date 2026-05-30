@@ -16,11 +16,11 @@ on:
         type: choice
         required: true
         options:
-          - img-gen
-          - img-gen-js
-          - img-gen-py
-          - img-gen-renderer
           - img-gen-spec
+          - img-gen-renderer
+          - img-gen
+          - img-gen-py
+          - img-gen-js
       component:
         description: The version component to increase
         type: choice
@@ -38,6 +38,7 @@ jobs:
   bump-release:
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
+    environment: staging-deployment
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -82,6 +83,9 @@ jobs:
           version: ${{ vars.NUSHELL_VERSION || '*' }}
       - name: Get changed packages
         id: get-pkgs
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref || github.ref }}
+          BASE_REF: ${{ github.event.pull_request.base.ref || 'HEAD~1'}}
         shell: nu {0}
         run: |-
           print (pwd)
@@ -90,7 +94,7 @@ jobs:
           $"pkgs=($pkgs)\n" | save --append $env.GITHUB_OUTPUT
 
   update-changelog:
-    if: github.event_name != 'workflow_dispatch'
+    if: github.event_name != 'workflow_dispatch' && needs.get-changed-pkgs.outputs.pkgs != '[]'
     needs: [get-changed-pkgs]
     permissions:
       contents: read

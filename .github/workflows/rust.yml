@@ -116,7 +116,7 @@ jobs:
     permissions:
       id-token: write
     environment: release
-    name: Release ${{ matrix.pkg }}
+    name: Release ${{ github.ref_name }}
     steps:
       - uses: actions/checkout@v6
         with:

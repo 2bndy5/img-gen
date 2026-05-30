@@ -113,6 +113,19 @@ def "nur docs" [
 }
 
 
+# Generate Rust API docs.
+def "nur docs rs" [
+    --open (-o), # Open the built docs in your browser
+] {
+    let args = if $open {
+        [--open]
+    } else {
+        []
+    }
+    run-cmd cargo doc --workspace --no-deps ...$args
+}
+
+
 # Run clippy and rustfmt (on packages only).
 #
 # Requires the following installed:

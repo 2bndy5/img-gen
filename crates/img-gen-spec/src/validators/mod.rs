@@ -1,3 +1,4 @@
+/// Layer attribute validators and helper types used by the public specification model.
 pub mod layers;
 pub use layers::{
     Arc, Background, Border, ColorGradient, ColorKind, ConicalGradient, Corners, Ellipse, Font,

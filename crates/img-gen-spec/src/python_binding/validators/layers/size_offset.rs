@@ -75,11 +75,13 @@ impl Size {
         Ok(())
     }
 
+    /// Returns the current width, if set.
     #[getter(width)]
     pub fn get_width_py(&self) -> Option<u32> {
         self.width.map(|v| v.get())
     }
 
+    /// Returns the current height, if set.
     #[getter(height)]
     pub fn get_height_py(&self) -> Option<u32> {
         self.height.map(|v| v.get())

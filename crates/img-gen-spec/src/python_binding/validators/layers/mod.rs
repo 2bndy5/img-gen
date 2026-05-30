@@ -30,11 +30,13 @@ impl Border {
         Ok(Self { color, width })
     }
 
+    /// Returns the border width.
     #[getter]
     pub fn width(&self) -> u32 {
         self.width.get()
     }
 
+    /// Sets the border width from ``width``.
     #[setter]
     pub fn set_width(&mut self, width: u32) -> PyResult<()> {
         self.width = NonZeroU32::new(width).ok_or(PyValueError::new_err(format!(

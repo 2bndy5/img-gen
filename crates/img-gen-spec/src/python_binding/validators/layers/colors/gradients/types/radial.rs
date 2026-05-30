@@ -4,6 +4,7 @@ use crate::{ColorGradient, RadialGradient, SolidColor, Spread, validators::Layer
 
 #[pymethods]
 impl RadialGradient {
+    /// Creates a radial gradient from ``colors``, ``center``, ``radius``, and optional focal settings.
     #[new]
     #[pyo3(
         text_signature = "(colors: ColorGradient, center: Offset, radius: float, focal_point: Offset | None = None, focal_radius: float | None = None, spread: Spread = Spread.Pad) -> RadialGradient",
@@ -26,6 +27,7 @@ impl RadialGradient {
         self.get_center()
     }
 
+    /// Sets the gradient center from ``val``.
     #[setter(center)]
     pub fn set_center_py(&mut self, val: LayerOffset) {
         self.set_center(val);
@@ -37,6 +39,7 @@ impl RadialGradient {
         self.get_radius()
     }
 
+    /// Sets the gradient radius from ``val``.
     #[setter(radius)]
     pub fn set_radius_py(&mut self, val: f32) {
         self.set_radius(val);
@@ -48,16 +51,19 @@ impl RadialGradient {
         self.get_focal_point()
     }
 
+    /// Sets the focal point from ``val``.
     #[setter(focal_point)]
     pub fn set_focal_point_py(&mut self, val: LayerOffset) {
         self.set_focal_point(val);
     }
 
+    /// Returns the focal radius.
     #[getter(focal_radius)]
     pub fn get_focal_radius_py(&self) -> f32 {
         self.get_focal_radius()
     }
 
+    /// Sets the focal radius from ``val``.
     #[setter(focal_radius)]
     pub fn set_focal_radius_py(&mut self, val: f32) {
         self.set_focal_radius(val);

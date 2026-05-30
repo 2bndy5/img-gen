@@ -1,9 +1,14 @@
+//! High-level image generation API and public re-exports.
+//!
+//! This crate provides the main facade for building layouts, rendering images, and accessing
+//! the shared specification and renderer types from one entry point.
 #![deny(
     clippy::unwrap_used,
     clippy::expect_used,
     clippy::panic,
     clippy::unimplemented,
-    clippy::todo
+    clippy::todo,
+    missing_docs
 )]
 
 pub use img_gen_renderer::{Generator, Image, ImgGenRendererError, Result};

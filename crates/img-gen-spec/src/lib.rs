@@ -1,11 +1,16 @@
+//! Validation types and error handling for image generation specifications.
+//!
+//! This crate defines the public data model shared by the renderer and higher-level API.
 #![deny(
     clippy::unwrap_used,
     clippy::expect_used,
     clippy::panic,
     clippy::unimplemented,
-    clippy::todo
+    clippy::todo,
+    missing_docs
 )]
 
+/// Public validation types used to describe layouts, layers, and styling.
 pub mod validators;
 pub use validators::{
     Arc, Background, Border, ColorGradient, ColorKind, ConicalGradient, Corners, Debug, Ellipse,
@@ -15,6 +20,7 @@ pub use validators::{
     TypographyAlign, WIDTH, Weight,
 };
 
+/// Error types returned while parsing or validating image generation specifications.
 pub mod error;
 pub use error::{ImgGenSpecError, Result};
 

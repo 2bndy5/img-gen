@@ -18,18 +18,21 @@ impl Default for LineHeight {
 }
 
 impl LineHeight {
+    /// Creates a line-height ratio where `height` is not equal to zero.
     pub fn new(height: f32) -> Option<Self> {
-        if height <= 0.0 {
+        if height == 0.0 {
             None
         } else {
             Some(Self(height))
         }
     }
 
+    /// Returns the validated line-height ratio.
     pub fn get(&self) -> f32 {
         self.0
     }
 
+    /// Deserializes a non-zero line-height ratio.
     pub fn deserialize<'de, D>(deserializer: D) -> std::result::Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -38,7 +41,7 @@ impl LineHeight {
 
         let val = f32::deserialize(deserializer)?;
         Self::new(val).ok_or_else(|| {
-            serde::de::Error::custom(format!("LineHeight must be greater than zero, got {val}"))
+            serde::de::Error::custom(format!("LineHeight must not be zero, got {val}"))
         })
     }
 }
@@ -99,7 +102,7 @@ mod tests {
     fn test_line_height() {
         assert!(LineHeight::new(1.0).is_some());
         assert!(LineHeight::new(0.0).is_none());
-        assert!(LineHeight::new(-1.0).is_none());
+        assert!(LineHeight::new(-1.0).is_some());
     }
 
     #[test]
@@ -117,13 +120,10 @@ mod tests {
         let json = r#"
         {
             "amount": 2,
-            "height": -1.0
+            "height": 0.0
         }
         "#;
         let err = serde_json::from_str::<Line>(json).unwrap_err();
-        assert!(
-            err.to_string()
-                .contains("LineHeight must be greater than zero")
-        );
+        assert!(err.to_string().contains("LineHeight must not be zero"));
     }
 }

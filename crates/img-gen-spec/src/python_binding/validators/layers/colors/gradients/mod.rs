@@ -4,6 +4,9 @@ mod types;
 
 #[pymethods]
 impl ColorGradient {
+    /// Creates a color gradient from ``spec`` or a named ``preset``.
+    ///
+    /// When ``spec`` is omitted, the preset is used instead.
     #[new]
     #[pyo3(
         text_signature = "(spec: Optional[List[Tuple[float, str]]] = None, preset: Optional[Preset] = Presets.MonoChrome) -> ColorGradient",

@@ -4,6 +4,7 @@ use crate::{ColorGradient, LayerOffset, LinearGradient, SolidColor, Spread};
 
 #[pymethods]
 impl LinearGradient {
+    /// Creates a linear gradient from ``colors``, ``start``, ``end``, and optional ``spread``.
     #[new]
     #[pyo3(
         text_signature = "(colors: ColorGradient, start: Offset, end: Offset, spread: Spread = Spread.Pad) -> LinearGradient",

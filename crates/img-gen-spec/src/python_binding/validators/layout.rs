@@ -7,6 +7,7 @@ use crate::{
 
 #[pymethods]
 impl Mask {
+    /// Creates a mask layer from optional geometry and drawable attributes.
     #[new]
     #[pyo3(
         text_signature = "(size: Size | None = None, offset: Offset | None = None, invert: bool = False, background: Background | None = None, ellipse: Ellipse | None = None, rectangle: Rectangle | None = None, polygon: Polygon | None = None, icon: Icon | None = None, typography: Typography | None = None) -> Mask",
@@ -41,6 +42,7 @@ impl Mask {
 #[pymethods]
 impl Layer {
     #[cfg(feature = "pyo3")]
+    /// Creates a layer from optional geometry and drawable attributes.
     #[new]
     #[pyo3(
         text_signature = "(size: Size | None = None, offset: Offset | None = None, background: Background | None = None, ellipse: Ellipse | None = None, rectangle: Rectangle | None = None, polygon: Polygon | None = None, icon: Icon | None = None, typography: Typography | None = None, mask: Mask | None = None) -> Layer",
@@ -74,6 +76,8 @@ impl Layer {
 
 #[pymethods]
 impl Debug {
+    /// Creates debug rendering options from ``enable``, ``grid``,
+    /// optional``grid_step``, and optional ``color``.
     #[new]
     #[pyo3(
         text_signature = "(enable: bool = False, grid: bool = True, grid_step: int = 16, color: Color | None = None) -> Debug",
@@ -102,6 +106,8 @@ impl Debug {
 
 #[pymethods]
 impl Layout {
+    /// Creates a layout from optional ``size``, a list of ``layers``,
+    /// and optional ``debug`` settings.
     #[new]
     #[pyo3(
         text_signature = "(size: Size | None = None, layers: list[Layer] = [], debug: Optional[Debug]) -> Layout",

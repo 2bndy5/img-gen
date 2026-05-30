@@ -56,6 +56,7 @@ impl Default for ColorKind {
 }
 
 impl ColorKind {
+    /// Returns the resolved RGBA tuple for the color at the given pixel coordinates.
     pub fn get_color_tuple_at(&self, x: u32, y: u32) -> (u8, u8, u8, u8) {
         match self {
             ColorKind::SolidColor(solid) => solid.to_tuple(),

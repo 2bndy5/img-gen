@@ -41,6 +41,7 @@ pub struct Border {
     pub color: ColorKind,
 }
 
+/// The default border width in pixels.
 pub const BORDER_WIDTH: NonZeroU32 = NonZeroU32::new(1).unwrap();
 
 impl Default for Border {

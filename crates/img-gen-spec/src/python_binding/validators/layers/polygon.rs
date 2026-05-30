@@ -6,6 +6,9 @@ use pyo3::{exceptions::PyValueError, prelude::*};
 
 #[pymethods]
 impl PolygonSides {
+    /// Creates regular polygon sides from ``sides``.
+    ///
+    /// The number of sides cannot be less than 3.
     #[staticmethod]
     pub fn regular(sides: u32) -> PyResult<Self> {
         RegularPolygonSides::new(sides)
@@ -15,6 +18,13 @@ impl PolygonSides {
             ))
     }
 
+    /// Creates irregular polygon sides from vertex ``offsets``.
+    ///
+    /// Each offset will be clamped to the bounds of the `Layer` dimensions,
+    /// and duplicate offsets will be removed. The last offset will be
+    /// connected to the first to close the polygon.
+    ///
+    /// The offsets list must contain at least 3 unique points.
     #[staticmethod]
     pub fn irregular(offsets: Vec<crate::LayerOffset>) -> PyResult<Self> {
         IrregularPolygonSides::new(offsets)
@@ -27,6 +37,9 @@ impl PolygonSides {
 
 #[pymethods]
 impl RegularPolygonSides {
+    /// Creates a regular polygon side-count wrapper from ``sides``.
+    ///
+    /// The number of sides cannot be less than 3.
     #[new]
     #[pyo3(
         text_signature = "(sides: int = 3) -> RegularPolygonSides",
@@ -47,6 +60,13 @@ impl RegularPolygonSides {
 
 #[pymethods]
 impl IrregularPolygonSides {
+    /// Creates irregular polygon sides from the vertex ``offsets`` list.
+    ///
+    /// Each offset will be clamped to the bounds of the `Layer` dimensions,
+    /// and duplicate offsets will be removed. The last offset will be
+    /// connected to the first to close the polygon.
+    ///
+    /// The offsets list must contain at least 3 unique points.
     #[new]
     #[pyo3(text_signature = "(offsets: list[Offset]) -> IrregularPolygonSides")]
     pub fn new_py(offsets: Vec<LayerOffset>) -> PyResult<Self> {
@@ -66,6 +86,8 @@ impl IrregularPolygonSides {
 
 #[pymethods]
 impl Polygon {
+    /// Creates a polygon from ``color`` and optional
+    /// ``border``, ``sides``, and ``rotation``.
     #[new]
     #[pyo3(
         text_signature = "(color: ColorKind, border: Border | None = None, sides: PolygonSides = PolygonSides.regular(3), rotation: float = 0.0) -> Polygon",

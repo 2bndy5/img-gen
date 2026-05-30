@@ -16,17 +16,23 @@ use serde::{Deserialize, Deserializer};
 #[serde(rename_all = "lowercase")]
 pub enum Weight {
     #[serde(alias = "100")]
+    /// Maps to CSS font weight `100`.
     Thin = 100,
     #[serde(alias = "300")]
+    /// Maps to CSS font weight `300`.
     Light = 300,
     #[serde(alias = "400")]
+    /// Maps to CSS font weight `400`.
     #[default]
     Regular = 400,
     #[serde(alias = "500")]
+    /// Maps to CSS font weight `500`.
     Medium = 500,
     #[serde(alias = "700")]
+    /// Maps to CSS font weight `700`.
     Bold = 700,
     #[serde(alias = "900")]
+    /// Maps to CSS font weight `900`.
     Black = 900,
 }
 
@@ -114,6 +120,9 @@ impl Font {
         }
     }
 
+    /// Creates a font from a family name and an optional style string.
+    ///
+    /// Legacy weight prefixes in `style` are normalized into [`Font::weight`] when present.
     pub fn from_family_style(family: String, style: Option<String>) -> Self {
         Self::from_parts(family, style, None, None, None)
     }
@@ -151,18 +160,22 @@ impl Font {
         }
     }
 
+    /// Returns the font family in the format expected by text layout code.
     pub fn font_family(&self) -> FontFamily<'_> {
         FontFamily::named(&self.family)
     }
 
+    /// Returns the parsed font style.
     pub fn font_style(&self) -> FontStyle {
         FontStyle::parse_css(self.style.trim()).unwrap_or(FontStyle::Normal)
     }
 
+    /// Returns the numeric font weight.
     pub fn font_weight(&self) -> FontWeight {
         FontWeight::new(self.weight.value() as f32)
     }
 
+    /// Returns the configured font path as a [`PathBuf`], when present.
     pub fn path_buf(&self) -> Option<PathBuf> {
         self.path.as_ref().map(PathBuf::from)
     }

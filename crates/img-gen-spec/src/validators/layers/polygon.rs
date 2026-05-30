@@ -16,6 +16,7 @@ impl RegularPolygonSides {
         if sides < 3 { None } else { Some(Self(sides)) }
     }
 
+    /// Returns the validated number of polygon sides.
     pub fn get(&self) -> u32 {
         self.0
     }
@@ -42,6 +43,7 @@ impl IrregularPolygonSides {
         }
     }
 
+    /// Returns the unique polygon points as a slice.
     pub fn as_slice(&self) -> &[LayerOffset] {
         &self.0
     }
@@ -51,7 +53,9 @@ impl IrregularPolygonSides {
 #[cfg_attr(feature = "pyo3", pyclass(module = "img_gen", from_py_object))]
 #[derive(Debug, Clone)]
 pub enum PolygonSides {
+    /// A polygon described by a validated side count.
     Regular(RegularPolygonSides),
+    /// A polygon described by explicit vertex offsets.
     Irregular(IrregularPolygonSides),
 }
 
@@ -74,6 +78,10 @@ impl Default for PolygonSides {
 }
 
 impl PolygonSides {
+    /// Deserializes either a regular side count or a list of irregular polygon points.
+    ///
+    /// Integer values produce [`PolygonSides::Regular`], while sequences of unique offsets
+    /// produce [`PolygonSides::Irregular`].
     pub fn deserialize<'de, D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -147,11 +155,17 @@ pub struct Polygon {
     #[serde(default = "ColorKind::transparent_default")]
     pub color: ColorKind,
 
+    /// The polygon side definition.
+    ///
+    /// Regular polygons use a side count, while irregular polygons use explicit vertex offsets.
     #[cfg(feature = "pyo3")]
     #[pyo3(get, set)]
     #[serde(default, deserialize_with = "PolygonSides::deserialize")]
     pub sides: PolygonSides,
 
+    /// The polygon side definition.
+    ///
+    /// Regular polygons use a side count, while irregular polygons use explicit vertex offsets.
     #[cfg(not(feature = "pyo3"))]
     #[serde(default, deserialize_with = "PolygonSides::deserialize")]
     pub sides: PolygonSides,

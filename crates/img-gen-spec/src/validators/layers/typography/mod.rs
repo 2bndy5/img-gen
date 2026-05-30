@@ -3,7 +3,9 @@ use pyo3::prelude::*;
 
 use serde::Deserialize;
 
+/// Font-related validators used by [`Typography`].
 pub mod font;
+/// Line-related validators used by [`Typography`].
 pub mod line;
 
 use super::{Border, ColorKind};
@@ -17,25 +19,44 @@ pub use line::{Line, LineHeight};
 )]
 #[derive(Debug, PartialEq, Clone, Default, Deserialize)]
 pub enum TypographyAlign {
+    /// Aligns text to the top-left corner.
     #[serde(alias = "start top")]
     #[default]
     StartTop,
+
+    /// Aligns text to the vertical center of the left edge.
     #[serde(alias = "start center")]
     StartCenter,
+
+    /// Aligns text to the bottom-left corner.
     #[serde(alias = "start bottom")]
     StartBottom,
+
+    /// Aligns text to the horizontal center of the top edge.
     #[serde(alias = "center top")]
     CenterTop,
+
+    /// Centers text horizontally and vertically.
     #[serde(alias = "center")]
     Center,
+
+    /// Centers text horizontally and vertically.
     #[serde(alias = "center center")]
     CenterCenter,
+
+    /// Aligns text to the horizontal center of the bottom edge.
     #[serde(alias = "center bottom")]
     CenterBottom,
+
+    /// Aligns text to the top-right corner.
     #[serde(alias = "end top")]
     EndTop,
+
+    /// Aligns text to the vertical center of the right edge.
     #[serde(alias = "end center")]
     EndCenter,
+
+    /// Aligns text to the bottom-right corner.
     #[serde(alias = "end bottom")]
     EndBottom,
 }

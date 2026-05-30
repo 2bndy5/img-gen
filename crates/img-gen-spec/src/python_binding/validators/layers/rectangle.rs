@@ -1,20 +1,9 @@
 use crate::{Border, ColorKind, Corners, Rectangle};
-use pyo3::{exceptions::PyValueError, prelude::*};
+use pyo3::prelude::*;
 
 #[pymethods]
 impl Corners {
-    /// Translate a given string value into an enumeration of `Corners`.
-    ///
-    /// Throws `ValueError` if the string is not a supported value (see signature).
-    #[staticmethod]
-    #[pyo3(
-        text_signature = "(val: Literal[\"top left\", \"top right\", \"bottom left\", \"bottom right\"]) -> Corners",
-        name = "from_string"
-    )]
-    pub fn from_string_py(val: &str) -> PyResult<Corners> {
-        Self::from_string(val).map_err(|e| PyValueError::new_err(e.to_string()))
-    }
-
+    /// Returns a list of all corner enum values.
     #[staticmethod]
     pub fn all() -> Vec<Self> {
         Self::ALL.to_vec()

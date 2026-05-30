@@ -38,6 +38,8 @@ fn clamp_angle(val: &mut f32) {
 }
 
 impl ConicalGradient {
+    /// Creates a conical gradient from `colors`, `center`, and
+    /// an optional starting `angle`.
     pub fn new(colors: ColorGradient, center: LayerOffset, angle: Option<f32>) -> Self {
         let mut a = angle.unwrap_or(0.0f32);
         clamp_angle(&mut a);
@@ -55,6 +57,9 @@ impl ConicalGradient {
         self.angle
     }
 
+    /// Sets the starting angle in degrees.
+    ///
+    /// Values are normalized into the inclusive range `[0.0, 360.0)`.
     pub fn set_angle(&mut self, val: f32) {
         let mut a = val;
         clamp_angle(&mut a);

@@ -226,6 +226,10 @@ impl RadialGradient {
         (point_dist - self.focal_radius) / span
     }
 
+    /// Creates a radial gradient from `colors`, `center`, `radius`, and
+    /// optional focal settings.
+    ///
+    /// Focal values are clamped to remain within the outer gradient circle.
     pub fn new(
         colors: ColorGradient,
         center: LayerOffset,
@@ -251,6 +255,9 @@ impl RadialGradient {
         self.center
     }
 
+    /// Sets the gradient center.
+    ///
+    /// Updating the center resets the focal point and focal radius to the new origin.
     pub fn set_center(&mut self, val: LayerOffset) {
         self.focal_point = Some(val);
         self.focal_radius = 0.0f32;
@@ -262,6 +269,7 @@ impl RadialGradient {
         self.radius
     }
 
+    /// Sets the gradient radius.
     pub fn set_radius(&mut self, val: f32) {
         self.radius = val;
         self.clamp_focal_point();
@@ -272,15 +280,20 @@ impl RadialGradient {
         self.focal_point.unwrap_or(self.center)
     }
 
+    /// Sets the focal point used to bias the radial gradient.
     pub fn set_focal_point(&mut self, val: LayerOffset) {
         self.focal_point = Some(val);
         self.clamp_focal_point();
     }
 
+    /// Returns the focal radius.
     pub fn get_focal_radius(&self) -> f32 {
         self.focal_radius
     }
 
+    /// Sets the focal radius.
+    ///
+    /// The value is clamped to remain within the outer gradient circle.
     pub fn set_focal_radius(&mut self, val: f32) {
         self.focal_radius = val;
         self.clamp_focal_point();

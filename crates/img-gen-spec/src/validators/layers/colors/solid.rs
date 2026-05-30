@@ -18,6 +18,7 @@ pub struct SolidColor {
     inner: Color,
 }
 
+/// A fully transparent RGBA color.
 pub const TRANSPARENT: SolidColor = SolidColor {
     inner: Color {
         r: 0.0,
@@ -62,6 +63,7 @@ impl SolidColor {
         })
     }
 
+    /// Returns the color components as an RGBA tuple.
     pub fn to_tuple(&self) -> (u8, u8, u8, u8) {
         (
             (self.inner.r * 255.0 + 0.5) as u8,
@@ -91,18 +93,22 @@ impl SolidColor {
         (self.inner.a * 255.0 + 0.5) as u8
     }
 
+    /// Sets the red component.
     pub fn set_r(&mut self, val: u8) {
         self.inner.r = val as f32 / 255.0;
     }
 
+    /// Sets the green component.
     pub fn set_g(&mut self, val: u8) {
         self.inner.g = val as f32 / 255.0;
     }
 
+    /// Sets the blue component.
     pub fn set_b(&mut self, val: u8) {
         self.inner.b = val as f32 / 255.0;
     }
 
+    /// Sets the alpha component.
     pub fn set_a(&mut self, val: u8) {
         self.inner.a = val as f32 / 255.0;
     }

@@ -29,9 +29,11 @@ use renderer::Renderer;
 #[cfg_attr(feature = "pyo3", pyclass(module = "img_gen", from_py_object))]
 #[derive(Clone)]
 pub struct Generator {
+    /// Search paths used to resolve input images and SVG assets.
     pub image_search_paths: Vec<PathBuf>,
     fontdb: Arc<fontdb::Database>,
     fontsource_client: FontSourceClient,
+    /// The root directory used for renderer cache data such as downloaded fonts.
     pub cache_root: PathBuf,
 }
 
@@ -91,6 +93,7 @@ impl Generator {
 #[cfg_attr(feature = "pyo3", pyclass(module = "img_gen", from_py_object))]
 #[derive(Clone)]
 pub struct Image {
+    /// The raw RGBA pixel buffer for the rendered image.
     pub data: RgbaImage,
 }
 

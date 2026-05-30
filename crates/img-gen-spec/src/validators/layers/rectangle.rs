@@ -1,7 +1,4 @@
-use std::fmt;
-
 use super::{Border, ColorKind};
-use crate::{ImgGenSpecError, Result};
 
 #[cfg(feature = "pyo3")]
 use pyo3::prelude::*;
@@ -33,35 +30,13 @@ pub enum Corners {
 }
 
 impl Corners {
-    pub fn from_string(val: &str) -> Result<Self> {
-        match val.to_lowercase().as_str() {
-            "top left" => Ok(Corners::TopLeft),
-            "top right" => Ok(Corners::TopRight),
-            "bottom left" => Ok(Corners::BottomLeft),
-            "bottom right" => Ok(Corners::BottomRight),
-            _ => Err(ImgGenSpecError::InvalidCornerIdentifier {
-                value: val.to_string(),
-            }),
-        }
-    }
-
+    /// All rectangle corners in display order.
     pub const ALL: [Self; 4] = [
         Corners::TopLeft,
         Corners::TopRight,
         Corners::BottomLeft,
         Corners::BottomRight,
     ];
-}
-
-impl fmt::Display for Corners {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Corners::TopLeft => write!(f, "top left"),
-            Corners::TopRight => write!(f, "top right"),
-            Corners::BottomLeft => write!(f, "bottom left"),
-            Corners::BottomRight => write!(f, "bottom right"),
-        }
-    }
 }
 
 /// An attribute to represent a rectangle rendered in the layer.
@@ -93,22 +68,4 @@ pub struct Rectangle {
     /// Any [`Corners`] not in this list will not be rounded.
     #[serde(default)]
     pub corners: Vec<Corners>,
-}
-
-#[cfg(test)]
-mod test {
-    #![allow(clippy::unwrap_used)]
-
-    use super::Corners;
-
-    #[test]
-    fn test_str() {
-        let str_values = ["top left", "top right", "bottom right", "bottom left"];
-        for str_val in str_values {
-            let val = Corners::from_string(str_val);
-            assert!(val.is_ok());
-            assert_eq!(val.unwrap().to_string(), str_val);
-        }
-        assert!(Corners::from_string("val").is_err());
-    }
 }

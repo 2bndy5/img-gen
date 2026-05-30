@@ -126,9 +126,12 @@ impl ColorGradient {
 #[derive(Debug, PartialEq, Clone, Copy, PartialOrd, Default, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum Spread {
+    /// Extends the edge colors beyond the gradient bounds.
     #[default]
     Pad,
+    /// Mirrors the gradient repeatedly beyond the gradient bounds.
     Reflect,
+    /// Restarts the gradient from the beginning beyond the gradient bounds.
     Repeat,
 }
 

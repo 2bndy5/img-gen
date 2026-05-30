@@ -28,6 +28,7 @@ macro_rules! enumerate_specs {
         #[doc = "These are also present in the Qt framework."]
         pub enum Presets {
             $(
+                #[doc = concat!("Uses the `", stringify!($preset_name), "` preset gradient.")]
                 $preset_name,
             )+
         }
@@ -61,6 +62,7 @@ macro_rules! enumerate_specs {
 
 
         impl Presets {
+            /// Parses a preset name from its exact enum variant string.
             pub fn from_string(val: &str) -> Option<Self> {
                 match val {
                     $(
@@ -70,7 +72,8 @@ macro_rules! enumerate_specs {
                 }
             }
 
-            pub fn get_gradient(preset: Presets) -> Result<LinearGradient, GradientBuilderError> {
+            /// Builds the gradient associated with `preset`.
+            pub(crate) fn get_gradient(preset: Presets) -> Result<LinearGradient, GradientBuilderError> {
                 match preset {
                     $(
                         Presets::$preset_name => $preset_name::default().get_gradient(),

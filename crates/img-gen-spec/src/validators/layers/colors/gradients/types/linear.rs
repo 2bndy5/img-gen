@@ -26,6 +26,8 @@ pub struct LinearGradient {
 }
 
 impl LinearGradient {
+    /// Creates a linear gradient from `colors`, `start`, `end`,
+    /// and an optional `spread` mode.
     pub fn new(
         colors: ColorGradient,
         start: LayerOffset,

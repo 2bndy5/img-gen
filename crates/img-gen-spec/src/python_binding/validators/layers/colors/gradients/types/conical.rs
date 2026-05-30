@@ -5,6 +5,7 @@ use crate::{ColorGradient, ConicalGradient, LayerOffset, SolidColor};
 
 #[pymethods]
 impl ConicalGradient {
+    /// Creates a conical gradient from ``colors``, ``center``, and optional ``angle``.
     #[new]
     #[pyo3(
             text_signature = "(colors: ColorGradient, center: Offset, angle: float = 0) -> ConicalGradient",
@@ -22,6 +23,7 @@ impl ConicalGradient {
         self.get_angle()
     }
 
+    /// Sets the starting gradient angle from ``val``.
     #[setter(angle)]
     pub fn set_angle_py(&mut self, val: f32) {
         self.set_angle(val);

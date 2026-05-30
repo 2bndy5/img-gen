@@ -7,6 +7,9 @@ use pyo3::{exceptions::PyValueError, prelude::*};
 
 #[pymethods]
 impl Line {
+    /// Creates a typography's line descriptor from ``amount`` and ``height``.
+    ///
+    /// ``amount`` must be greater than zero, and ``height`` must not be zero.
     #[new]
     #[pyo3(
         text_signature = "(amount: int = 1, height: float = 1.0) -> Line",
@@ -22,16 +25,19 @@ impl Line {
         Ok(Self { amount, height })
     }
 
+    /// Returns the current line height.
     #[getter]
     pub fn get_height(&self) -> f32 {
         self.height.get()
     }
 
+    /// Returns the current line amount.
     #[getter]
     pub fn get_amount(&self) -> i32 {
         self.amount.get()
     }
 
+    /// Sets the line height from ``height``.
     #[setter]
     pub fn set_height(&mut self, height: f32) -> PyResult<()> {
         self.height = LineHeight::new(height).ok_or(PyValueError::new_err(
@@ -40,6 +46,7 @@ impl Line {
         Ok(())
     }
 
+    /// Sets the line amount from ``amount``.
     #[setter]
     pub fn set_amount(&mut self, amount: i32) -> PyResult<()> {
         self.amount = NonZeroI32::new(amount).ok_or(PyValueError::new_err(
@@ -51,6 +58,8 @@ impl Line {
 
 #[pymethods]
 impl Font {
+    /// Creates a font from ``family`` and optional
+    /// ``style``, ``weight``, ``subset``, and ``path``.
     #[new]
     #[pyo3(
         text_signature = "(family: str = \"Roboto\", style: str | None = None, weight: Weight | None = None, subset: str | None = None, path: str | None = None) -> Font",

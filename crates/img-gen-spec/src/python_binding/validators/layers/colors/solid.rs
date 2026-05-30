@@ -3,6 +3,9 @@ use pyo3::{exceptions::PyValueError, prelude::*};
 
 #[pymethods]
 impl SolidColor {
+    /// Creates a solid color from ``r``, ``g``, ``b``, and ``a`` components.
+    ///
+    /// Each component is clamped to range [0, 255].
     #[new]
     #[pyo3(
         text_signature = "(r: int = 0, g: int = 0, b: int = 0, a: int = 0) -> None",
@@ -63,21 +66,25 @@ impl SolidColor {
         self.get_a()
     }
 
+    /// Sets the red component from ``val``.
     #[setter(r)]
     pub fn set_r_py(&mut self, val: u8) {
         self.set_r(val);
     }
 
+    /// Sets the green component from ``val``.
     #[setter(g)]
     pub fn set_g_py(&mut self, val: u8) {
         self.set_g(val);
     }
 
+    /// Sets the blue component from ``val``.
     #[setter(b)]
     pub fn set_b_py(&mut self, val: u8) {
         self.set_b(val);
     }
 
+    /// Sets the alpha component from ``val``.
     #[setter(a)]
     pub fn set_a_py(&mut self, val: u8) {
         self.set_a(val);

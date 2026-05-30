@@ -13,9 +13,7 @@ classifiers = [
     "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dynamic = ["version"]
-dependencies = [
-    "asyncio>=4.0.0",
-]
+dependencies = []
 
 [tool.maturin]
 manifest-path = "crates/img-gen/Cargo.toml"
@@ -37,8 +35,10 @@ dev = [
     "mypy==2.1.0",
     "pre-commit==4.6.0",
     "ruff==0.15.14",
+    "asyncio>=4.0.0",
 ]
 docs = [
+    "myst-parser>=4.0.1",
     "sphinx>=7.4.7,<9",
     "sphinx-immaterial>=0.12.5",
     "sphinx-jinja>=2.0.2",

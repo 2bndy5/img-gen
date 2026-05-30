@@ -47,11 +47,6 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
           persist-credentials: true # needed for `git push`
-      - name: Set up Python
-        if: inputs.package == 'img-gen-py'
-        uses: actions/setup-python@v6
-        with:
-          python-version: 3.x
       - uses: cargo-bins/cargo-binstall@aaa84a43aec4955a42c5ffc65d258961e39f276e # v1.19.1
       - run: cargo binstall -y git-cliff
         env:
@@ -60,12 +55,18 @@ jobs:
         uses: hustcer/setup-nu@92c296ba1ba2ba04cc948ab64ddefe192dc13f0c # v3.23
         with:
           version: ${{ vars.NUSHELL_VERSION || '*' }}
+      - name: Install cargo-edit
+        if: inputs.package != 'img-gen-py'
+        run: >-
+          cargo install cargo-edit
+          --no-default-features
+          --features set-version
+          --locked
       - name: Bump ${{ inputs.component }} version
         env:
           GITHUB_TOKEN: ${{ secrets.BUMP_N_RELEASE }}
           GH_TOKEN: ${{ secrets.BUMP_N_RELEASE }}
         run: nu .github/workflows/bump-n-release.nu ${{ inputs.package }} ${{ inputs.component }}
-        id: tagged
 
   get-changed-pkgs:
     if: github.event_name != 'workflow_dispatch' && !startsWith(github.ref, 'refs/tags/')

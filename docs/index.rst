@@ -11,6 +11,11 @@ external dependencies (like cairo) installed.
     API/layout
     API/generator
 
+.. toctree::
+    :hidden:
+
+    changelogs/index
+
 .. spell-checker: disable-next-line
 .. currentmodule:: img_gen
 

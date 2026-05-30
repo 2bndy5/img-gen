@@ -8,6 +8,22 @@ Generate images from a deterministic data structure.
 
 This project is written in Rust but ships as a Python package also.
 
+## Distributions
+
+### Rust
+
+| name | version | docs |
+|------|---------|------|
+| `img-gen` | [![crates.io][img-gen-crate-badge]][img-gen-crate-link] | [![docs.rs][img-gen-crate-docs-badge]][img-gen-crate-docs-link] |
+| `img-gen-renderer` | [![crates.io][img-gen-renderer-crate-badge]][img-gen-renderer-crate-link] | [![docs.rs][img-gen-renderer-crate-docs-badge]][img-gen-renderer-crate-docs-link] |
+| `img-gen-spec` | [![crates.io][img-gen-spec-crate-badge]][img-gen-spec-crate-link] | [![docs.rs][img-gen-spec-crate-docs-badge]][img-gen-spec-crate-docs-link] |
+
+### Python
+
+| name | version | docs |
+|------|---------|------|
+| `img-gen` | [![PyPI][pypi-badge]][pypi-link] | [![gh-pages][gh-pages-badge]][gh-pages-link] |
+
 ## Examples
 
 The below examples use the following YAML doc as a file named `example-layout.yml`.
@@ -78,3 +94,19 @@ async fn main() {
 [py-ci-link]: https://github.com/2bndy5/img-gen/actions/workflows/python.yml
 [rust-ci-badge]: https://github.com/2bndy5/img-gen/actions/workflows/rust.yml/badge.svg
 [rust-ci-link]: https://github.com/2bndy5/img-gen/actions/workflows/rust.yml
+[img-gen-crate-badge]: https://img.shields.io/crates/v/img-gen
+[img-gen-crate-link]: https://crates.io/crates/img-gen
+[img-gen-crate-docs-badge]: https://img.shields.io/docsrs/img-gen
+[img-gen-crate-docs-link]: https://docs.rs/img-gen/
+[img-gen-renderer-crate-badge]: https://img.shields.io/crates/v/img-gen-renderer
+[img-gen-renderer-crate-link]: https://crates.io/crates/img-gen-renderer
+[img-gen-renderer-crate-docs-badge]: https://img.shields.io/docsrs/img-gen-renderer
+[img-gen-renderer-crate-docs-link]: https://docs.rs/img-gen-renderer/
+[img-gen-spec-crate-badge]: https://img.shields.io/crates/v/img-gen-spec
+[img-gen-spec-crate-link]: https://crates.io/crates/img-gen-spec
+[img-gen-spec-crate-docs-badge]: https://img.shields.io/docsrs/img-gen-spec
+[img-gen-spec-crate-docs-link]: https://docs.rs/img-gen-spec/
+[pypi-badge]: https://img.shields.io/pypi/v/img-gen
+[pypi-link]: https://pypi.org/project/img-gen
+[gh-pages-link]: https://2bndy5.github.io/img-gen
+[gh-pages-badge]: https://img.shields.io/github/deployments/2bndy5/img-gen/github-pages?label=docs

@@ -4,7 +4,13 @@
 [changelog]
 # template for the changelog header
 header = """
-# Changelog\n
+---
+title: {{ get_env(name="GIT_CLIFF_TAG", default="/") | split_regex(pat="/") | first }} Changelog
+---
+
+<!-- markdownlint-disable MD025 -->
+# Changelog
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
@@ -60,7 +66,7 @@ body = """
 {%- else -%}
     {#- Otherwise, use the previous version tag as the starting point -#}
     {%- set first_commit = previous.version -%}
-{%- endif -%}
+{%- endif %}
 [{{ this_version }}]: {{ self::remote_url() }}/compare/{{ first_commit }}...{{ last_commit }}
 
 Full commit diff: [`{% if not previous.version -%}

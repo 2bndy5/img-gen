@@ -8,6 +8,11 @@ license = { workspace = true }
 authors = { workspace = true }
 repository = { workspace = true }
 homepage = { workspace = true }
+keywords = [
+    "image",
+    "generation",
+    "renderer",
+]
 
 [dependencies]
 directories = "6.0"

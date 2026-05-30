@@ -8,6 +8,11 @@ license = { workspace = true }
 authors = { workspace = true }
 repository = { workspace = true }
 homepage = { workspace = true }
+keywords = [
+    "image",
+    "generation",
+    "specification",
+]
 
 [dependencies]
 colorgrad = { version = "0.8.0", features = ["named-colors"] }

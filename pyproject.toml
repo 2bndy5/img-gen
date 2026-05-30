@@ -1,5 +1,5 @@
 [build-system]
-requires = ["maturin>=1.7,<2.0"]
+requires = ["maturin>=1.13.3,<2.0"]
 build-backend = "maturin"
 
 [project]
@@ -33,10 +33,10 @@ addopts = "-vv --durations=5"
 
 [dependency-groups]
 dev = [
-    "maturin==1.10.1",
+    "maturin==1.13.3",
     "mypy==2.1.0",
-    "pre-commit==4.3.0",
-    "ruff==0.15.13",
+    "pre-commit==4.6.0",
+    "ruff==0.15.14",
 ]
 docs = [
     "sphinx>=7.4.7,<9",

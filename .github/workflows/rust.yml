@@ -75,7 +75,7 @@ jobs:
         with:
           path: "~/.cargo"
           key: cargo-test-${{ hashFiles('Cargo.lock') }}
-      - uses: cargo-bins/cargo-binstall@ae04fb5e853ae6cd3ad7de4a1d554a8b646d12aa # v1.15.11
+      - uses: cargo-bins/cargo-binstall@aaa84a43aec4955a42c5ffc65d258961e39f276e # v1.19.1
       - name: Install cargo-nextest, cargo-llvm-cov, and nur
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -100,10 +100,10 @@ jobs:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v8
         with:
           name: test-coverage
-      - uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
+      - uses: codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354 # v6.0.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: lcov.info

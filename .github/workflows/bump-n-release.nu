@@ -197,7 +197,7 @@ export def gen-changes [
         '--config' $"($config_path | path join 'cliff.toml')"
     ]
     if (($tag | str length) > 0) {
-        $args = $args | append ['--tag', $tag]
+        $args = $args | append ['--tag', $tag, '--tag-pattern', $"($pkg)/v*"]
     }
     let prompt = if $unreleased {
         let out_path = $config_path | path join 'ReleaseNotes.md'

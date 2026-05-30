@@ -57,6 +57,7 @@ words:
   - pymodule
   - pypa
   - pypi
+  - pyproject
   - pytest
   - reqwest
   - resvg

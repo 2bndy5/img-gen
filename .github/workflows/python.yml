@@ -8,9 +8,23 @@ name: Python
 on:
   push:
     branches: [main]
+    paths:
+      - crates/**/*.rs
+      - "!crates/img-gen/tests/*.rs"
+      - crates/img-gen/tests/*.py
+      - pyproject.toml
+      - docs/
+      - .github/workflows/python.yml
     tags: ["img-gen-py/v*"]
   pull_request:
     branches: [main]
+    paths:
+      - crates/**/*.rs
+      - "!crates/img-gen/tests/*.rs"
+      - crates/img-gen/tests/*.py
+      - pyproject.toml
+      - docs/
+      - .github/workflows/python.yml
 
 permissions: {}
 

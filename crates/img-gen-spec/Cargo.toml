@@ -1,0 +1,23 @@
+[package]
+name = "img-gen-spec"
+description = "An API to create image generator specifications"
+version = "0.0.0"
+readme = "README.md"
+edition = { workspace = true }
+license = { workspace = true }
+authors = { workspace = true }
+repository = { workspace = true }
+homepage = { workspace = true }
+
+[dependencies]
+colorgrad = { version = "0.8.0", features = ["named-colors"] }
+fontsource_downloader = { workspace = true }
+parley = { workspace = true }
+pyo3 = { workspace = true, optional = true }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde-saphyr = { workspace = true }
+thiserror = { workspace = true }
+
+[features]
+pyo3 = ["dep:pyo3"]

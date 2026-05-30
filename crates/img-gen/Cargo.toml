@@ -1,0 +1,36 @@
+[package]
+name = "img-gen"
+description = "A convenience library that re-exports public API from img-gen-spec and img-gen-renderer"
+version = "0.0.0"
+readme = "README.md"
+edition = { workspace = true }
+license = { workspace = true }
+authors = { workspace = true }
+repository = { workspace = true }
+homepage = { workspace = true }
+exclude = ["tests/*.py"]
+
+[lib]
+name = "img_gen"
+crate-type = ["cdylib", "lib"]
+
+[dependencies]
+img-gen-renderer = { path = "../img-gen-renderer", version = "0.0.0" }
+img-gen-spec = { path = "../img-gen-spec", version = "0.0.0" }
+pyo3 = { workspace = true, optional = true, features = ["extension-module", "abi3-py310"] }
+reqwest = { version = "0.13", optional = true, features = ["default-tls"] }
+tokio = { workspace = true, optional = true }
+
+[features]
+pyo3 = [
+    "dep:pyo3",
+    "dep:tokio",
+    "dep:reqwest",
+    "img-gen-spec/pyo3",
+    "img-gen-renderer/pyo3",
+]
+
+[dev-dependencies]
+reqwest = { version = "0.13", features = ["default-tls"] }
+serde-saphyr = { workspace = true }
+tokio = { workspace = true, features = ["rt-multi-thread"] }

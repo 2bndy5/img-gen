@@ -1,0 +1,22 @@
+[workspace]
+resolver = "2"
+members = [
+	"crates/img-gen-spec",
+	"crates/img-gen-renderer",
+	"crates/img-gen",
+]
+
+[workspace.package]
+edition = "2024"
+authors = ["Brendan Doherty"]
+license = "MIT"
+repository = "https://github.com/2bndy5/img-gen"
+homepage = "https://2bndy5.github.io/img-gen"
+
+[workspace.dependencies]
+fontsource_downloader = "0.3.1"
+parley = { version = "0.9.0", default-features = false, features = ["std"] }
+pyo3 = "0.28.3"
+serde-saphyr = "0.0.27"
+thiserror = "2.0"
+tokio = { version = "1.52.3", features = ["macros"] }

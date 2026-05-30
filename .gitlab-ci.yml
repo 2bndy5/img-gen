@@ -1,0 +1,51 @@
+# Official language image. Look for the different tagged releases at:
+# https://hub.docker.com/r/library/rust/tags/
+image: "rust:latest"
+
+# Optional: Pick zero or more services to be used on all builds.
+# Only needed when using a docker container to run your tests in.
+# Check out: https://docs.gitlab.com/ee/ci/services/index.html
+# services:
+#   - mysql:latest
+#   - redis:latest
+#   - postgres:latest
+
+# Optional: Install a C compiler, cmake and git into the container.
+# You will often need this when you (or any of your dependencies) depends on C code.
+before_script:
+  - apt-get update -yqq
+  - apt-get install -yqq --no-install-recommends build-essential
+
+# Use cargo to test the project
+test:cargo:
+  before_script:
+    # install cargo-nextest
+    - curl -LsSf https://get.nexte.st/latest/linux | tar zxf - -C ${CARGO_HOME:-~/.cargo}/bin
+    # install cargo-llvm-cov
+    - |-
+      # Get host target
+      host=$(rustc -vV | grep '^host:' | cut -d' ' -f2)
+      # Download binary and install to $HOME/.cargo/bin
+      # spell-checker: disable-next-line
+      curl --proto '=https' --tlsv1.2 -fsSL https://github.com/taiki-e/cargo-llvm-cov/releases/latest/download/cargo-llvm-cov-$host.tar.gz | tar xzf - -C "${CARGO_HOME:-~/.cargo}/bin"
+  script:
+    - rustc --version && cargo --version  # Print version info for debugging
+    - cargo llvm-cov nextest --profile ci
+  artifacts:
+    when: always
+    reports:
+      junit: $CI_PROJECT_DIR/target/nextest/*/junit.xml
+  cache:
+    key: binaries-cache-$CI_COMMIT_REF_SLUG
+    paths:
+      - ${CARGO_HOME:-~/.cargo}
+  coverage: '/^TOTAL\s+\d+\s+\d+\s+\d+.\d+\%\s+\d+\s+\d+\s+\d+.\d+\%\s+\d+\s+\d+\s+(\d+.\d+\%)\s+\d+\s+\d+\s+.$/'
+
+deploy:
+  stage: deploy
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+      when: manual
+  script:
+    - cargo publish
+  environment: production

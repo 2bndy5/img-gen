@@ -1,0 +1,34 @@
+# This is the default config used by nextest. It is embedded in the binary at
+# build time. It may be used as a template for .config/nextest.toml.
+
+[store]
+# The directory under the workspace root at which nextest-related files are
+# written. Profile-specific storage is currently written to dir/<profile-name>.
+dir = "target/nextest"
+
+[profile.ci]
+# A profile to run only tests that use clang-tidy and/or clang-format
+# NOTE: This profile is intended to keep CI runtime low. Locally, use default or all profiles
+
+# show which tests were skipped
+status-level = "skip"
+
+# show log output from each test
+success-output = "final"
+failure-output = "immediate-final"
+
+[profile.ci.junit]
+# Output a JUnit report into the given file inside 'store.dir/<profile-name>'.
+# If unspecified, JUnit is not written out.
+path = "junit.xml"
+
+# Whether standard output and standard error for passing tests should be stored in the JUnit report.
+# Output is stored in the <system-out> and <system-err> elements of the <testcase> element.
+store-success-output = true
+
+# Whether standard output and standard error for failing tests should be stored in the JUnit report.
+# Output is stored in the <system-out> and <system-err> elements of the <testcase> element.
+#
+# Note that if a description can be extracted from the output, it is always stored in the
+# <description> element.
+store-failure-output = true

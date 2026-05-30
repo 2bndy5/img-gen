@@ -1,0 +1,267 @@
+use std::{collections::HashSet, path::PathBuf};
+
+use image::{
+    ImageReader, RgbaImage,
+    imageops::{FilterType, overlay},
+};
+use resvg::{
+    tiny_skia::{Pixmap, Transform},
+    usvg::{Tree, roxmltree},
+};
+
+use crate::{ImgGenRendererError, Layer, PreserveAspect, Result};
+
+use super::{ConcreteSize, Renderer};
+
+impl Renderer<'_> {
+    pub async fn render_background(
+        &mut self,
+        layer: &Layer,
+        size: ConcreteSize,
+        canvas: &mut RgbaImage,
+    ) -> Result<()> {
+        if let Some(l) = layer.background.as_ref() {
+            let mut img = None;
+
+            // load image data
+            if let Some(i) = &l.image {
+                img = Some(if maybe_builtin_svg(i) {
+                    self.load_svg(i, size, l.preserve_aspect).await?
+                } else {
+                    self.load_image(i, size, l.preserve_aspect)?
+                });
+            }
+
+            // colorize
+            if let Some(color) = &l.color {
+                let mut over_layer = RgbaImage::new(size.width, size.height);
+                Self::colorize(color, &mut over_layer, false);
+                if let Some(ref mut pic) = img {
+                    overlay(pic, &over_layer, 0, 0);
+                } else {
+                    img = Some(over_layer);
+                }
+            }
+
+            if let Some(img) = img {
+                overlay(canvas, &img, layer.offset.x.into(), layer.offset.y.into());
+            }
+        }
+        Ok(())
+    }
+
+    pub async fn render_icon(
+        &mut self,
+        layer: &Layer,
+        size: ConcreteSize,
+        canvas: &mut RgbaImage,
+    ) -> Result<()> {
+        if let Some(l) = layer.icon.as_ref() {
+            // load image data
+            let mut img = if maybe_builtin_svg(&l.image) {
+                self.load_svg(&l.image, size, l.preserve_aspect).await?
+            } else {
+                self.load_image(&l.image, size, l.preserve_aspect)?
+            };
+
+            // colorize
+            if let Some(color) = &l.color {
+                Self::colorize(color, &mut img, true);
+            }
+
+            overlay(canvas, &img, layer.offset.x.into(), layer.offset.y.into());
+        }
+        Ok(())
+    }
+
+    fn load_image(
+        &self,
+        path: &str,
+        size: ConcreteSize,
+        preserve_aspect: PreserveAspect,
+    ) -> Result<RgbaImage> {
+        let resolved_path = self
+            .find_ext_resource_path(path)
+            .unwrap_or(PathBuf::from(path));
+        let mut buf = ImageReader::open(&resolved_path)
+            .map_err(|source| ImgGenRendererError::OpenImageFailed {
+                path: path.to_string(),
+                source,
+            })?
+            .decode()
+            .map_err(|source| ImgGenRendererError::DecodeImageFailed {
+                path: path.to_string(),
+                source,
+            })?;
+        let width = size.width;
+        let height = size.height;
+        let og_width = buf.width();
+        let og_height = buf.height();
+        let (new_width, new_height) = match preserve_aspect {
+            PreserveAspect::Off => (width, height),
+            PreserveAspect::On => {
+                if og_width > og_height {
+                    (
+                        width,
+                        (height as f32 * (og_height as f32 / og_width as f32) + 0.5) as u32,
+                    )
+                } else {
+                    (
+                        (width as f32 * (og_width as f32 / og_height as f32) + 0.5) as u32,
+                        height,
+                    )
+                }
+            }
+            PreserveAspect::Width => {
+                let ratio = og_height as f32 / og_width as f32;
+                (width, (width as f32 * ratio + 0.5) as u32)
+            }
+            PreserveAspect::Height => {
+                let ratio = og_width as f32 / og_height as f32;
+                ((height as f32 * ratio + 0.5) as u32, height)
+            }
+        };
+        buf = buf.resize_exact(new_width, new_height, FilterType::CatmullRom);
+        let mut img = RgbaImage::new(width, height);
+        let offset_x = (width as i64 - buf.width() as i64) / 2;
+        let offset_y = (height as i64 - buf.height() as i64) / 2;
+        overlay(&mut img, &RgbaImage::from(buf), offset_x, offset_y);
+        Ok(img)
+    }
+
+    async fn prefetch_svg_fonts<'a>(
+        &mut self,
+        svg_data: &'a str,
+        path: &str,
+    ) -> Result<(roxmltree::Document<'a>, HashSet<String>)> {
+        let (doc, families) = super::fonts::extract_fonts_from_svg(svg_data).map_err(|source| {
+            ImgGenRendererError::ParseSvgXmlFailed {
+                path: path.to_string(),
+                source,
+            }
+        })?;
+        for family in &families {
+            let font = crate::Font::from_family_style(family.to_string(), None);
+            let query = super::fonts::to_font_query(&font);
+            let downloaded_paths = self.fontsource_client.download_font(&query).await?;
+            for path in &downloaded_paths {
+                self.register_font_path(path)?;
+            }
+        }
+        Ok((doc, families))
+    }
+
+    async fn load_svg(
+        &mut self,
+        path: &str,
+        size: ConcreteSize,
+        preserve_aspect: PreserveAspect,
+    ) -> Result<RgbaImage> {
+        let tree = {
+            let svg_data = match load_builtin_svg_pack(path)? {
+                Some(data) => data,
+                None => {
+                    let svg_path = PathBuf::from(path).with_extension("svg");
+                    let p = self.find_ext_resource_path(&svg_path).unwrap_or(svg_path);
+                    &std::fs::read_to_string(&p).map_err(|source| {
+                        ImgGenRendererError::ReadSvgFailed {
+                            path: path.to_string(),
+                            source,
+                        }
+                    })?
+                }
+            };
+            let (svg_doc, _font_families) = self.prefetch_svg_fonts(svg_data, path).await?;
+            Tree::from_xmltree(&svg_doc, &self.svg_options).map_err(|source| {
+                ImgGenRendererError::ParseSvgFailed {
+                    path: path.to_string(),
+                    source,
+                }
+            })?
+        };
+        let width = size.width;
+        let height = size.height;
+        let og_width = tree.size().width();
+        let og_height = tree.size().height();
+        let (scale_x, scale_y) = match preserve_aspect {
+            PreserveAspect::Off => {
+                let scale_x = width as f32 / og_width;
+                let scale_y = height as f32 / og_height;
+                (scale_x, scale_y)
+            }
+            PreserveAspect::On => {
+                let ratio = if og_width > og_height {
+                    og_width / width as f32
+                } else {
+                    og_height / height as f32
+                };
+                (1.0 / ratio, 1.0 / ratio)
+            }
+            PreserveAspect::Width => {
+                let ratio = og_width / width as f32;
+                (1.0 / ratio, 1.0 / ratio)
+            }
+            PreserveAspect::Height => {
+                let ratio = og_height / height as f32;
+                (1.0 / ratio, 1.0 / ratio)
+            }
+        };
+        let mut pixmap = Pixmap::new((og_width * scale_x) as u32, (og_height * scale_y) as u32)
+            .ok_or(ImgGenRendererError::SvgScaledToZeroSize {
+                path: path.to_string(),
+            })?;
+        resvg::render(
+            &tree,
+            Transform::from_scale(scale_x, scale_y),
+            &mut pixmap.as_mut(),
+        );
+        let mut img = RgbaImage::new(width, height);
+        let offset_x = (width as i64 - pixmap.width() as i64) / 2;
+        let offset_y = (height as i64 - pixmap.height() as i64) / 2;
+        let svg = RgbaImage::from_raw(pixmap.width(), pixmap.height(), pixmap.data().to_vec())
+            .ok_or(ImgGenRendererError::RasterBufferConversionFailed {
+                shape: "svg",
+                width: pixmap.width(),
+                height: pixmap.height(),
+            })?;
+        overlay(&mut img, &svg, offset_x, offset_y);
+        Ok(img)
+    }
+}
+
+fn maybe_builtin_svg(name: &str) -> bool {
+    match PathBuf::from(name).extension() {
+        Some(ext) => ext.eq_ignore_ascii_case("svg"),
+        None => name
+            .split_once('/')
+            .map(|(icon_pkg, _)| {
+                matches!(icon_pkg, "material" | "simple" | "octicons" | "fontawesome")
+            })
+            .unwrap_or(false),
+    }
+}
+
+fn load_builtin_svg_pack(name: &str) -> Result<Option<&str>> {
+    if let Some((icon_pkg, slug)) = name.split_once('/') {
+        let svg_str = match icon_pkg {
+            "material" => material_design_icons_pack::get_icon(slug).map(|v| v.svg),
+            "simple" => simple_icons_pack::get_icon(slug).map(|v| v.svg),
+            "octicons" => octicons_pack::get_icon(slug).map(|v| v.svg),
+            "fontawesome" => fontawesome_free_pack::get_icon(slug).map(|v| v.svg),
+            _ => None,
+        };
+        return Ok(svg_str);
+    }
+    Ok(None)
+}
+
+#[cfg(test)]
+mod tests {
+    #![allow(clippy::unwrap_used)]
+    use super::*;
+
+    #[test]
+    fn non_builtin_svg() {
+        assert!(load_builtin_svg_pack("non-existent-svg").unwrap().is_none());
+    }
+}

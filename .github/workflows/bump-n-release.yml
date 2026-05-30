@@ -84,8 +84,8 @@ jobs:
       - name: Get changed packages
         id: get-pkgs
         env:
-          HEAD_REF: ${{ github.event.pull_request.head.ref || github.ref }}
-          BASE_REF: ${{ github.event.pull_request.base.ref || 'HEAD~1'}}
+          HEAD_REF: ${{ github.event.pull_request.head.sha || 'HEAD' }}
+          BASE_REF: ${{ github.event.pull_request.base.sha || 'HEAD~1'}}
         shell: nu {0}
         run: |-
           print (pwd)

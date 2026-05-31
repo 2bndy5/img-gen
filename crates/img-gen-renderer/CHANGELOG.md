@@ -11,11 +11,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 <!-- markdownlint-disable MD024 -->
 
+## [img-gen-renderer/v0.2.1] - 2026-05-31
+
+### <!-- 6 --> 📦 Dependency updates
+
+- Bump version to img-gen-spec/v0.2.1 by @2bndy5 in [`05911e5`](https://github.com/2bndy5/img-gen/commit/05911e57b2f20d633b63540fc18f081d9c54c259)
+
+[img-gen-renderer/v0.2.1]: https://github.com/2bndy5/img-gen/compare/img-gen-renderer/v0.2.0...img-gen-renderer/v0.2.1
+
+Full commit diff: [`19dce6e...img-gen-renderer/v0.2.1`][img-gen-renderer/v0.2.1]
+
 ## [img-gen-renderer/v0.2.0] - 2026-05-31
 
 ### <!-- 6 --> 📦 Dependency updates
 
 - Bump version to img-gen-spec/v0.2.0 by @2bndy5 in [`c1e31a5`](https://github.com/2bndy5/img-gen/commit/c1e31a503ddcbe8a31268cf83b0b286567c3600a)
+- Bump version to img-gen-renderer/v0.2.0 by @2bndy5 in [`c6be725`](https://github.com/2bndy5/img-gen/commit/c6be7251bbd26007db569d5a1476fbb427e1826e)
 
 [img-gen-renderer/v0.2.0]: https://github.com/2bndy5/img-gen/compare/img-gen-renderer/v0.1.0...img-gen-renderer/v0.2.0
 

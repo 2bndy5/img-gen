@@ -1,7 +1,7 @@
 [package]
 name = "img-gen"
 description = "A convenience library that re-exports public API from img-gen-spec and img-gen-renderer"
-version = "0.1.0"
+version = "0.2.0"
 readme = "README.md"
 edition = { workspace = true }
 license = { workspace = true }

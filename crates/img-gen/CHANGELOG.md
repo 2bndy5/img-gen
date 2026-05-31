@@ -11,6 +11,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 <!-- markdownlint-disable MD024 -->
 
+## [img-gen/v0.2.0] - 2026-05-31
+
+### <!-- 1 --> 🚀 Added
+
+- Add serialization support by @2bndy5 in [#8](https://github.com/2bndy5/img-gen/pull/8)
+
+### <!-- 6 --> 📦 Dependency updates
+
+- Bump version to img-gen-spec/v0.2.0 by @2bndy5 in [`c1e31a5`](https://github.com/2bndy5/img-gen/commit/c1e31a503ddcbe8a31268cf83b0b286567c3600a)
+- Bump version to img-gen-renderer/v0.2.0 by @2bndy5 in [`c6be725`](https://github.com/2bndy5/img-gen/commit/c6be7251bbd26007db569d5a1476fbb427e1826e)
+
+[img-gen/v0.2.0]: https://github.com/2bndy5/img-gen/compare/img-gen/v0.1.0...img-gen/v0.2.0
+
+Full commit diff: [`19dce6e...img-gen/v0.2.0`][img-gen/v0.2.0]
+
 ## [img-gen/v0.1.0] - 2026-05-30
 
 ### <!-- 1 --> 🚀 Added
@@ -22,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Bump version to img-gen-spec/v0.1.0 by @2bndy5 in [`a98597e`](https://github.com/2bndy5/img-gen/commit/a98597e2432354b0d4f70498c1b680ece691d161)
 - Bump version to img-gen-renderer/v0.1.0 by @2bndy5 in [`854733a`](https://github.com/2bndy5/img-gen/commit/854733af4297a24739f4bb45ddd6232579132f63)
+- Bump version to img-gen/v0.1.0 by @2bndy5 in [`9282e58`](https://github.com/2bndy5/img-gen/commit/9282e58e60e41248e0290fe9485f8d6b60850ab5)
 
 ### <!-- 8 --> 📝 Documentation
 

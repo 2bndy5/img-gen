@@ -11,6 +11,31 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 <!-- markdownlint-disable MD024 -->
 
+## [img-gen/v0.2.2] - 2026-05-31
+
+### <!-- 4 --> 🛠️ Fixed
+
+- Deserialize repeated YAML fields in py binding by @2bndy5 in [`38f2cd4`](https://github.com/2bndy5/img-gen/commit/38f2cd4969d0940765a45dc870c1a9b47bb2d8b9)
+
+### <!-- 6 --> 📦 Dependency updates
+
+- Bump version to img-gen-spec/v0.2.1 by @2bndy5 in [`05911e5`](https://github.com/2bndy5/img-gen/commit/05911e57b2f20d633b63540fc18f081d9c54c259)
+- Bump version to img-gen-renderer/v0.2.1 by @2bndy5 in [`24b3038`](https://github.com/2bndy5/img-gen/commit/24b303823fe74fbf8e91a0aad1ccd7e0ddfcd2b0)
+
+[img-gen/v0.2.2]: https://github.com/2bndy5/img-gen/compare/img-gen/v0.2.1...img-gen/v0.2.2
+
+Full commit diff: [`19dce6e...img-gen/v0.2.2`][img-gen/v0.2.2]
+
+## [img-gen/v0.2.1] - 2026-05-31
+
+### <!-- 6 --> 📦 Dependency updates
+
+- Bump version to img-gen/v0.2.1 by @2bndy5 in [`fd7b5a6`](https://github.com/2bndy5/img-gen/commit/fd7b5a60b8f96dc5ac2cb317da8425b91ed797cb)
+
+[img-gen/v0.2.1]: https://github.com/2bndy5/img-gen/compare/img-gen/v0.2.0...img-gen/v0.2.1
+
+Full commit diff: [`19dce6e...img-gen/v0.2.1`][img-gen/v0.2.1]
+
 ## [img-gen/v0.2.0] - 2026-05-31
 
 ### <!-- 1 --> 🚀 Added

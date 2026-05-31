@@ -3,6 +3,7 @@ use crate::{
     RegularPolygonSides,
 };
 use pyo3::{exceptions::PyValueError, prelude::*};
+use serde_saphyr::options::DuplicateKeyPolicy;
 
 #[pymethods]
 impl PolygonSides {
@@ -37,7 +38,13 @@ impl PolygonSides {
     /// Deserialize a `PolygonSides` object from a YAML string.
     #[staticmethod]
     pub fn from_yaml_str(yaml_str: String) -> PyResult<Self> {
-        serde_saphyr::from_str(&yaml_str).map_err(|e| PyValueError::new_err(e.to_string()))
+        serde_saphyr::from_str_with_options(
+            &yaml_str,
+            serde_saphyr::options! {
+                duplicate_keys: DuplicateKeyPolicy::LastWins,
+            },
+        )
+        .map_err(|e| PyValueError::new_err(e.to_string()))
     }
 
     /// Deserialize a `PolygonSides` object from a JSON string.
@@ -82,7 +89,13 @@ impl RegularPolygonSides {
     /// Deserialize a `RegularPolygonSides` object from a YAML string.
     #[staticmethod]
     pub fn from_yaml_str(yaml_str: String) -> PyResult<Self> {
-        serde_saphyr::from_str(&yaml_str).map_err(|e| PyValueError::new_err(e.to_string()))
+        serde_saphyr::from_str_with_options(
+            &yaml_str,
+            serde_saphyr::options! {
+                duplicate_keys: DuplicateKeyPolicy::LastWins,
+            },
+        )
+        .map_err(|e| PyValueError::new_err(e.to_string()))
     }
 
     /// Deserialize a `RegularPolygonSides` object from a JSON string.
@@ -130,7 +143,13 @@ impl IrregularPolygonSides {
     /// Deserialize an `IrregularPolygonSides` object from a YAML string.
     #[staticmethod]
     pub fn from_yaml_str(yaml_str: String) -> PyResult<Self> {
-        serde_saphyr::from_str(&yaml_str).map_err(|e| PyValueError::new_err(e.to_string()))
+        serde_saphyr::from_str_with_options(
+            &yaml_str,
+            serde_saphyr::options! {
+                duplicate_keys: DuplicateKeyPolicy::LastWins,
+            },
+        )
+        .map_err(|e| PyValueError::new_err(e.to_string()))
     }
 
     /// Deserialize an `IrregularPolygonSides` object from a JSON string.
@@ -176,7 +195,13 @@ impl Polygon {
     /// Deserialize a `Polygon` object from a YAML string.
     #[staticmethod]
     pub fn from_yaml_str(yaml_str: String) -> PyResult<Self> {
-        serde_saphyr::from_str(&yaml_str).map_err(|e| PyValueError::new_err(e.to_string()))
+        serde_saphyr::from_str_with_options(
+            &yaml_str,
+            serde_saphyr::options! {
+                duplicate_keys: DuplicateKeyPolicy::LastWins,
+            },
+        )
+        .map_err(|e| PyValueError::new_err(e.to_string()))
     }
 
     /// Deserialize a `Polygon` object from a JSON string.

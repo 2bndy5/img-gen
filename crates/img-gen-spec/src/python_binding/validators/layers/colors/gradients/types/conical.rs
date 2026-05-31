@@ -1,5 +1,6 @@
 #[cfg(feature = "pyo3")]
 use pyo3::{exceptions::PyValueError, prelude::*};
+use serde_saphyr::options::DuplicateKeyPolicy;
 
 use crate::{ColorGradient, ConicalGradient, LayerOffset, SolidColor};
 
@@ -41,7 +42,13 @@ impl ConicalGradient {
     /// Deserialize a `ConicalGradient` object from a YAML string.
     #[staticmethod]
     pub fn from_yaml_str(yaml_str: String) -> PyResult<Self> {
-        serde_saphyr::from_str(&yaml_str).map_err(|e| PyValueError::new_err(e.to_string()))
+        serde_saphyr::from_str_with_options(
+            &yaml_str,
+            serde_saphyr::options! {
+                duplicate_keys: DuplicateKeyPolicy::LastWins,
+            },
+        )
+        .map_err(|e| PyValueError::new_err(e.to_string()))
     }
 
     /// Deserialize a `ConicalGradient` object from a JSON string.

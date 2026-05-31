@@ -2,6 +2,7 @@ use std::num::NonZeroU32;
 
 use crate::{Border, ColorKind, PreserveAspect, validators::layers::BORDER_WIDTH};
 use pyo3::{exceptions::PyValueError, prelude::*};
+use serde_saphyr::options::DuplicateKeyPolicy;
 
 mod background;
 mod colors;
@@ -48,7 +49,13 @@ impl Border {
     /// Deserialize a `Border` object from a YAML string.
     #[staticmethod]
     pub fn from_yaml_str(yaml_str: String) -> PyResult<Self> {
-        serde_saphyr::from_str(&yaml_str).map_err(|e| PyValueError::new_err(e.to_string()))
+        serde_saphyr::from_str_with_options(
+            &yaml_str,
+            serde_saphyr::options! {
+                duplicate_keys: DuplicateKeyPolicy::LastWins,
+            },
+        )
+        .map_err(|e| PyValueError::new_err(e.to_string()))
     }
 
     /// Deserialize a `Border` object from a JSON string.
@@ -85,7 +92,13 @@ impl PreserveAspect {
     /// Deserialize a `PreserveAspect` object from a YAML string.
     #[staticmethod]
     pub fn from_yaml_str(yaml_str: String) -> PyResult<Self> {
-        serde_saphyr::from_str(&yaml_str).map_err(|e| PyValueError::new_err(e.to_string()))
+        serde_saphyr::from_str_with_options(
+            &yaml_str,
+            serde_saphyr::options! {
+                duplicate_keys: DuplicateKeyPolicy::LastWins,
+            },
+        )
+        .map_err(|e| PyValueError::new_err(e.to_string()))
     }
 
     /// Deserialize a `PreserveAspect` object from a JSON string.

@@ -1,4 +1,5 @@
 use pyo3::{exceptions::PyValueError, prelude::*};
+use serde_saphyr::options::DuplicateKeyPolicy;
 
 use crate::{
     Background, Debug, Ellipse, Icon, Layer, LayerOffset, Layout, Mask, Polygon, Rectangle, Size,
@@ -41,7 +42,13 @@ impl Mask {
     /// Deserialize a `Mask` object from a YAML string.
     #[staticmethod]
     pub fn from_yaml_str(yaml_str: String) -> PyResult<Self> {
-        serde_saphyr::from_str(&yaml_str).map_err(|e| PyValueError::new_err(e.to_string()))
+        serde_saphyr::from_str_with_options(
+            &yaml_str,
+            serde_saphyr::options! {
+                duplicate_keys: DuplicateKeyPolicy::LastWins,
+            },
+        )
+        .map_err(|e| PyValueError::new_err(e.to_string()))
     }
 
     /// Deserialize a `Mask` object from a JSON string.
@@ -98,7 +105,13 @@ impl Layer {
     /// Deserialize a `Layer` object from a YAML string.
     #[staticmethod]
     pub fn from_yaml_str(yaml_str: String) -> PyResult<Self> {
-        serde_saphyr::from_str(&yaml_str).map_err(|e| PyValueError::new_err(e.to_string()))
+        serde_saphyr::from_str_with_options(
+            &yaml_str,
+            serde_saphyr::options! {
+                duplicate_keys: DuplicateKeyPolicy::LastWins,
+            },
+        )
+        .map_err(|e| PyValueError::new_err(e.to_string()))
     }
 
     /// Deserialize a `Layer` object from a JSON string.
@@ -150,7 +163,13 @@ impl Debug {
     /// Deserialize a `Debug` object from a YAML string.
     #[staticmethod]
     pub fn from_yaml_str(yaml_str: String) -> PyResult<Self> {
-        serde_saphyr::from_str(&yaml_str).map_err(|e| PyValueError::new_err(e.to_string()))
+        serde_saphyr::from_str_with_options(
+            &yaml_str,
+            serde_saphyr::options! {
+                duplicate_keys: DuplicateKeyPolicy::LastWins,
+            },
+        )
+        .map_err(|e| PyValueError::new_err(e.to_string()))
     }
 
     /// Deserialize a `Debug` object from a JSON string.
@@ -200,7 +219,13 @@ impl Layout {
     /// Deserialize a `Layout` object from a YAML string.
     #[staticmethod]
     pub fn from_yaml_str(yaml_str: String) -> PyResult<Self> {
-        serde_saphyr::from_str(&yaml_str).map_err(|e| PyValueError::new_err(e.to_string()))
+        serde_saphyr::from_str_with_options(
+            &yaml_str,
+            serde_saphyr::options! {
+                duplicate_keys: DuplicateKeyPolicy::LastWins,
+            },
+        )
+        .map_err(|e| PyValueError::new_err(e.to_string()))
     }
 
     /// Deserialize a `Layout` object from a JSON string.

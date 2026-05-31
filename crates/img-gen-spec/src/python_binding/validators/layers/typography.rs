@@ -4,6 +4,7 @@ use crate::{
     Border, ColorKind, Font, Line, Typography, TypographyAlign, Weight, validators::LineHeight,
 };
 use pyo3::{exceptions::PyValueError, prelude::*};
+use serde_saphyr::options::DuplicateKeyPolicy;
 
 #[pymethods]
 impl Line {
@@ -58,7 +59,13 @@ impl Line {
     /// Deserialize a `Line` object from a YAML string.
     #[staticmethod]
     pub fn from_yaml_str(yaml_str: String) -> PyResult<Self> {
-        serde_saphyr::from_str(&yaml_str).map_err(|e| PyValueError::new_err(e.to_string()))
+        serde_saphyr::from_str_with_options(
+            &yaml_str,
+            serde_saphyr::options! {
+                duplicate_keys: DuplicateKeyPolicy::LastWins,
+            },
+        )
+        .map_err(|e| PyValueError::new_err(e.to_string()))
     }
 
     /// Deserialize a `Line` object from a JSON string.
@@ -100,7 +107,13 @@ impl Font {
     /// Deserialize a `Font` object from a YAML string.
     #[staticmethod]
     pub fn from_yaml_str(yaml_str: String) -> PyResult<Self> {
-        serde_saphyr::from_str(&yaml_str).map_err(|e| PyValueError::new_err(e.to_string()))
+        serde_saphyr::from_str_with_options(
+            &yaml_str,
+            serde_saphyr::options! {
+                duplicate_keys: DuplicateKeyPolicy::LastWins,
+            },
+        )
+        .map_err(|e| PyValueError::new_err(e.to_string()))
     }
 
     /// Deserialize a `Font` object from a JSON string.
@@ -156,7 +169,13 @@ impl Typography {
     /// Deserialize a `Typography` object from a YAML string.
     #[staticmethod]
     pub fn from_yaml_str(yaml_str: String) -> PyResult<Self> {
-        serde_saphyr::from_str(&yaml_str).map_err(|e| PyValueError::new_err(e.to_string()))
+        serde_saphyr::from_str_with_options(
+            &yaml_str,
+            serde_saphyr::options! {
+                duplicate_keys: DuplicateKeyPolicy::LastWins,
+            },
+        )
+        .map_err(|e| PyValueError::new_err(e.to_string()))
     }
 
     /// Deserialize a `Typography` object from a JSON string.

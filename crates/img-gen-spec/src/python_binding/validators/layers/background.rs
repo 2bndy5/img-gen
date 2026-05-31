@@ -24,7 +24,7 @@ impl Background {
     /// Deserialize a `Background` object from a YAML string.
     #[staticmethod]
     pub fn from_yaml_str(yaml_str: String) -> PyResult<Self> {
-        serde_saphyr::from_str(&yaml_str).map_err(|e| PyValueError::new_err(e.to_string()))
+        crate::python_binding::parse_yaml_last_wins(&yaml_str).map_err(PyValueError::new_err)
     }
 
     /// Deserialize a `Background` object from a JSON string.

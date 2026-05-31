@@ -37,3 +37,26 @@ pub struct Background {
     #[serde(default)]
     pub preserve_aspect: PreserveAspect,
 }
+
+#[cfg(test)]
+mod test {
+    #![allow(clippy::unwrap_used, clippy::panic)]
+
+    use super::Background;
+
+    #[test]
+    fn duplicate_color_last_wins() {
+        let yaml = "color: red\ncolor: blue\n";
+        let opts = serde_saphyr::options! {
+            duplicate_keys: serde_saphyr::options::DuplicateKeyPolicy::LastWins,
+        };
+        // Parse into an intermediate `serde_json::Value` with LastWins, then deserialize
+        let value: serde_json::Value = serde_saphyr::from_str_with_options(yaml, opts).unwrap();
+        let bg: Background = serde_json::from_value(value).unwrap();
+        assert!(bg.color.is_some());
+        match bg.color.unwrap() {
+            super::ColorKind::SolidColor(sc) => assert_eq!(sc.get_b(), 255u8),
+            other => panic!("unexpected color kind: {:?}", other),
+        }
+    }
+}

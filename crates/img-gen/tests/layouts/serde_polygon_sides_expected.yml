@@ -1,0 +1,13 @@
+regular:
+  border: null
+  color: rgba(255, 0, 0, 1)
+  sides: 5
+  rotation: 15.0
+irregular:
+  border: null
+  color: rgba(0, 255, 0, 1)
+  sides:
+    - { x: 0, y: 0 }
+    - { x: 100, y: 0 }
+    - { x: 50, y: 100 }
+  rotation: 0.0

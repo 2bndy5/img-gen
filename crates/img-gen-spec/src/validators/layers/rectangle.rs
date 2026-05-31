@@ -3,14 +3,14 @@ use super::{Border, ColorKind};
 #[cfg(feature = "pyo3")]
 use pyo3::prelude::*;
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 /// An enum to represent the possible options in specifying which [`Rectangle::corners`] to render rounded.
 #[cfg_attr(
     feature = "pyo3",
     pyclass(eq, eq_int, module = "img_gen", from_py_object)
 )]
-#[derive(Debug, PartialEq, Clone, Copy, Deserialize)]
+#[derive(Debug, PartialEq, Clone, Copy, Serialize, Deserialize)]
 pub enum Corners {
     /// The ``"top left"`` corner of the `Rectangle`.
     #[serde(alias = "top left")]
@@ -46,7 +46,7 @@ impl Corners {
     feature = "pyo3",
     pyclass(module = "img_gen", get_all, set_all, from_py_object)
 )]
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct Rectangle {
     /// The [`Border`] (if specified) to render around the rectangle.
     pub border: Option<Border>,

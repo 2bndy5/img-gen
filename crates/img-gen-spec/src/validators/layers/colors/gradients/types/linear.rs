@@ -3,7 +3,7 @@ use std::f32::consts::PI;
 #[cfg(feature = "pyo3")]
 use pyo3::prelude::*;
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::{ColorGradient, LayerOffset, SolidColor, Spread};
 
@@ -12,7 +12,7 @@ use crate::{ColorGradient, LayerOffset, SolidColor, Spread};
     feature = "pyo3",
     pyclass(module = "img_gen", get_all, set_all, from_py_object)
 )]
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LinearGradient {
     #[serde(rename = "colors", alias = "preset")]
     inner: ColorGradient,

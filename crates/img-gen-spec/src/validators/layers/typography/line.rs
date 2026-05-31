@@ -3,12 +3,12 @@ use std::num::NonZeroI32;
 #[cfg(feature = "pyo3")]
 use pyo3::prelude::*;
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::{ImgGenSpecError, Result};
 
 /// A custom type to ensure the minimum number of lines is a positive, non-zero [`f32`].
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub struct LineHeight(f32);
 
 impl Default for LineHeight {
@@ -49,7 +49,7 @@ impl LineHeight {
 /// A property to implicitly describe the size of the text in a
 /// [`Typography`](struct@super::Typography) attribute.
 #[cfg_attr(feature = "pyo3", pyclass(module = "img_gen", from_py_object))]
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Line {
     /// The maximum number of lines in the layer.
     ///

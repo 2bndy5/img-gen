@@ -8,64 +8,55 @@ pub use types::{ConicalGradient, LinearGradient, RadialGradient};
 
 use crate::{ImgGenSpecError, Result};
 use colorgrad::{Gradient, GradientBuilder, LinearGradient as RustLinearGradient};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::fmt;
 
 #[cfg(feature = "pyo3")]
 use pyo3::prelude::*;
 
-/// Normalize a `gradient_spec` into a range (`[0, 1.0]`) of color `&str`s
-pub(super) fn parse_color_map_to_gradient<'s>(
-    gradient_spec: &Vec<(f32, &'s str)>,
-) -> (Vec<f32>, Vec<&'s str>) {
-    // first sort the spec by values (f23)
-    let mut domain = vec![];
-    let mut colors = vec![];
-    // if no colors were specified, return black to white as default
-    if gradient_spec.is_empty() {
-        domain.push(0.0);
-        colors.push("black");
-        domain.push(1.0);
-        colors.push("white");
-        return (domain, colors);
-    }
+fn parse_color_map_to_gradient<'s>(gradient_spec: &[(f32, &'s str)]) -> Vec<(f32, &'s str)> {
+    let mono;
+    let gradient_spec = if gradient_spec.is_empty() {
+        mono = Presets::get_stops(Presets::MonoChrome);
+        &mono
+    } else {
+        gradient_spec
+    };
+
+    let mut normalized: Vec<(f32, &'s str)> = Vec::new();
+
     for (point, color) in gradient_spec {
-        if domain.is_empty() {
-            domain.push(*point);
-            colors.push(*color);
-        } else {
-            let mut inserted = false;
-            for i in 0..domain.len() {
-                if domain[i] >= *point {
-                    let index = i.saturating_sub(1);
-                    domain.insert(index, *point);
-                    colors.insert(index, *color);
-                    inserted = true;
-                    break;
-                }
-            }
-            if !inserted {
-                domain.push(*point);
-                colors.push(*color);
+        if normalized.is_empty() {
+            normalized.push((*point, color));
+            continue;
+        }
+
+        let mut inserted = false;
+        for i in 0..normalized.len() {
+            if normalized[i].0 >= *point {
+                normalized.insert(i, (*point, color));
+                inserted = true;
+                break;
             }
         }
+
+        if !inserted {
+            normalized.push((*point, color));
+        }
     }
-    // ensure domain range is at least 0.0 to 1.0
-    if let Some(point) = domain.first()
+
+    if let Some((point, color)) = normalized.first()
         && *point > 0.0
-        && let Some(first_color) = colors.first()
     {
-        domain.insert(0, 0.0);
-        colors.insert(0, first_color);
+        normalized.insert(0, (0.0, *color));
     }
-    if let Some(point) = domain.last()
+    if let Some((point, color)) = normalized.last()
         && *point < 1.0
-        && let Some(last_color) = colors.last()
     {
-        domain.push(1.0);
-        colors.push(last_color);
+        normalized.push((1.0, *color));
     }
-    (domain, colors)
+
+    normalized
 }
 
 /// A class to represent a gradient of colors.
@@ -73,9 +64,33 @@ pub(super) fn parse_color_map_to_gradient<'s>(
 #[derive(Clone, Debug)]
 pub struct ColorGradient {
     pub(super) inner: RustLinearGradient,
+    pub(super) stops: Vec<(f32, SolidColor)>,
 }
 
 impl ColorGradient {
+    fn from_str_spec(spec: &[(f32, &str)]) -> Result<Self> {
+        let normalized = parse_color_map_to_gradient(spec);
+
+        let mut stops = Vec::with_capacity(normalized.len());
+        let mut domain = Vec::with_capacity(normalized.len());
+        let mut color_strs = Vec::with_capacity(normalized.len());
+        for (point, color_str) in &normalized {
+            stops.push((*point, SolidColor::from_string(color_str)?));
+            domain.push(*point);
+            color_strs.push(*color_str);
+        }
+
+        let inner = GradientBuilder::new()
+            .html_colors(&color_strs)
+            .domain(&domain)
+            .build::<RustLinearGradient>()
+            .map_err(|e| ImgGenSpecError::InvalidGradientSpec {
+                reason: e.to_string(),
+            })?;
+
+        Ok(Self { inner, stops })
+    }
+
     /// Instantiate a [`ColorGradient`] object.
     ///
     /// The `spec` parameter is an optional list of `(f32, String)` pairs.
@@ -86,19 +101,14 @@ impl ColorGradient {
     /// If `spec` parameter is not specified, then the optional `preset` parameter
     /// (which defaults to [`Presets::MonoChrome`]) is used instead.
     pub fn new(spec: Option<Vec<(f32, &str)>>, preset: Option<Presets>) -> Result<Self> {
-        let gradient = if let Some(color_spec) = spec {
-            let (domain, colors) = parse_color_map_to_gradient(&color_spec);
-            GradientBuilder::new()
-                .html_colors(&colors)
-                .domain(&domain)
-                .build::<RustLinearGradient>()
+        let preset_stops;
+        let effective: &[(f32, &str)] = if let Some(ref s) = spec {
+            s
         } else {
-            Presets::get_gradient(preset.unwrap_or(Presets::MonoChrome))
-        }
-        .map_err(|e| ImgGenSpecError::InvalidGradientSpec {
-            reason: e.to_string(),
-        })?;
-        Ok(ColorGradient { inner: gradient })
+            preset_stops = Presets::get_stops(preset.unwrap_or(Presets::MonoChrome));
+            &preset_stops
+        };
+        Self::from_str_spec(effective)
     }
 
     /// A helper function to get the interpolated color of the gradient at the specified `position`.
@@ -123,7 +133,7 @@ impl ColorGradient {
     feature = "pyo3",
     pyclass(eq, eq_int, module = "img_gen", from_py_object)
 )]
-#[derive(Debug, PartialEq, Clone, Copy, PartialOrd, Default, Deserialize)]
+#[derive(Debug, PartialEq, Clone, Copy, PartialOrd, Default, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum Spread {
     /// Extends the edge colors beyond the gradient bounds.
@@ -183,8 +193,9 @@ mod tests {
 
     #[test]
     fn parse_empty_gradient_spec() {
-        let empty_spec = vec![];
-        let (domain, colors) = parse_color_map_to_gradient(&empty_spec);
+        let normalized = parse_color_map_to_gradient(&[]);
+        let domain: Vec<f32> = normalized.iter().map(|(point, _)| *point).collect();
+        let colors: Vec<&str> = normalized.into_iter().map(|(_, color)| color).collect();
         assert_eq!(domain, vec![0.0, 1.0]);
         assert_eq!(colors, vec!["black", "white"]);
     }
@@ -194,7 +205,9 @@ mod tests {
     #[test]
     fn parse_unordered_gradient_spec() {
         let spec = vec![(0.5, "green"), (0.1, "red"), (0.9, "blue")];
-        let (domain, colors) = parse_color_map_to_gradient(&spec);
+        let normalized = parse_color_map_to_gradient(&spec);
+        let domain: Vec<f32> = normalized.iter().map(|(point, _)| *point).collect();
+        let colors: Vec<&str> = normalized.into_iter().map(|(_, color)| color).collect();
         assert_eq!(domain, vec![0.0, 0.1, 0.5, 0.9, 1.0]);
         assert_eq!(colors, vec!["red", "red", "green", "blue", "blue"]);
     }

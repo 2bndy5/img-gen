@@ -1,4 +1,3 @@
-use colorgrad::{GradientBuilder, GradientBuilderError, LinearGradient};
 #[cfg(feature = "pyo3")]
 use pyo3::prelude::*;
 
@@ -14,10 +13,6 @@ NOTE: Some gradients' names were altered to satisfy use as enumerations
 - 2 different gradients named "Deep Blue" are enumerated as DeepBlue and DeepBlue2
 - Arielle's Smile is enumerated as AriellesSmile
 */
-
-trait CreateGradient {
-    fn get_gradient(&self) -> Result<LinearGradient, GradientBuilderError>;
-}
 
 macro_rules! enumerate_specs {
     ( $( $preset_name:ident, [ $( ($color:expr, $point:expr) $(,)? )+ ] $(,)? )+ ) => {
@@ -36,7 +31,7 @@ macro_rules! enumerate_specs {
         $(
             struct $preset_name {
                 domain: Vec<f32>,
-                colors: Vec<String>,
+                colors: Vec<&'static str>,
             }
 
             impl $preset_name {
@@ -46,18 +41,12 @@ macro_rules! enumerate_specs {
                             $($point,)+
                         ].to_vec(),
                         colors: [
-                            $($color.to_string(),)+
+                            $($color,)+
                         ].to_vec()
                     }
                 }
             }
 
-            impl CreateGradient for $preset_name {
-                fn get_gradient(&self) -> Result<LinearGradient, GradientBuilderError> {
-                    let colors: Vec<&str> = self.colors.iter().map(String::as_str).collect();
-                    GradientBuilder::new().html_colors(&colors).domain(&self.domain).build::<LinearGradient>()
-                }
-            }
         )+
 
 
@@ -72,14 +61,18 @@ macro_rules! enumerate_specs {
                 }
             }
 
-            /// Builds the gradient associated with `preset`.
-            pub(crate) fn get_gradient(preset: Presets) -> Result<LinearGradient, GradientBuilderError> {
+            /// Returns the preset's canonical color-stop specification.
+            pub(crate) fn get_stops(preset: Presets) -> Vec<(f32, &'static str)> {
                 match preset {
                     $(
-                        Presets::$preset_name => $preset_name::default().get_gradient(),
+                        Presets::$preset_name => {
+                            let preset = $preset_name::default();
+                            preset.domain.into_iter().zip(preset.colors).collect()
+                        },
                     )*
                 }
             }
+
         }
     };
 }

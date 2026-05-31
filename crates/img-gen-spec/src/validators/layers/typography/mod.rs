@@ -1,7 +1,7 @@
 #[cfg(feature = "pyo3")]
 use pyo3::prelude::*;
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 /// Font-related validators used by [`Typography`].
 pub mod font;
@@ -17,7 +17,7 @@ pub use line::{Line, LineHeight};
     feature = "pyo3",
     pyclass(eq, eq_int, module = "img_gen", from_py_object)
 )]
-#[derive(Debug, PartialEq, Clone, Default, Deserialize)]
+#[derive(Debug, PartialEq, Clone, Default, Serialize, Deserialize)]
 pub enum TypographyAlign {
     /// Aligns text to the top-left corner.
     #[serde(alias = "start top")]
@@ -66,7 +66,7 @@ pub enum TypographyAlign {
     feature = "pyo3",
     pyclass(module = "img_gen", get_all, set_all, from_py_object)
 )]
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct Typography {
     /// The text content.
     pub content: String,

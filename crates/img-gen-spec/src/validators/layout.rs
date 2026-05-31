@@ -2,7 +2,7 @@
 use pyo3::prelude::*;
 
 use serde::{
-    Deserialize, Deserializer,
+    Deserialize, Deserializer, Serialize,
     de::{self, MapAccess, Visitor},
 };
 
@@ -16,16 +16,20 @@ use super::{
     feature = "pyo3",
     pyclass(module = "img_gen", get_all, set_all, from_py_object)
 )]
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct Mask {
     /// The mask's [`Size`].
     pub size: Option<Size>,
+
     /// The mask's [`LayerOffset`].
+    #[serde(default)]
     pub offset: LayerOffset,
+
     /// A flag to control the behavior of the mask.
     ///
     /// False means only visible pixels are used in the mask.
     /// True means only invisible pixels are used in the mask.
+    #[serde(default)]
     pub invert: bool,
 
     /// A background attribute for the mask.
@@ -53,7 +57,7 @@ pub struct Mask {
     feature = "pyo3",
     pyclass(module = "img_gen", get_all, set_all, from_py_object)
 )]
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct Layer {
     /// The layer's [`Size`]
     pub size: Option<Size>,
@@ -83,7 +87,7 @@ pub struct Layer {
     feature = "pyo3",
     pyclass(module = "img_gen", set_all, get_all, from_py_object)
 )]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct Debug {
     /// A flag to enable or disable the debug output.
     pub enable: bool,
@@ -221,7 +225,7 @@ impl Default for Debug {
     feature = "pyo3",
     pyclass(module = "img_gen", set_all, get_all, from_py_object)
 )]
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct Layout {
     /// The layout's `Size`
     #[serde(default)]

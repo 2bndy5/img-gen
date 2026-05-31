@@ -3,6 +3,7 @@ use colorgrad::Color;
 #[cfg(feature = "pyo3")]
 use pyo3::prelude::*;
 
+use serde::Serialize;
 /// A class to represent a solid color.
 ///
 /// Instantiate a `Color` from a 4 unsigned integers in range [0, 255].
@@ -73,6 +74,12 @@ impl SolidColor {
         )
     }
 
+    /// Returns a CSS-compatible `rgba(...)` string.
+    pub(crate) fn to_rgba_css_string(&self) -> String {
+        let (r, g, b, a) = self.to_tuple();
+        format!("rgba({r}, {g}, {b}, {})", a as f32 / 255.0)
+    }
+
     /// The color's red component.
     pub fn get_r(&self) -> u8 {
         (self.inner.r * 255.0 + 0.5) as u8
@@ -111,6 +118,15 @@ impl SolidColor {
     /// Sets the alpha component.
     pub fn set_a(&mut self, val: u8) {
         self.inner.a = val as f32 / 255.0;
+    }
+}
+
+impl Serialize for SolidColor {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(&self.to_rgba_css_string())
     }
 }
 

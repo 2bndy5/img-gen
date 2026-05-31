@@ -1,4 +1,4 @@
-use pyo3::prelude::*;
+use pyo3::{exceptions::PyValueError, prelude::*};
 
 use crate::{ColorGradient, RadialGradient, SolidColor, Spread, validators::LayerOffset};
 
@@ -76,5 +76,27 @@ impl RadialGradient {
     #[pyo3(text_signature = "(x: int, y: int) -> SolidColor", signature = (x, y), name = "get_color_at")]
     pub fn get_color_at_py(&self, x: u32, y: u32) -> SolidColor {
         self.get_color_at(x, y)
+    }
+
+    /// Deserialize a `RadialGradient` object from a YAML string.
+    #[staticmethod]
+    pub fn from_yaml_str(yaml_str: String) -> PyResult<Self> {
+        serde_saphyr::from_str(&yaml_str).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
+
+    /// Deserialize a `RadialGradient` object from a JSON string.
+    #[staticmethod]
+    pub fn from_json_str(json_str: String) -> PyResult<Self> {
+        serde_json::from_str(&json_str).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
+
+    /// Serialize the `RadialGradient` object to a JSON string.
+    pub fn as_json_str(&self) -> PyResult<String> {
+        serde_json::to_string(self).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
+
+    /// Serialize the `RadialGradient` object to a YAML string.
+    pub fn as_yaml_str(&self) -> PyResult<String> {
+        serde_saphyr::to_string(self).map_err(|e| PyValueError::new_err(e.to_string()))
     }
 }

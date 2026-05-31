@@ -1,12 +1,12 @@
 #[cfg(feature = "pyo3")]
 use pyo3::prelude::*;
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use super::{Border, ColorKind};
 
 /// An attribute to represent an Arc rendered in the layer.
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[cfg_attr(
     feature = "pyo3",
     pyclass(module = "img_gen", get_all, set_all, from_py_object)
@@ -19,7 +19,7 @@ pub struct Arc {
 }
 
 /// An attribute to represent an Ellipse rendered in the layer.
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[cfg_attr(
     feature = "pyo3",
     pyclass(module = "img_gen", get_all, set_all, from_py_object)

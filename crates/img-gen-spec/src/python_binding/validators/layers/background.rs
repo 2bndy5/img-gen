@@ -1,5 +1,5 @@
 use crate::{Background, ColorKind, PreserveAspect};
-use pyo3::prelude::*;
+use pyo3::{exceptions::PyValueError, prelude::*};
 
 #[pymethods]
 impl Background {
@@ -19,5 +19,27 @@ impl Background {
             color,
             preserve_aspect: preserve_aspect.unwrap_or_default(),
         }
+    }
+
+    /// Deserialize a `Background` object from a YAML string.
+    #[staticmethod]
+    pub fn from_yaml_str(yaml_str: String) -> PyResult<Self> {
+        serde_saphyr::from_str(&yaml_str).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
+
+    /// Deserialize a `Background` object from a JSON string.
+    #[staticmethod]
+    pub fn from_json_str(json_str: String) -> PyResult<Self> {
+        serde_json::from_str(&json_str).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
+
+    /// Serialize the `Background` object to a JSON string.
+    pub fn as_json_str(&self) -> PyResult<String> {
+        serde_json::to_string(self).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
+
+    /// Serialize the `Background` object to a YAML string.
+    pub fn as_yaml_str(&self) -> PyResult<String> {
+        serde_saphyr::to_string(self).map_err(|e| PyValueError::new_err(e.to_string()))
     }
 }

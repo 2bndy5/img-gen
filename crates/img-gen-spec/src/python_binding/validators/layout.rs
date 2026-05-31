@@ -37,6 +37,28 @@ impl Mask {
             typography,
         }
     }
+
+    /// Deserialize a `Mask` object from a YAML string.
+    #[staticmethod]
+    pub fn from_yaml_str(yaml_str: String) -> PyResult<Self> {
+        serde_saphyr::from_str(&yaml_str).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
+
+    /// Deserialize a `Mask` object from a JSON string.
+    #[staticmethod]
+    pub fn from_json_str(json_str: String) -> PyResult<Self> {
+        serde_json::from_str(&json_str).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
+
+    /// Serialize the `Mask` object to a JSON string.
+    pub fn as_json_str(&self) -> PyResult<String> {
+        serde_json::to_string(self).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
+
+    /// Serialize the `Mask` object to a YAML string.
+    pub fn as_yaml_str(&self) -> PyResult<String> {
+        serde_saphyr::to_string(self).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
 }
 
 #[pymethods]
@@ -72,6 +94,28 @@ impl Layer {
             mask,
         }
     }
+
+    /// Deserialize a `Layer` object from a YAML string.
+    #[staticmethod]
+    pub fn from_yaml_str(yaml_str: String) -> PyResult<Self> {
+        serde_saphyr::from_str(&yaml_str).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
+
+    /// Deserialize a `Layer` object from a JSON string.
+    #[staticmethod]
+    pub fn from_json_str(json_str: String) -> PyResult<Self> {
+        serde_json::from_str(&json_str).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
+
+    /// Serialize the `Layer` object to a JSON string.
+    pub fn as_json_str(&self) -> PyResult<String> {
+        serde_json::to_string(self).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
+
+    /// Serialize the `Layer` object to a YAML string.
+    pub fn as_yaml_str(&self) -> PyResult<String> {
+        serde_saphyr::to_string(self).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
 }
 
 #[pymethods]
@@ -101,6 +145,28 @@ impl Debug {
     #[pyo3(name = "get_foreground_color", text_signature = "() -> SolidColor")]
     pub fn get_foreground_color_py(&self) -> SolidColor {
         self.get_foreground_color()
+    }
+
+    /// Deserialize a `Debug` object from a YAML string.
+    #[staticmethod]
+    pub fn from_yaml_str(yaml_str: String) -> PyResult<Self> {
+        serde_saphyr::from_str(&yaml_str).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
+
+    /// Deserialize a `Debug` object from a JSON string.
+    #[staticmethod]
+    pub fn from_json_str(json_str: String) -> PyResult<Self> {
+        serde_json::from_str(&json_str).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
+
+    /// Serialize the `Debug` object to a JSON string.
+    pub fn as_json_str(&self) -> PyResult<String> {
+        serde_json::to_string(self).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
+
+    /// Serialize the `Debug` object to a YAML string.
+    pub fn as_yaml_str(&self) -> PyResult<String> {
+        serde_saphyr::to_string(self).map_err(|e| PyValueError::new_err(e.to_string()))
     }
 }
 
@@ -141,5 +207,15 @@ impl Layout {
     #[staticmethod]
     pub fn from_json_str(yaml_str: String) -> PyResult<Self> {
         serde_json::from_str(&yaml_str).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
+
+    /// Serialize the `Layout` object to a JSON string.
+    pub fn as_json_str(&self) -> PyResult<String> {
+        serde_json::to_string(self).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
+
+    /// Serialize the `Layout` object to a YAML string.
+    pub fn as_yaml_str(&self) -> PyResult<String> {
+        serde_saphyr::to_string(self).map_err(|e| PyValueError::new_err(e.to_string()))
     }
 }

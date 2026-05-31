@@ -1,0 +1,6 @@
+layers:
+  - typography:
+      content: Legacy style parse
+      font:
+        family: Roboto
+        style: Bold Italic

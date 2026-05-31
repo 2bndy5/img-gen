@@ -3,14 +3,14 @@ use super::{ColorKind, PreserveAspect};
 #[cfg(feature = "pyo3")]
 use pyo3::prelude::*;
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 /// An attribute to describe a [`Layer`](struct@crate::Layer)'s [`Icon`].
 #[cfg_attr(
     feature = "pyo3",
     pyclass(module = "img_gen", get_all, set_all, from_py_object)
 )]
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Icon {
     /// A path to an image file.
     ///

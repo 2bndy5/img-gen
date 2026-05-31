@@ -10,7 +10,7 @@ mod typography;
 #[cfg(feature = "pyo3")]
 use pyo3::prelude::*;
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use std::{fmt, num::NonZeroU32};
 
@@ -33,7 +33,7 @@ pub use typography::{Font, Line, LineHeight, Typography, TypographyAlign, Weight
     feature = "pyo3",
     pyclass(module = "img_gen", set_all, get_all, from_py_object)
 )]
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Border {
     /// The width (in pixels) used to draw the border.
     pub width: NonZeroU32,
@@ -59,7 +59,7 @@ impl Default for Border {
     feature = "pyo3",
     pyclass(eq, eq_int, module = "img_gen", from_py_object)
 )]
-#[derive(Debug, PartialEq, Clone, Copy, Default, Deserialize)]
+#[derive(Debug, PartialEq, Clone, Copy, Default, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum PreserveAspect {
     /// Preserve the original image's aspect ratio with respect to both width and height.

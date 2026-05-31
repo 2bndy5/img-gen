@@ -33,6 +33,28 @@ impl PolygonSides {
                 "PolygonSides irregular offsets cannot have less than 3 unique points".to_string(),
             ))
     }
+
+    /// Deserialize a `PolygonSides` object from a YAML string.
+    #[staticmethod]
+    pub fn from_yaml_str(yaml_str: String) -> PyResult<Self> {
+        serde_saphyr::from_str(&yaml_str).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
+
+    /// Deserialize a `PolygonSides` object from a JSON string.
+    #[staticmethod]
+    pub fn from_json_str(json_str: String) -> PyResult<Self> {
+        serde_json::from_str(&json_str).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
+
+    /// Serialize the `PolygonSides` object to a JSON string.
+    pub fn as_json_str(&self) -> PyResult<String> {
+        serde_json::to_string(self).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
+
+    /// Serialize the `PolygonSides` object to a YAML string.
+    pub fn as_yaml_str(&self) -> PyResult<String> {
+        serde_saphyr::to_string(self).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
 }
 
 #[pymethods]
@@ -55,6 +77,28 @@ impl RegularPolygonSides {
     #[pyo3(name = "get", text_signature = "() -> u32")]
     pub fn get_py(&self) -> u32 {
         self.get()
+    }
+
+    /// Deserialize a `RegularPolygonSides` object from a YAML string.
+    #[staticmethod]
+    pub fn from_yaml_str(yaml_str: String) -> PyResult<Self> {
+        serde_saphyr::from_str(&yaml_str).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
+
+    /// Deserialize a `RegularPolygonSides` object from a JSON string.
+    #[staticmethod]
+    pub fn from_json_str(json_str: String) -> PyResult<Self> {
+        serde_json::from_str(&json_str).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
+
+    /// Serialize the `RegularPolygonSides` object to a JSON string.
+    pub fn as_json_str(&self) -> PyResult<String> {
+        serde_json::to_string(self).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
+
+    /// Serialize the `RegularPolygonSides` object to a YAML string.
+    pub fn as_yaml_str(&self) -> PyResult<String> {
+        serde_saphyr::to_string(self).map_err(|e| PyValueError::new_err(e.to_string()))
     }
 }
 
@@ -82,6 +126,28 @@ impl IrregularPolygonSides {
     pub fn get(&self) -> Vec<LayerOffset> {
         self.as_slice().to_owned()
     }
+
+    /// Deserialize an `IrregularPolygonSides` object from a YAML string.
+    #[staticmethod]
+    pub fn from_yaml_str(yaml_str: String) -> PyResult<Self> {
+        serde_saphyr::from_str(&yaml_str).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
+
+    /// Deserialize an `IrregularPolygonSides` object from a JSON string.
+    #[staticmethod]
+    pub fn from_json_str(json_str: String) -> PyResult<Self> {
+        serde_json::from_str(&json_str).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
+
+    /// Serialize the `IrregularPolygonSides` object to a JSON string.
+    pub fn as_json_str(&self) -> PyResult<String> {
+        serde_json::to_string(self).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
+
+    /// Serialize the `IrregularPolygonSides` object to a YAML string.
+    pub fn as_yaml_str(&self) -> PyResult<String> {
+        serde_saphyr::to_string(self).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
 }
 
 #[pymethods]
@@ -105,5 +171,27 @@ impl Polygon {
             sides: sides.unwrap_or_default(),
             rotation: rotation.unwrap_or_default(),
         })
+    }
+
+    /// Deserialize a `Polygon` object from a YAML string.
+    #[staticmethod]
+    pub fn from_yaml_str(yaml_str: String) -> PyResult<Self> {
+        serde_saphyr::from_str(&yaml_str).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
+
+    /// Deserialize a `Polygon` object from a JSON string.
+    #[staticmethod]
+    pub fn from_json_str(json_str: String) -> PyResult<Self> {
+        serde_json::from_str(&json_str).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
+
+    /// Serialize the `Polygon` object to a JSON string.
+    pub fn as_json_str(&self) -> PyResult<String> {
+        serde_json::to_string(self).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
+
+    /// Serialize the `Polygon` object to a YAML string.
+    pub fn as_yaml_str(&self) -> PyResult<String> {
+        serde_saphyr::to_string(self).map_err(|e| PyValueError::new_err(e.to_string()))
     }
 }

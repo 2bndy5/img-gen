@@ -18,6 +18,28 @@ impl LayerOffset {
             y: y.unwrap_or_default(),
         }
     }
+
+    /// Deserialize a `LayerOffset` object from a YAML string.
+    #[staticmethod]
+    pub fn from_yaml_str(yaml_str: String) -> PyResult<Self> {
+        serde_saphyr::from_str(&yaml_str).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
+
+    /// Deserialize a `LayerOffset` object from a JSON string.
+    #[staticmethod]
+    pub fn from_json_str(json_str: String) -> PyResult<Self> {
+        serde_json::from_str(&json_str).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
+
+    /// Serialize the `LayerOffset` object to a JSON string.
+    pub fn as_json_str(&self) -> PyResult<String> {
+        serde_json::to_string(self).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
+
+    /// Serialize the `LayerOffset` object to a YAML string.
+    pub fn as_yaml_str(&self) -> PyResult<String> {
+        serde_saphyr::to_string(self).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
 }
 
 #[pymethods]
@@ -85,5 +107,27 @@ impl Size {
     #[getter(height)]
     pub fn get_height_py(&self) -> Option<u32> {
         self.height.map(|v| v.get())
+    }
+
+    /// Deserialize a `Size` object from a YAML string.
+    #[staticmethod]
+    pub fn from_yaml_str(yaml_str: String) -> PyResult<Self> {
+        serde_saphyr::from_str(&yaml_str).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
+
+    /// Deserialize a `Size` object from a JSON string.
+    #[staticmethod]
+    pub fn from_json_str(json_str: String) -> PyResult<Self> {
+        serde_json::from_str(&json_str).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
+
+    /// Serialize the `Size` object to a JSON string.
+    pub fn as_json_str(&self) -> PyResult<String> {
+        serde_json::to_string(self).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
+
+    /// Serialize the `Size` object to a YAML string.
+    pub fn as_yaml_str(&self) -> PyResult<String> {
+        serde_saphyr::to_string(self).map_err(|e| PyValueError::new_err(e.to_string()))
     }
 }

@@ -1,0 +1,4 @@
+enable: true
+grid: true
+grid_step: 30
+color: rgba(128, 128, 128, 1)

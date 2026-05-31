@@ -3,7 +3,7 @@ use super::{ColorKind, PreserveAspect};
 #[cfg(feature = "pyo3")]
 use pyo3::prelude::*;
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 /// An attribute to describe a [`Layer`](struct@crate::Layer)'s
 /// ``background``.
@@ -11,7 +11,7 @@ use serde::Deserialize;
     feature = "pyo3",
     pyclass(module = "img_gen", get_all, set_all, from_py_object)
 )]
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct Background {
     /// A path to an image file.
     ///

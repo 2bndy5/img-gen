@@ -1,12 +1,10 @@
 use std::fmt;
 
-use colorgrad::{GradientBuilder, LinearGradient as RustLinearGradient};
 use serde::{
-    Deserialize, Deserializer,
+    Deserialize, Deserializer, Serialize,
     de::{self, MapAccess, Visitor},
 };
 
-use super::gradients::parse_color_map_to_gradient;
 use crate::{
     ColorGradient, ColorKind, ConicalGradient, LinearGradient, Presets, RadialGradient, SolidColor,
 };
@@ -30,9 +28,7 @@ impl<'de> Visitor<'de> for GradientVisitor {
         E: serde::de::Error,
     {
         if let Some(preset) = Presets::from_string(gradient_str) {
-            Presets::get_gradient(preset)
-                .map(|gradient| ColorGradient { inner: gradient })
-                .map_err(serde::de::Error::custom)
+            ColorGradient::new(None, Some(preset)).map_err(serde::de::Error::custom)
         } else {
             Err(E::invalid_value(
                 serde::de::Unexpected::Str(gradient_str),
@@ -50,17 +46,11 @@ impl<'de> Visitor<'de> for GradientVisitor {
             let key = key.parse::<f32>().map_err(serde::de::Error::custom)?;
             gradient_spec.push((key, value));
         }
-        let str_spec: Vec<(f32, &str)> = gradient_spec
+        let spec: Vec<(f32, &str)> = gradient_spec
             .iter()
             .map(|(k, v)| (*k, v.as_str()))
             .collect();
-        let (domain, colors) = parse_color_map_to_gradient(&str_spec);
-        GradientBuilder::new()
-            .html_colors(&colors)
-            .domain(&domain)
-            .build::<RustLinearGradient>()
-            .map(|gradient| ColorGradient { inner: gradient })
-            .map_err(serde::de::Error::custom)
+        ColorGradient::new(Some(spec), None).map_err(serde::de::Error::custom)
     }
 
     fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
@@ -144,11 +134,40 @@ impl<'de> Visitor<'de> for ColorKindVisitor {
     }
 }
 
+impl Serialize for ColorGradient {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeMap;
+
+        let mut map = serializer.serialize_map(Some(self.stops.len()))?;
+        for (point, color) in &self.stops {
+            map.serialize_entry(&point.to_string(), color)?;
+        }
+        map.end()
+    }
+}
+
+impl Serialize for ColorKind {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        match self {
+            ColorKind::LinearGradient(g) => g.serialize(serializer),
+            ColorKind::RadialGradient(g) => g.serialize(serializer),
+            ColorKind::ConicalGradient(g) => g.serialize(serializer),
+            ColorKind::SolidColor(c) => serializer.serialize_str(&c.to_rgba_css_string()),
+        }
+    }
+}
+
 #[cfg(test)]
 mod test {
     #![allow(clippy::unwrap_used, clippy::panic)]
 
-    use crate::{ColorKind, Spread};
+    use crate::{ColorGradient, ColorKind, Spread};
 
     #[test]
     fn deserialize_solid_color() {
@@ -255,5 +274,44 @@ colors:
         let invalid_str = r"42";
         let err = serde_saphyr::from_str::<ColorKind>(invalid_str).unwrap_err();
         assert!(err.to_string().contains("a color string or a gradient map"));
+    }
+
+    #[test]
+    fn serialize_color_gradient_preset_as_map() {
+        let gradient: ColorGradient = serde_saphyr::from_str("MonoChrome").unwrap();
+        let value = serde_json::to_value(&gradient).unwrap();
+
+        let serde_json::Value::Object(obj) = value else {
+            panic!("Expected serialized preset gradient to be a JSON object")
+        };
+        assert_eq!(
+            obj.get("0").or_else(|| obj.get("0.0")),
+            Some(&serde_json::Value::String("rgba(0, 0, 0, 1)".to_string()))
+        );
+        assert_eq!(
+            obj.get("1").or_else(|| obj.get("1.0")),
+            Some(&serde_json::Value::String(
+                "rgba(255, 255, 255, 1)".to_string()
+            ))
+        );
+    }
+
+    #[test]
+    fn serialize_color_gradient_stops_as_map() {
+        let gradient: ColorGradient = serde_saphyr::from_str("{0.0: red, 1.0: blue}").unwrap();
+        let value = serde_json::to_value(&gradient).unwrap();
+
+        let serde_json::Value::Object(obj) = value else {
+            panic!("Expected serialized gradient to be a JSON object")
+        };
+
+        assert_eq!(
+            obj.get("0").or_else(|| obj.get("0.0")),
+            Some(&serde_json::Value::String("rgba(255, 0, 0, 1)".to_string()))
+        );
+        assert_eq!(
+            obj.get("1").or_else(|| obj.get("1.0")),
+            Some(&serde_json::Value::String("rgba(0, 0, 255, 1)".to_string()))
+        );
     }
 }

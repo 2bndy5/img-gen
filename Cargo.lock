@@ -1151,6 +1151,7 @@ dependencies = [
  "pyo3",
  "reqwest",
  "serde-saphyr",
+ "serde_json",
  "tokio",
 ]
 

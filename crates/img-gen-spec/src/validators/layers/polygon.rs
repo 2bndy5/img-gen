@@ -3,10 +3,10 @@ use super::{Border, ColorKind, LayerOffset};
 #[cfg(feature = "pyo3")]
 use pyo3::prelude::*;
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 /// A custom type to ensure regular polygons have at least 3 sides.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Serialize)]
 #[cfg_attr(feature = "pyo3", pyclass(module = "img_gen", from_py_object))]
 pub struct RegularPolygonSides(u32);
 
@@ -23,7 +23,7 @@ impl RegularPolygonSides {
 }
 
 /// A custom type to ensure irregular polygons have at least 3 offsets.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 #[cfg_attr(feature = "pyo3", pyclass(module = "img_gen", from_py_object))]
 pub struct IrregularPolygonSides(Vec<LayerOffset>);
 
@@ -77,12 +77,67 @@ impl Default for PolygonSides {
     }
 }
 
+impl<'de> Deserialize<'de> for RegularPolygonSides {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        use serde::de::Error;
+
+        let sides = u32::deserialize(deserializer)?;
+        RegularPolygonSides::new(sides).ok_or_else(|| {
+            D::Error::custom(format!(
+                "Regular Polygons cannot have less than 3 sides, got {sides}"
+            ))
+        })
+    }
+}
+
+impl<'de> Deserialize<'de> for IrregularPolygonSides {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        use serde::de::Error;
+
+        let offsets = Vec::<LayerOffset>::deserialize(deserializer)?;
+        IrregularPolygonSides::new(offsets).ok_or_else(|| {
+            D::Error::custom("Irregular Polygons cannot have less than 3 unique points")
+        })
+    }
+}
+
+impl<'de> Deserialize<'de> for PolygonSides {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        PolygonSides::deserialize_sides(deserializer)
+    }
+}
+
+impl Serialize for PolygonSides {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        PolygonSides::serialize_sides(self, serializer)
+    }
+}
+
 impl PolygonSides {
     /// Deserializes either a regular side count or a list of irregular polygon points.
     ///
     /// Integer values produce [`PolygonSides::Regular`], while sequences of unique offsets
     /// produce [`PolygonSides::Irregular`].
     pub fn deserialize<'de, D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        PolygonSides::deserialize_sides(deserializer)
+    }
+
+    fn deserialize_sides<'de, D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
@@ -130,11 +185,38 @@ impl PolygonSides {
 
         deserializer.deserialize_any(PolygonSidesVisitor)
     }
+
+    /// Serializes [`PolygonSides::Regular`] as a `u32` and [`PolygonSides::Irregular`] as a sequence of offsets.
+    pub fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        PolygonSides::serialize_sides(self, serializer)
+    }
+
+    fn serialize_sides<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeSeq;
+
+        match self {
+            PolygonSides::Regular(r) => serializer.serialize_u32(r.get()),
+            PolygonSides::Irregular(i) => {
+                let offsets = i.as_slice();
+                let mut seq = serializer.serialize_seq(Some(offsets.len()))?;
+                for offset in offsets {
+                    seq.serialize_element(offset)?;
+                }
+                seq.end()
+            }
+        }
+    }
 }
 
 /// An attribute to represent a [`Polygon`] rendered in the layer.
 #[cfg_attr(feature = "pyo3", pyclass(module = "img_gen", from_py_object))]
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct Polygon {
     /// The border (if specified) ro render around the polygon.
     #[cfg(feature = "pyo3")]
@@ -160,14 +242,22 @@ pub struct Polygon {
     /// Regular polygons use a side count, while irregular polygons use explicit vertex offsets.
     #[cfg(feature = "pyo3")]
     #[pyo3(get, set)]
-    #[serde(default, deserialize_with = "PolygonSides::deserialize")]
+    #[serde(
+        default,
+        deserialize_with = "PolygonSides::deserialize",
+        serialize_with = "PolygonSides::serialize"
+    )]
     pub sides: PolygonSides,
 
     /// The polygon side definition.
     ///
     /// Regular polygons use a side count, while irregular polygons use explicit vertex offsets.
     #[cfg(not(feature = "pyo3"))]
-    #[serde(default, deserialize_with = "PolygonSides::deserialize")]
+    #[serde(
+        default,
+        deserialize_with = "PolygonSides::deserialize",
+        serialize_with = "PolygonSides::serialize"
+    )]
     pub sides: PolygonSides,
 
     /// The rotation applied to the rendered polygon.
@@ -292,5 +382,26 @@ mod test {
         let value = StrDeserializer::<serde_saphyr::Error>::new("not-a-valid-polygon-sides");
         let error = PolygonSides::deserialize(value).unwrap_err().to_string();
         assert!(error.contains("an integer >= 3 or a sequence of at least 3 unique offsets"));
+    }
+
+    #[test]
+    fn deserialize_regular_polygon_sides_validates_minimum() {
+        use serde::Deserialize;
+        use serde::de::{IntoDeserializer, value::U32Deserializer};
+
+        let deserializer: U32Deserializer<serde_saphyr::Error> = 2_u32.into_deserializer();
+        let error = RegularPolygonSides::deserialize(deserializer)
+            .unwrap_err()
+            .to_string();
+        assert!(error.contains("Regular Polygons cannot have less than 3 sides"));
+    }
+
+    #[test]
+    fn deserialize_irregular_polygon_sides_validates_minimum_unique_points() {
+        let yaml = "- { x: 0, y: 0 }\n- { x: 0, y: 0 }\n- { x: 100, y: 0 }\n";
+        let error = serde_saphyr::from_str::<IrregularPolygonSides>(yaml)
+            .unwrap_err()
+            .to_string();
+        assert!(error.contains("Irregular Polygons cannot have less than 3 unique points"));
     }
 }

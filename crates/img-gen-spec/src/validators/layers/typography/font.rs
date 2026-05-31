@@ -5,14 +5,14 @@ use pyo3::prelude::*;
 
 use fontsource_downloader::Weight as FsWeight;
 use parley::{FontFamily, FontStyle, FontWeight};
-use serde::{Deserialize, Deserializer};
+use serde::{Deserialize, Deserializer, Serialize};
 
 /// An enumeration of the possible font weights.
 #[cfg_attr(
     feature = "pyo3",
     pyclass(eq, eq_int, module = "img_gen", from_py_object)
 )]
-#[derive(Debug, PartialEq, Clone, Copy, Default, Deserialize)]
+#[derive(Debug, PartialEq, Clone, Copy, Default, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum Weight {
     #[serde(alias = "100")]
@@ -195,7 +195,7 @@ impl Font {
 
 /// Intermediate deserialization shape used to support both the current
 /// explicit `weight` field and the legacy style format (`"{weight} {style}"`).
-#[derive(Deserialize)]
+#[derive(Serialize, Deserialize)]
 struct FontSerde {
     #[serde(default = "Font::default_font_family")]
     family: String,
@@ -220,6 +220,22 @@ impl<'de> Deserialize<'de> for Font {
             Some(parsed.subset),
             parsed.path,
         ))
+    }
+}
+
+impl Serialize for Font {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        FontSerde {
+            family: self.family.clone(),
+            style: self.style.clone(),
+            weight: Some(self.weight),
+            subset: self.subset.clone(),
+            path: self.path.clone(),
+        }
+        .serialize(serializer)
     }
 }
 

@@ -1,0 +1,12 @@
+layers:
+  - polygon:
+      color: red
+      sides: 5
+      rotation: 15
+  - polygon:
+      color: '#00ff00'
+      sides:
+        - { x: 0, y: 0 }
+        - { x: 100, y: 0 }
+        - { x: 0, y: 0 }
+        - { x: 50, y: 100 }

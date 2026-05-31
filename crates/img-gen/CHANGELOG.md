@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Bump version to img-gen-spec/v0.2.0 by @2bndy5 in [`c1e31a5`](https://github.com/2bndy5/img-gen/commit/c1e31a503ddcbe8a31268cf83b0b286567c3600a)
 - Bump version to img-gen-renderer/v0.2.0 by @2bndy5 in [`c6be725`](https://github.com/2bndy5/img-gen/commit/c6be7251bbd26007db569d5a1476fbb427e1826e)
+- Bump version to img-gen/v0.2.0 by @2bndy5 in [`2e4be64`](https://github.com/2bndy5/img-gen/commit/2e4be643753340d0ef7bc3df972bbac0ffcf99b0)
 
 [img-gen/v0.2.0]: https://github.com/2bndy5/img-gen/compare/img-gen/v0.1.0...img-gen/v0.2.0
 

@@ -11,11 +11,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 <!-- markdownlint-disable MD024 -->
 
+## [img-gen-spec/v0.2.1] - 2026-05-31
+
+### <!-- 4 --> 🛠️ Fixed
+
+- Deserialize repeated YAML fields in py binding by @2bndy5 in [`38f2cd4`](https://github.com/2bndy5/img-gen/commit/38f2cd4969d0940765a45dc870c1a9b47bb2d8b9)
+
+[img-gen-spec/v0.2.1]: https://github.com/2bndy5/img-gen/compare/img-gen-spec/v0.2.0...img-gen-spec/v0.2.1
+
+Full commit diff: [`19dce6e...img-gen-spec/v0.2.1`][img-gen-spec/v0.2.1]
+
 ## [img-gen-spec/v0.2.0] - 2026-05-31
 
 ### <!-- 1 --> 🚀 Added
 
 - Add serialization support by @2bndy5 in [#8](https://github.com/2bndy5/img-gen/pull/8)
+
+### <!-- 6 --> 📦 Dependency updates
+
+- Bump version to img-gen-spec/v0.2.0 by @2bndy5 in [`c1e31a5`](https://github.com/2bndy5/img-gen/commit/c1e31a503ddcbe8a31268cf83b0b286567c3600a)
 
 [img-gen-spec/v0.2.0]: https://github.com/2bndy5/img-gen/compare/img-gen-spec/v0.1.0...img-gen-spec/v0.2.0
 

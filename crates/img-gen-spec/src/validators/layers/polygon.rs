@@ -404,4 +404,56 @@ mod test {
             .to_string();
         assert!(error.contains("Irregular Polygons cannot have less than 3 unique points"));
     }
+
+    #[test]
+    fn polygon_sides_deserialize_trait_validates_regular_minimum() {
+        let err = serde_json::from_str::<PolygonSides>("2")
+            .unwrap_err()
+            .to_string();
+        assert!(err.contains("Regular Polygons cannot have less than 3 sides"));
+
+        let parsed = serde_json::from_str::<PolygonSides>("5").unwrap();
+        assert!(matches!(parsed, PolygonSides::Regular(v) if v.get() == 5));
+    }
+
+    #[test]
+    fn polygon_sides_deserialize_trait_validates_irregular_unique_points() {
+        let err = serde_json::from_str::<PolygonSides>(
+            r#"[{"x":0,"y":0},{"x":0,"y":0},{"x":100,"y":0}]"#,
+        )
+        .unwrap_err()
+        .to_string();
+        assert!(err.contains("Irregular Polygons cannot have less than 3 unique points"));
+
+        let parsed = serde_json::from_str::<PolygonSides>(
+            r#"[{"x":0,"y":0},{"x":100,"y":0},{"x":50,"y":100}]"#,
+        )
+        .unwrap();
+        assert!(matches!(parsed, PolygonSides::Irregular(v) if v.as_slice().len() == 3));
+    }
+
+    #[test]
+    fn polygon_sides_serialize_trait_emits_expected_shape() {
+        let regular: PolygonSides = RegularPolygonSides::new(6).unwrap().into();
+        assert_eq!(
+            serde_json::to_value(&regular).unwrap(),
+            serde_json::json!(6)
+        );
+
+        let irregular: PolygonSides = IrregularPolygonSides::new(vec![
+            LayerOffset { x: 0, y: 0 },
+            LayerOffset { x: 100, y: 0 },
+            LayerOffset { x: 50, y: 100 },
+        ])
+        .unwrap()
+        .into();
+        assert_eq!(
+            serde_json::to_value(&irregular).unwrap(),
+            serde_json::json!([
+                { "x": 0, "y": 0 },
+                { "x": 100, "y": 0 },
+                { "x": 50, "y": 100 }
+            ])
+        );
+    }
 }

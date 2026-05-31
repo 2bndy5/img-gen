@@ -34,8 +34,7 @@ fn parse_color_map_to_gradient<'s>(gradient_spec: &[(f32, &'s str)]) -> Vec<(f32
         let mut inserted = false;
         for i in 0..normalized.len() {
             if normalized[i].0 >= *point {
-                let index = i.saturating_sub(1);
-                normalized.insert(index, (*point, color));
+                normalized.insert(i, (*point, color));
                 inserted = true;
                 break;
             }

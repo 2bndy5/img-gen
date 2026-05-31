@@ -167,21 +167,16 @@ impl Serialize for ColorKind {
 mod test {
     #![allow(clippy::unwrap_used, clippy::panic)]
 
-    use crate::{ColorGradient, ColorKind, Spread};
+    use crate::{ColorGradient, ColorKind, ConicalGradient, LinearGradient, RadialGradient};
 
     #[test]
     fn deserialize_solid_color() {
         let color_str = "rgba(255, 0, 0, 1.0)";
         let color_kind: ColorKind = serde_saphyr::from_str(color_str).unwrap();
-        match color_kind {
-            ColorKind::SolidColor(solid_color) => {
-                assert_eq!(solid_color.get_r(), 255);
-                assert_eq!(solid_color.get_g(), 0);
-                assert_eq!(solid_color.get_b(), 0);
-                assert_eq!(solid_color.get_a(), 255);
-            }
-            _ => panic!("Expected a SolidColor variant"),
-        }
+        assert_eq!(
+            serde_json::to_value(&color_kind).unwrap(),
+            serde_json::json!("rgba(255, 0, 0, 1)"),
+        );
     }
 
     #[test]
@@ -199,12 +194,12 @@ colors:
   0.0: red
   1.0: blue
 "#;
-        let ColorKind::LinearGradient(linear_gradient) =
-            serde_saphyr::from_str(gradient_str).unwrap()
-        else {
-            panic!("Expected a LinearGradient variant")
-        };
-        assert!(matches!(linear_gradient.spread, Spread::Pad));
+        let color_kind: ColorKind = serde_saphyr::from_str(gradient_str).unwrap();
+        let value = serde_json::to_value(&color_kind).unwrap();
+        assert_eq!(value["spread"], serde_json::json!("pad"));
+        assert_eq!(value["start"], serde_json::json!({"x": 0, "y": 0}));
+        assert_eq!(value["end"], serde_json::json!({"x": 100, "y": 100}));
+        let linear_gradient = serde_json::from_value::<LinearGradient>(value).unwrap();
         assert_eq!(linear_gradient.get_color_at(0, 0).to_tuple(), red_tuple);
         assert_eq!(
             linear_gradient.get_color_at(100, 100).to_tuple(),
@@ -230,12 +225,12 @@ colors:
     0.1: red
     1.0: blue
 "#;
-        let ColorKind::RadialGradient(radial) = serde_saphyr::from_str(gradient_str).unwrap()
-        else {
-            panic!("Expected a RadialGradient variant")
-        };
-        assert!(matches!(radial.spread, Spread::Pad));
-        assert_eq!(radial.get_radius(), 100.0);
+        let color_kind: ColorKind = serde_saphyr::from_str(gradient_str).unwrap();
+        let value = serde_json::to_value(&color_kind).unwrap();
+        assert_eq!(value["spread"], serde_json::json!("pad"));
+        assert_eq!(value["radius"], serde_json::json!(100.0));
+        assert_eq!(value["center"], serde_json::json!({"x": 50, "y": 50}));
+        let radial = serde_json::from_value::<RadialGradient>(value).unwrap();
         assert_eq!(radial.get_color_at(50, 50).to_tuple(), red_tuple);
         assert_eq!(radial.get_color_at(150, 150).to_tuple(), blue_tuple);
     }
@@ -254,13 +249,11 @@ colors:
     0.1: red
     1.0: blue
 "#;
-        let ColorKind::ConicalGradient(conical) = serde_saphyr::from_str(gradient_str).unwrap()
-        else {
-            panic!("Expected a ConicalGradient variant")
-        };
-        assert_eq!(conical.get_angle(), 0.0);
-        assert_eq!(conical.center.x, 1);
-        assert_eq!(conical.center.y, 1);
+        let color_kind: ColorKind = serde_saphyr::from_str(gradient_str).unwrap();
+        let value = serde_json::to_value(&color_kind).unwrap();
+        assert_eq!(value["center"], serde_json::json!({"x": 1, "y": 1}));
+        assert_eq!(value["angle"], serde_json::json!(0.0));
+        let conical = serde_json::from_value::<ConicalGradient>(value).unwrap();
         assert_eq!(conical.get_color_at(2, 1).to_tuple(), blue_tuple);
         assert_eq!(conical.get_color_at(50, 0).to_tuple(), red_tuple);
     }
@@ -280,16 +273,12 @@ colors:
     fn serialize_color_gradient_preset_as_map() {
         let gradient: ColorGradient = serde_saphyr::from_str("MonoChrome").unwrap();
         let value = serde_json::to_value(&gradient).unwrap();
-
-        let serde_json::Value::Object(obj) = value else {
-            panic!("Expected serialized preset gradient to be a JSON object")
-        };
         assert_eq!(
-            obj.get("0").or_else(|| obj.get("0.0")),
+            value.get("0").or_else(|| value.get("0.0")),
             Some(&serde_json::Value::String("rgba(0, 0, 0, 1)".to_string()))
         );
         assert_eq!(
-            obj.get("1").or_else(|| obj.get("1.0")),
+            value.get("1").or_else(|| value.get("1.0")),
             Some(&serde_json::Value::String(
                 "rgba(255, 255, 255, 1)".to_string()
             ))
@@ -300,17 +289,12 @@ colors:
     fn serialize_color_gradient_stops_as_map() {
         let gradient: ColorGradient = serde_saphyr::from_str("{0.0: red, 1.0: blue}").unwrap();
         let value = serde_json::to_value(&gradient).unwrap();
-
-        let serde_json::Value::Object(obj) = value else {
-            panic!("Expected serialized gradient to be a JSON object")
-        };
-
         assert_eq!(
-            obj.get("0").or_else(|| obj.get("0.0")),
+            value.get("0").or_else(|| value.get("0.0")),
             Some(&serde_json::Value::String("rgba(255, 0, 0, 1)".to_string()))
         );
         assert_eq!(
-            obj.get("1").or_else(|| obj.get("1.0")),
+            value.get("1").or_else(|| value.get("1.0")),
             Some(&serde_json::Value::String("rgba(0, 0, 255, 1)".to_string()))
         );
     }

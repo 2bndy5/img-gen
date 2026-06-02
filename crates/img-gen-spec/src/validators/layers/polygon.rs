@@ -234,7 +234,15 @@ pub struct Polygon {
 
     /// The color used to fill the polygon.
     #[cfg(not(feature = "pyo3"))]
-    #[serde(default = "ColorKind::transparent_default")]
+    #[serde(
+        default = "ColorKind::transparent_default",
+        alias = "linear_gradient",
+        alias = "radial_gradient",
+        alias = "conical_gradient",
+        alias = "linear-gradient",
+        alias = "radial-gradient",
+        alias = "conical-gradient"
+    )]
     pub color: ColorKind,
 
     /// The polygon side definition.

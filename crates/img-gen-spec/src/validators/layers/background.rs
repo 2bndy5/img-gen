@@ -11,7 +11,7 @@ use serde::{Deserialize, Serialize};
     feature = "pyo3",
     pyclass(module = "img_gen", get_all, set_all, from_py_object)
 )]
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Background {
     /// A path to an image file.
     ///
@@ -31,11 +31,35 @@ pub struct Background {
     pub image: Option<String>,
     /// A color overlaid on top of the `image`.
     /// If no image is specified, then the layer is simple filled with this color.
+    #[serde(
+        alias = "linear_gradient",
+        alias = "radial_gradient",
+        alias = "conical_gradient",
+        alias = "linear-gradient",
+        alias = "radial-gradient",
+        alias = "conical-gradient"
+    )]
     pub color: Option<ColorKind>,
     /// This controls how the original image is rendered into the layer.
     /// Default is to preserve the original image's width and height.
-    #[serde(default)]
+    #[serde(default = "Background::default_preserve_aspect")]
     pub preserve_aspect: PreserveAspect,
+}
+
+impl Background {
+    const fn default_preserve_aspect() -> PreserveAspect {
+        PreserveAspect::Off
+    }
+}
+
+impl Default for Background {
+    fn default() -> Self {
+        Self {
+            image: None,
+            color: None,
+            preserve_aspect: Self::default_preserve_aspect(),
+        }
+    }
 }
 
 #[cfg(test)]
@@ -51,12 +75,9 @@ mod test {
             duplicate_keys: serde_saphyr::options::DuplicateKeyPolicy::LastWins,
         };
         // Parse into an intermediate `serde_json::Value` with LastWins, then deserialize
-        let value: serde_json::Value = serde_saphyr::from_str_with_options(yaml, opts).unwrap();
-        let bg: Background = serde_json::from_value(value).unwrap();
-        assert!(bg.color.is_some());
-        match bg.color.unwrap() {
-            super::ColorKind::SolidColor(sc) => assert_eq!(sc.get_b(), 255u8),
-            other => panic!("unexpected color kind: {:?}", other),
-        }
+        let bg: Background = serde_saphyr::from_str_with_options(yaml, opts).unwrap();
+        assert!(
+            matches!(bg.color.unwrap(), super::ColorKind::SolidColor(sc) if sc.to_tuple() == (0, 0, 255, 255))
+        );
     }
 }

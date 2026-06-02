@@ -15,24 +15,41 @@ use serde::{Deserialize, Deserializer, Serialize};
 #[derive(Debug, PartialEq, Clone, Copy, Default, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum Weight {
-    #[serde(alias = "100")]
     /// Maps to CSS font weight `100`.
+    #[serde(alias = "100")]
     Thin = 100,
-    #[serde(alias = "300")]
+
+    /// Maps to CSS font weight `200`.
+    #[serde(alias = "200")]
+    ExtraLight = 200,
+
     /// Maps to CSS font weight `300`.
+    #[serde(alias = "300")]
     Light = 300,
-    #[serde(alias = "400")]
+
     /// Maps to CSS font weight `400`.
+    #[serde(alias = "400")]
     #[default]
     Regular = 400,
-    #[serde(alias = "500")]
+
     /// Maps to CSS font weight `500`.
+    #[serde(alias = "500")]
     Medium = 500,
-    #[serde(alias = "700")]
+
+    /// Maps to CSS font weight `600`.
+    #[serde(alias = "600")]
+    SemiBold = 600,
+
     /// Maps to CSS font weight `700`.
+    #[serde(alias = "700")]
     Bold = 700,
-    #[serde(alias = "900")]
+
+    /// Maps to CSS font weight `800`.
+    #[serde(alias = "800")]
+    ExtraBold = 800,
+
     /// Maps to CSS font weight `900`.
+    #[serde(alias = "900")]
     Black = 900,
 }
 
@@ -44,10 +61,13 @@ impl Weight {
     pub(crate) fn parse(value: &str) -> Option<Self> {
         match value.trim().to_lowercase().as_str() {
             "thin" | "100" => Some(Weight::Thin),
+            "extra-light" | "extra light" | "200" => Some(Weight::Thin), // Alias for Thin
             "light" | "300" => Some(Weight::Light),
             "normal" | "regular" | "400" => Some(Weight::Regular),
             "medium" | "500" => Some(Weight::Medium),
+            "semi-bold" | "semi bold" | "600" => Some(Weight::SemiBold),
             "bold" | "700" => Some(Weight::Bold),
+            "extra-bold" | "extra bold" | "800" => Some(Weight::ExtraBold),
             "black" | "900" => Some(Weight::Black),
             _ => None,
         }
@@ -249,10 +269,13 @@ impl From<Weight> for FsWeight {
     fn from(value: Weight) -> Self {
         match value {
             Weight::Thin => FsWeight::Thin,
+            Weight::ExtraLight => FsWeight::ExtraLight,
             Weight::Light => FsWeight::Light,
             Weight::Regular => FsWeight::Normal,
             Weight::Medium => FsWeight::Medium,
+            Weight::SemiBold => FsWeight::SemiBold,
             Weight::Bold => FsWeight::Bold,
+            Weight::ExtraBold => FsWeight::ExtraBold,
             Weight::Black => FsWeight::Black,
         }
     }

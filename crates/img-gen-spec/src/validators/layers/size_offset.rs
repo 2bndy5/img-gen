@@ -13,8 +13,11 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, Hash, Eq, PartialEq)]
 pub struct LayerOffset {
     /// The offset in pixels along the x-axis.
+    #[serde(default)]
     pub x: i32,
+
     /// The offset in pixels along the y-axis.
+    #[serde(default)]
     pub y: i32,
 }
 

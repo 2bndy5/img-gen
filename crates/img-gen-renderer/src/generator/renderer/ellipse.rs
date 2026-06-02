@@ -1,11 +1,219 @@
 use super::{ConcreteSize, Renderer};
 use crate::{ImgGenRendererError, Layer, Result};
-use img_gen_spec::TRANSPARENT;
+use img_gen_spec::{Arc, Ellipse, LayerOffset};
 
-use image::RgbaImage;
-use resvg::{tiny_skia::PathBuilder, usvg::Rect};
+use image::{RgbaImage, imageops::overlay};
+use resvg::{
+    tiny_skia::{FillRule, Mask, MaskType, Paint, Path, PathBuilder, Pixmap, PixmapRef, Stroke},
+    usvg::{Rect, Transform},
+};
+
+fn clamp_to_360(angle: f32) -> f32 {
+    let mut a = angle % 360.0;
+    if a < 0.0 {
+        a += 360.0;
+    }
+    a
+}
+
+pub(super) fn arc_path(arc: &Arc, center: (f32, f32), radiuses: (f32, f32), pb: &mut PathBuilder) {
+    let start = clamp_to_360(arc.start);
+    let end = clamp_to_360(arc.end);
+    let delta = clamp_to_360(end - start);
+
+    // Number of segments to approximate the arc. ~1 segment per 5 degrees.
+    let segments = (delta / 5.0).ceil().max(2.0) as usize;
+
+    let (cx, cy) = center;
+    let (rx, ry) = radiuses;
+    // compute first point separately to initialize path
+    let angle0 = (360.0 - start).to_radians();
+    let x0 = cx + rx * angle0.cos();
+    let y0 = cy + ry * angle0.sin();
+
+    if pb.is_empty() {
+        pb.move_to(x0, y0);
+    } else {
+        pb.line_to(x0, y0);
+    }
+
+    for i in 1..=segments {
+        let t = i as f32 / segments as f32;
+        let angle = (360.0 - (start + delta * t)).to_radians();
+        let x = cx + rx * angle.cos();
+        let y = cy + ry * angle.sin();
+        pb.line_to(x, y);
+    }
+}
+
+fn draw_arc(arc: &Arc, size: ConcreteSize, inset: f32) -> Result<Path> {
+    // Common float helpers
+    let fw = size.width as f32;
+    let fh = size.height as f32;
+    let cx = fw / 2.0;
+    let cy = fh / 2.0;
+    let rx = fw / 2.0 - inset;
+    let ry = fh / 2.0 - inset;
+    // Build the sector path (center -> arc -> center) used for filling the wedge
+    let mut sector_pb = PathBuilder::new();
+    sector_pb.move_to(cx, cy);
+    arc_path(arc, (cx, cy), (rx, ry), &mut sector_pb);
+    sector_pb.line_to(cx, cy);
+    sector_pb.close();
+
+    sector_pb
+        .finish()
+        .ok_or(ImgGenRendererError::InvalidPathBounds {
+            shape: "ellipse arc",
+        })
+}
 
 impl Renderer<'_> {
+    /// Render an arc with border.
+    ///
+    /// Needed a dedicated function because drawing a border for an arc is tricky.
+    fn render_arc_with_border(
+        &self,
+        layer: &Ellipse,
+        size: ConcreteSize,
+        layer_offset: &LayerOffset,
+        canvas: &mut RgbaImage,
+    ) -> Result<()> {
+        let (Some(arc), Some(border)) = (layer.arc.as_ref(), layer.border.as_ref()) else {
+            return Ok(()); // unreachable since caller checks for arc presence.
+        };
+        let border_width = border.width.get() as f32;
+        let inset = border_width / 2.0;
+
+        let mut paint = Paint::default();
+        paint.set_color_rgba8(255, 255, 255, 255);
+
+        // only stroke the arc with a border.
+        // To get a border whose ends align with the arc region's edges,
+        // we must draw an entire ellipse with a border and
+        // mask out the region beyond the arc bounds.
+
+        // create our mask of the arc. what results from masking is what gets colored.
+        let mask_path = draw_arc(arc, size, 0.0)?;
+        let mut pixmap_mask = Pixmap::new(size.width, size.height).ok_or(
+            ImgGenRendererError::PixmapAllocationFailed {
+                shape: "shape border mask",
+                width: size.width,
+                height: size.height,
+            },
+        )?;
+        pixmap_mask.fill_path(
+            &mask_path,
+            &paint,
+            FillRule::EvenOdd,
+            Transform::identity(),
+            None,
+        );
+        let mask = Mask::from_pixmap(
+            PixmapRef::from_bytes(pixmap_mask.data(), size.width, size.height).ok_or(
+                ImgGenRendererError::RasterBufferConversionFailed {
+                    shape: "arc border mask",
+                    width: size.width,
+                    height: size.height,
+                },
+            )?,
+            MaskType::Alpha,
+        );
+
+        // create the ellipse path used for both arc and border.
+        let ellipse_path = PathBuilder::from_oval(
+            // spell-checker: disable-next-line
+            Rect::from_xywh(
+                inset,
+                inset,
+                size.width as f32 - border_width,
+                size.height as f32 - border_width,
+            )
+            .ok_or(ImgGenRendererError::BoundsTooLarge {
+                shape: "ellipse arc border",
+            })?,
+        )
+        .ok_or(ImgGenRendererError::InvalidPathBounds {
+            shape: "ellipse arc border",
+        })?;
+
+        let mut pixmap = Pixmap::new(size.width, size.height).ok_or(
+            ImgGenRendererError::PixmapAllocationFailed {
+                shape: "ellipse arc border",
+                width: size.width,
+                height: size.height,
+            },
+        )?;
+
+        if !layer.color.is_transparent() {
+            // first fill the ellipse path and mask it to the arc region.
+            pixmap.fill_path(
+                &ellipse_path,
+                &paint,
+                FillRule::EvenOdd,
+                Transform::identity(),
+                Some(&mask),
+            );
+            // color the fill using a temp canvas
+            let mut tmp_canvas =
+                RgbaImage::from_raw(pixmap.width(), pixmap.height(), pixmap.data().to_vec())
+                    .ok_or(ImgGenRendererError::RasterBufferConversionFailed {
+                        shape: "ellipse arc",
+                        width: pixmap.width(),
+                        height: pixmap.height(),
+                    })?;
+            Self::colorize(&layer.color, &mut tmp_canvas, true);
+            overlay(
+                canvas,
+                &tmp_canvas,
+                layer_offset.x.into(),
+                layer_offset.y.into(),
+            );
+        }
+
+        if !border.color.is_transparent() {
+            // draw the border with same path
+            let mut border_pixmap = Pixmap::new(size.width, size.height).ok_or(
+                ImgGenRendererError::PixmapAllocationFailed {
+                    shape: "ellipse arc border",
+                    width: size.width,
+                    height: size.height,
+                },
+            )?;
+            let stroke = Stroke {
+                width: border_width,
+                ..Default::default()
+            };
+            border_pixmap.stroke_path(
+                &ellipse_path,
+                &paint,
+                &stroke,
+                Transform::identity(),
+                Some(&mask),
+            );
+            // color the border using a temp canvas
+            let mut border_canvas = RgbaImage::from_raw(
+                border_pixmap.width(),
+                border_pixmap.height(),
+                border_pixmap.data().to_vec(),
+            )
+            .ok_or(ImgGenRendererError::RasterBufferConversionFailed {
+                shape: "ellipse arc border",
+                width: border_pixmap.width(),
+                height: border_pixmap.height(),
+            })?;
+            Self::colorize(&border.color, &mut border_canvas, true);
+            overlay(
+                canvas,
+                &border_canvas,
+                layer_offset.x.into(),
+                layer_offset.y.into(),
+            );
+        }
+
+        Ok(())
+    }
+
     pub fn render_ellipse(
         &self,
         layer: &Layer,
@@ -13,122 +221,26 @@ impl Renderer<'_> {
         canvas: &mut RgbaImage,
     ) -> Result<()> {
         if let Some(l) = layer.ellipse.as_ref() {
-            let border_width = l.border.as_ref().map_or(0, |b| b.width.get());
-            let inset = border_width as f32 / 2.0;
-
-            // Common float helpers
-            let fw = size.width as f32;
-            let fh = size.height as f32;
-            let cx = fw / 2.0;
-            let cy = fh / 2.0;
-            let rx = fw / 2.0 - inset;
-            let ry = fh / 2.0 - inset;
-
-            if let Some(arc) = l.arc.as_ref() {
-                let mut start = arc.start % 360.0;
-                if start < 0.0 {
-                    start += 360.0;
-                }
-                let mut end = arc.end % 360.0;
-                if end < 0.0 {
-                    end += 360.0;
-                }
-                let mut delta = end - start;
-                if delta <= 0.0 {
-                    delta += 360.0;
-                }
-
-                // Number of segments to approximate the arc. ~1 segment per 5 degrees.
-                let segments = (delta / 5.0).ceil().max(2.0) as usize;
-
-                // Build two paths:
-                //  - sector_path: closed path (center -> arc -> center) used for filling the wedge
-                //  - arc_path: open path following just the arc used for stroking when border_to_origin is false
-                let mut sector_pb = PathBuilder::new();
-                let mut arc_pb = PathBuilder::new();
-
-                // compute first point separately to initialize paths
-                let angle0 = (start).to_radians();
-                let x0 = cx + rx * angle0.cos();
-                let y0 = cy + ry * angle0.sin();
-
-                sector_pb.move_to(cx, cy);
-                sector_pb.line_to(x0, y0);
-
-                arc_pb.move_to(x0, y0);
-
-                for i in 1..=segments {
-                    let t = i as f32 / segments as f32;
-                    let angle = (start + delta * t).to_radians();
-                    let x = cx + rx * angle.cos();
-                    let y = cy + ry * angle.sin();
-                    sector_pb.line_to(x, y);
-                    arc_pb.line_to(x, y);
-                }
-
-                sector_pb.line_to(cx, cy);
-                sector_pb.close();
-
-                let sector_path =
-                    sector_pb
-                        .finish()
-                        .ok_or(ImgGenRendererError::InvalidPathBounds {
-                            shape: "ellipse arc",
-                        })?;
-                let arc_path = arc_pb
-                    .finish()
-                    .ok_or(ImgGenRendererError::InvalidPathBounds {
-                        shape: "ellipse arc",
-                    })?;
-
-                // Fill the sector with the ellipse color (no stroke)
-                Self::render_shape(
-                    sector_path.clone(),
-                    &l.color,
-                    size,
-                    &layer.offset,
-                    &None,
-                    canvas,
-                )?;
-
-                // Draw border if requested. If border_to_origin=false, stroke only the arc path;
-                // if true, stroke the whole sector path (including radial edges).
-                if l.border.is_some() {
-                    let transparent = TRANSPARENT.into();
-                    let border_ref = &l.border;
-                    if l.border_to_origin {
-                        Self::render_shape(
-                            sector_path,
-                            &transparent,
-                            size,
-                            &layer.offset,
-                            border_ref,
-                            canvas,
-                        )?;
-                    } else {
-                        Self::render_shape(
-                            arc_path,
-                            &transparent,
-                            size,
-                            &layer.offset,
-                            border_ref,
-                            canvas,
-                        )?;
-                    }
-                }
+            if l.arc.is_some() && l.border.is_some() && !l.border_to_origin {
+                self.render_arc_with_border(l, size, &layer.offset, canvas)?;
             } else {
-                // Full ellipse as before.
-                let path = PathBuilder::from_oval(
-                    // spell-checker: disable-next-line
-                    Rect::from_xywh(
-                        inset,
-                        inset,
-                        size.width as f32 - border_width as f32,
-                        size.height as f32 - border_width as f32,
+                let border_width = l.border.as_ref().map_or(0, |b| b.width.get());
+                let inset = border_width as f32 / 2.0;
+                let path = if let Some(arc) = &l.arc {
+                    draw_arc(arc, size, inset)?
+                } else {
+                    PathBuilder::from_oval(
+                        // spell-checker: disable-next-line
+                        Rect::from_xywh(
+                            inset,
+                            inset,
+                            size.width as f32 - border_width as f32,
+                            size.height as f32 - border_width as f32,
+                        )
+                        .ok_or(ImgGenRendererError::BoundsTooLarge { shape: "ellipse" })?,
                     )
-                    .ok_or(ImgGenRendererError::BoundsTooLarge { shape: "ellipse" })?,
-                )
-                .ok_or(ImgGenRendererError::InvalidPathBounds { shape: "ellipse" })?;
+                    .ok_or(ImgGenRendererError::InvalidPathBounds { shape: "ellipse" })?
+                };
                 Self::render_shape(path, &l.color, size, &layer.offset, &l.border, canvas)?;
             }
         }

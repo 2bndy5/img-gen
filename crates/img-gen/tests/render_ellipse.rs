@@ -82,7 +82,7 @@ async fn render_arcs() {
         width: NonZeroU32::new(250),
         height: NonZeroU32::new(250),
     };
-    let arcs = [(315.0, 45.0), (45.0, 315.0), (-45.0, 45.0), (45.0, -45.0)];
+    let arcs = [(315.0, 45.0), (45.0, 315.0), (-45.0, 225.0), (225.0, -45.0)];
     for (index, (start, end)) in arcs.iter().enumerate() {
         let (r, g, b) = (
             255 * ([0, 3].contains(&index)) as u8,
@@ -97,14 +97,10 @@ async fn render_arcs() {
             },
             ellipse: Some(Ellipse {
                 color: SolidColor::new(g, b, r, 127).into(),
-                border: if index == 0 {
-                    None
-                } else {
-                    Some(Border {
-                        color: SolidColor::new(r, g, b, 63).into(),
-                        width: NonZeroU32::new(10).unwrap(),
-                    })
-                },
+                border: Some(Border {
+                    color: SolidColor::new(r, g, b, 63).into(),
+                    width: NonZeroU32::new(10).unwrap(),
+                }),
                 arc: Some(Arc {
                     start: *start,
                     end: *end,

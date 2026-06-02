@@ -52,7 +52,15 @@ pub struct Rectangle {
     pub border: Option<Border>,
 
     /// The color used to fill the rectangle.
-    #[serde(default = "ColorKind::transparent_default")]
+    #[serde(
+        default = "ColorKind::transparent_default",
+        alias = "linear_gradient",
+        alias = "radial_gradient",
+        alias = "conical_gradient",
+        alias = "linear-gradient",
+        alias = "radial-gradient",
+        alias = "conical-gradient"
+    )]
     pub color: ColorKind,
 
     /// The radius of the rendered [`Rectangle::corners`].

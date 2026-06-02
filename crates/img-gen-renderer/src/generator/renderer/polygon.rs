@@ -19,47 +19,43 @@ impl Renderer<'_> {
                 match &l.sides {
                     PolygonSides::Regular(sides) => {
                         let sides = sides.get();
-                        let radius = size.width.min(size.height) as f32 / 2.0 - border_width as f32;
-                        for i in 0..sides {
-                            let angle =
-                                ((360.0 / sides as f32 * i as f32) - l.rotation).to_radians();
-                            let x = angle.cos() * radius + (size.width as f32 / 2.0);
-                            let y = angle.sin() * radius + (size.height as f32 / 2.0);
-                            if i == 0 {
-                                pb.move_to(x, y);
-                            } else {
-                                pb.line_to(x, y);
+                        let degrees = 360.0 / sides as f32;
+                        let inset = border_width as f32;
+                        let radius = size.width.min(size.height) as f32 / 2.0 - inset;
+                        let center_x = size.width as f32 / 2.0;
+                        let center_y = size.height as f32 / 2.0;
+                        let mut angle = (270.0 - 0.5 * degrees) + l.rotation;
+
+                        let radians = (360.0 - angle).to_radians();
+                        let (sin_angle, cos_angle) = radians.sin_cos();
+                        pb.move_to(cos_angle * radius + center_x, sin_angle * radius + center_y);
+
+                        for _ in 1..sides {
+                            angle += degrees;
+                            if angle > 360.0 {
+                                angle -= 360.0;
                             }
+
+                            let radians = (360.0 - angle).to_radians();
+                            let (sin_angle, cos_angle) = radians.sin_cos();
+                            pb.line_to(
+                                cos_angle * radius + center_x,
+                                sin_angle * radius + center_y,
+                            );
                         }
                     }
                     PolygonSides::Irregular(offsets) => {
-                        let x_min = if border_width > 0 {
-                            border_width as i32
-                        } else {
-                            0
-                        };
-                        let y_min = if border_width > 0 {
-                            border_width as i32
-                        } else {
-                            0
-                        };
-                        let x_max = if border_width > 0 {
-                            size.width.saturating_sub(border_width) as i32
-                        } else {
-                            size.width as i32
-                        };
-                        let y_max = if border_width > 0 {
-                            size.height.saturating_sub(border_width) as i32
-                        } else {
-                            size.height as i32
-                        };
+                        let x_max = size.width.saturating_sub(border_width) as i32;
+                        let y_max = size.height.saturating_sub(border_width) as i32;
 
-                        for (i, offset) in offsets.as_slice().iter().enumerate() {
-                            let x = offset.x.clamp(x_min, x_max) as f32;
-                            let y = offset.y.clamp(y_min, y_max) as f32;
-                            if i == 0 {
-                                pb.move_to(x, y);
-                            } else {
+                        if let Some((first, remaining)) = offsets.as_slice().split_first() {
+                            let x = first.x.clamp(border_width as i32, x_max) as f32;
+                            let y = first.y.clamp(border_width as i32, y_max) as f32;
+                            pb.move_to(x, y);
+
+                            for offset in remaining {
+                                let x = offset.x.clamp(border_width as i32, x_max) as f32;
+                                let y = offset.y.clamp(border_width as i32, y_max) as f32;
                                 pb.line_to(x, y);
                             }
                         }

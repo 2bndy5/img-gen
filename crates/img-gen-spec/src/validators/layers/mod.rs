@@ -38,6 +38,14 @@ pub struct Border {
     /// The width (in pixels) used to draw the border.
     pub width: NonZeroU32,
     /// The color used to draw the border.
+    #[serde(
+        alias = "linear_gradient",
+        alias = "radial_gradient",
+        alias = "conical_gradient",
+        alias = "linear-gradient",
+        alias = "radial-gradient",
+        alias = "conical-gradient"
+    )]
     pub color: ColorKind,
 }
 

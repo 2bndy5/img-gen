@@ -23,11 +23,33 @@ struct GradientVisitor;
 impl<'de> Visitor<'de> for GradientVisitor {
     type Value = ColorGradient;
 
+    fn visit_u64<E>(self, v: u64) -> Result<Self::Value, E>
+    where
+        E: de::Error,
+    {
+        if let Some(preset) = Presets::try_from_index(v.clamp(0, u8::MAX as u64) as u8) {
+            ColorGradient::new(None, Some(preset)).map_err(serde::de::Error::custom)
+        } else {
+            Err(E::invalid_value(serde::de::Unexpected::Unsigned(v), &self))
+        }
+    }
+
+    fn visit_i64<E>(self, v: i64) -> Result<Self::Value, E>
+    where
+        E: de::Error,
+    {
+        if let Some(preset) = Presets::try_from_index(v.clamp(0, u8::MAX as i64) as u8) {
+            ColorGradient::new(None, Some(preset)).map_err(serde::de::Error::custom)
+        } else {
+            Err(E::invalid_value(serde::de::Unexpected::Signed(v), &self))
+        }
+    }
+
     fn visit_str<E>(self, gradient_str: &str) -> Result<Self::Value, E>
     where
         E: serde::de::Error,
     {
-        if let Some(preset) = Presets::from_string(gradient_str) {
+        if let Some(preset) = Presets::try_from_str(gradient_str) {
             ColorGradient::new(None, Some(preset)).map_err(serde::de::Error::custom)
         } else {
             Err(E::invalid_value(
@@ -54,7 +76,9 @@ impl<'de> Visitor<'de> for GradientVisitor {
     }
 
     fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
-        formatter.write_str("a string representing a gradient preset or a gradient specification in the form of a HashMap<f32, String>.")
+        formatter.write_str(
+            "a string or index number representing a gradient preset or a gradient specification in the form of a HashMap<f32, String>.",
+        )
     }
 }
 
@@ -167,7 +191,9 @@ impl Serialize for ColorKind {
 mod test {
     #![allow(clippy::unwrap_used, clippy::panic)]
 
-    use crate::{ColorGradient, ColorKind, ConicalGradient, LinearGradient, RadialGradient};
+    use crate::{
+        ColorGradient, ColorKind, ConicalGradient, LinearGradient, RadialGradient, Spread,
+    };
 
     #[test]
     fn deserialize_solid_color() {
@@ -256,6 +282,23 @@ colors:
         let conical = serde_json::from_value::<ConicalGradient>(value).unwrap();
         assert_eq!(conical.get_color_at(2, 1).to_tuple(), blue_tuple);
         assert_eq!(conical.get_color_at(50, 0).to_tuple(), red_tuple);
+    }
+
+    #[test]
+    fn deserialize_preset_from_int() {
+        let gradient_str = "-42";
+        let color_gradient: ColorGradient = serde_saphyr::from_str(gradient_str).unwrap();
+        assert_eq!(
+            color_gradient.get_color_at(0.0, &Spread::Pad).to_tuple(),
+            (0, 0, 0, 255)
+        );
+
+        let gradient_str = "0";
+        let color_gradient: ColorGradient = serde_saphyr::from_str(gradient_str).unwrap();
+        assert_eq!(
+            color_gradient.get_color_at(0.0, &Spread::Pad).to_tuple(),
+            (0, 0, 0, 255)
+        );
     }
 
     #[test]

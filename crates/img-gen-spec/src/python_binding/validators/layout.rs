@@ -141,12 +141,6 @@ impl Debug {
         }
     }
 
-    /// Calculate a black or white foreground color using `Debug.color` as a background.
-    #[pyo3(name = "get_foreground_color", text_signature = "() -> SolidColor")]
-    pub fn get_foreground_color_py(&self) -> SolidColor {
-        self.get_foreground_color()
-    }
-
     /// Deserialize a `Debug` object from a YAML string.
     #[staticmethod]
     pub fn from_yaml_str(yaml_str: String) -> PyResult<Self> {

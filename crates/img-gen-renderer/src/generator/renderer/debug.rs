@@ -17,7 +17,7 @@ impl Renderer<'_> {
                 return Ok(());
             }
             let bg = debug.color.clone();
-            let fg = debug.get_foreground_color();
+            let fg = bg.get_foreground_color();
             let fg_color = fg.clone().into();
             let layout_cs = ConcreteSize::from(&layout.size);
             if debug.grid {

@@ -54,6 +54,7 @@ class SolidColor:
     g: int
     b: int
     a: int
+    def get_foreground_color(self) -> SolidColor: ...
     @staticmethod
     def from_yaml_str(yaml_str: str) -> SolidColor: ...
     @staticmethod

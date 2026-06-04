@@ -100,46 +100,6 @@ pub struct Debug {
 }
 
 impl Debug {
-    /// Calculate a black or white foreground color using [`Debug::color`] as a background.
-    pub fn get_foreground_color(&self) -> SolidColor {
-        let luminance = {
-            let mut result = 0.0f32;
-            for (index, c) in vec![
-                &self.color.get_r(),
-                &self.color.get_g(),
-                &self.color.get_b(),
-            ]
-            .into_iter()
-            .take(3)
-            .enumerate()
-            {
-                let component = *c as f32 / 255.0;
-                let new_component = if component <= 0.03928 {
-                    component / 12.92
-                } else {
-                    ((component + 0.055) / 1.055).powf(2.4)
-                };
-                match index {
-                    0 => {
-                        result += 0.2126 * new_component;
-                    }
-                    1 => {
-                        result += 0.7152 * new_component;
-                    }
-                    _ => {
-                        result += 0.0722 * new_component;
-                    }
-                }
-            }
-            result
-        };
-        if luminance > 0.451 {
-            SolidColor::new(0, 0, 0, 255)
-        } else {
-            SolidColor::new(255, 255, 255, 255)
-        }
-    }
-
     pub(crate) const fn default_grid_step() -> u32 {
         30
     }
@@ -300,13 +260,13 @@ mod tests {
         // Black (0,0,0): all channels <= 0.03928 threshold -> component / 12.92 path (L111)
         // Luminance = 0 <= 0.451 -> white foreground
         let d: Debug = serde_saphyr::from_str("color: \"black\"\n").unwrap();
-        assert_eq!(d.get_foreground_color().to_tuple(), (255, 255, 255, 255));
+        assert_eq!(d.color.get_foreground_color().to_tuple(), (255, 255, 255, 255));
     }
 
     #[test]
     fn debug_foreground_bright_color() {
         // White (255,255,255): luminance ~= 1.0 > 0.451 -> black foreground (L130)
         let d: Debug = serde_saphyr::from_str("color: \"white\"\n").unwrap();
-        assert_eq!(d.get_foreground_color().to_tuple(), (0, 0, 0, 255));
+        assert_eq!(d.color.get_foreground_color().to_tuple(), (0, 0, 0, 255));
     }
 }

@@ -137,7 +137,7 @@ async def generate_preset_examples() -> dict[int, str]:
     generator = Generator()
     for p in dir(Presets):
         # cycle through all the presets and generate example images for each
-        if not p.startswith("_"):
+        if not p.startswith("_") and not p.startswith("from_"):
             preset = getattr(Presets, p)
             presets[int(preset)] = p
             preset_example_img = preset_examples / f"{p}.png"

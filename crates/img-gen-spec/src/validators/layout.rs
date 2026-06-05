@@ -260,7 +260,10 @@ mod tests {
         // Black (0,0,0): all channels <= 0.03928 threshold -> component / 12.92 path (L111)
         // Luminance = 0 <= 0.451 -> white foreground
         let d: Debug = serde_saphyr::from_str("color: \"black\"\n").unwrap();
-        assert_eq!(d.color.get_foreground_color().to_tuple(), (255, 255, 255, 255));
+        assert_eq!(
+            d.color.get_foreground_color().to_tuple(),
+            (255, 255, 255, 255)
+        );
     }
 
     #[test]

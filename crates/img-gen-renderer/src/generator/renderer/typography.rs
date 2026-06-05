@@ -221,7 +221,7 @@ impl Renderer<'_> {
         let true_height = Self::layout_true_height(&layout);
         // Distribute any remaining vertical space evenly between lines so that
         // multi-line text fills the full layer height (like CSS justify for vertical).
-        let gap_per_line = if params.line.height.get() > 1.0  && num_lines > 1 {
+        let gap_per_line = if params.line.height.get() > 1.0 && num_lines > 1 {
             let available = params.max_height.saturating_sub(border_width) as f32;
             (available - true_height) / (num_lines - 1) as f32
         } else {

@@ -124,20 +124,15 @@ impl SolidColor {
     pub fn get_foreground_color(&self) -> SolidColor {
         let luminance = {
             let mut result = 0.0f32;
-            for (index, c) in vec![
-                &self.inner.r,
-                &self.inner.g,
-                &self.inner.b,
-            ]
-            .into_iter()
-            .take(3)
-            .enumerate()
+            for (index, c) in vec![&self.inner.r, &self.inner.g, &self.inner.b]
+                .into_iter()
+                .take(3)
+                .enumerate()
             {
-                let component = *c / 255.0;
-                let new_component = if component <= 0.03928 {
-                    component / 12.92
+                let new_component = if *c <= 0.03928 {
+                    *c / 12.92
                 } else {
-                    ((component + 0.055) / 1.055).powf(2.4)
+                    ((*c + 0.055) / 1.055).powf(2.4)
                 };
                 match index {
                     0 => {

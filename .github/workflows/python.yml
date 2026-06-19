@@ -51,7 +51,7 @@ jobs:
           - runner: ubuntu-latest
             target: ppc64le
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.3
         with:
           persist-credentials: false
       - uses: actions/setup-python@v6
@@ -108,7 +108,7 @@ jobs:
           - runner: ubuntu-latest
             target: armv7
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.3
         with:
           persist-credentials: false
       - uses: actions/setup-python@v6
@@ -137,7 +137,7 @@ jobs:
           - runner: windows-latest
             target: x86
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.3
         with:
           persist-credentials: false
       - uses: actions/setup-python@v6
@@ -166,7 +166,7 @@ jobs:
           - runner: macos-15
             target: aarch64
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.3
         with:
           persist-credentials: false
       - uses: actions/setup-python@v6
@@ -187,7 +187,7 @@ jobs:
   sdist:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.3
         with:
           persist-credentials: false
       - name: Build sdist
@@ -207,7 +207,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.3
         with:
           persist-credentials: false
       - run: rustup update
@@ -215,11 +215,11 @@ jobs:
         id: python-setup
         with:
           python-version: 3.x
-      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+      - uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
         # zizmor: ignore[cache-poisoning]
         with:
           python-version: ${{ steps.python-setup.outputs.python-version }}
-      - uses: cargo-bins/cargo-binstall@aaa84a43aec4955a42c5ffc65d258961e39f276e # v1.19.1
+      - uses: cargo-bins/cargo-binstall@30b5ca8b54e1dcffd9548bc87ede1531310fdc67 # v1.20.0
       - name: Install nur
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -249,20 +249,20 @@ jobs:
     name: Build docs
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.3
         with:
           persist-credentials: false
       - uses: actions/setup-python@v6
         with:
           python-version: 3.x
-      - uses: cargo-bins/cargo-binstall@aaa84a43aec4955a42c5ffc65d258961e39f276e # v1.19.1
+      - uses: cargo-bins/cargo-binstall@30b5ca8b54e1dcffd9548bc87ede1531310fdc67 # v1.20.0
       - name: Install nur
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: cargo binstall -y nur
       - name: Install uv
         # zizmor: ignore[cache-poisoning]
-        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
       - name: Build docs
         run: nur docs
       - name: Upload docs

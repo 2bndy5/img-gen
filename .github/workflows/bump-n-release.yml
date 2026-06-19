@@ -41,18 +41,18 @@ jobs:
     environment: staging-deployment
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.3
         with:
           token: ${{ secrets.BUMP_N_RELEASE }}
           fetch-depth: 0
           fetch-tags: true
           persist-credentials: true # needed for `git push`
-      - uses: cargo-bins/cargo-binstall@aaa84a43aec4955a42c5ffc65d258961e39f276e # v1.19.1
+      - uses: cargo-bins/cargo-binstall@30b5ca8b54e1dcffd9548bc87ede1531310fdc67 # v1.20.0
       - run: cargo binstall -y git-cliff
         env:
           GITHUB_TOKEN: ${{ github.token }}
       - name: Install nushell
-        uses: hustcer/setup-nu@92c296ba1ba2ba04cc948ab64ddefe192dc13f0c # v3.23
+        uses: hustcer/setup-nu@ccd5bb5426b05a32009c2ba967946231f3919c97 # v3.25
         with:
           version: ${{ vars.NUSHELL_VERSION || '*' }}
       - name: Install cargo-edit
@@ -74,12 +74,12 @@ jobs:
     outputs:
       pkgs: ${{ steps.get-pkgs.outputs.pkgs }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.3
         with:
           fetch-depth: 0
           persist-credentials: false
       - name: Install nushell
-        uses: hustcer/setup-nu@92c296ba1ba2ba04cc948ab64ddefe192dc13f0c # v3.23
+        uses: hustcer/setup-nu@ccd5bb5426b05a32009c2ba967946231f3919c97 # v3.25
         with:
           version: ${{ vars.NUSHELL_VERSION || '*' }}
       - name: Get changed packages
@@ -105,17 +105,17 @@ jobs:
       matrix:
         pkg: ${{ fromJSON(needs.get-changed-pkgs.outputs.pkgs) }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.3
         with:
           fetch-depth: 0
           fetch-tags: true
           persist-credentials: false
-      - uses: cargo-bins/cargo-binstall@aaa84a43aec4955a42c5ffc65d258961e39f276e # v1.19.1
+      - uses: cargo-bins/cargo-binstall@30b5ca8b54e1dcffd9548bc87ede1531310fdc67 # v1.20.0
       - run: cargo binstall -y git-cliff
         env:
           GITHUB_TOKEN: ${{ github.token }}
       - name: Install nushell
-        uses: hustcer/setup-nu@92c296ba1ba2ba04cc948ab64ddefe192dc13f0c # v3.23
+        uses: hustcer/setup-nu@ccd5bb5426b05a32009c2ba967946231f3919c97 # v3.25
         with:
           version: ${{ vars.NUSHELL_VERSION || '*' }}
       - name: Generate a release notes

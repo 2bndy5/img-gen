@@ -69,4 +69,9 @@ impl ColorKind {
     pub(crate) fn transparent_default() -> Self {
         Self::SolidColor(TRANSPARENT)
     }
+
+    /// Returns `true` if `self` is a [`SolidColor`] and fully transparent.
+    pub fn is_transparent(&self) -> bool {
+        matches!(self, Self::SolidColor(c) if c.get_a() == 0)
+    }
 }

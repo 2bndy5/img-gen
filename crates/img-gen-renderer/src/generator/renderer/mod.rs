@@ -94,36 +94,42 @@ impl<'a> Renderer<'a> {
         border: &Option<Border>,
         canvas: &mut RgbaImage,
     ) -> Result<()> {
-        let mut pixmap = Pixmap::new(shape_size.width, shape_size.height).ok_or(
-            ImgGenRendererError::PixmapAllocationFailed {
-                shape: "shape",
-                width: shape_size.width,
-                height: shape_size.height,
-            },
-        )?;
         let mut paint = Paint::default();
         paint.set_color_rgba8(255, 255, 255, 255);
-        pixmap.fill_path(
-            &path,
-            &paint,
-            FillRule::EvenOdd,
-            Transform::identity(),
-            None,
-        );
-        let mut body = RgbaImage::from_raw(pixmap.width(), pixmap.height(), pixmap.data().to_vec())
-            .ok_or(ImgGenRendererError::RasterBufferConversionFailed {
-                shape: "shape",
-                width: pixmap.width(),
-                height: pixmap.height(),
-            })?;
-        Self::colorize(layer_color, &mut body, true);
-        overlay(canvas, &body, layer_offset.x.into(), layer_offset.y.into());
-        if let Some(b) = border {
+
+        if !layer_color.is_transparent() {
+            let mut pixmap = Pixmap::new(shape_size.width, shape_size.height).ok_or(
+                ImgGenRendererError::PixmapAllocationFailed {
+                    shape: "shape",
+                    width: shape_size.width,
+                    height: shape_size.height,
+                },
+            )?;
+            pixmap.fill_path(
+                &path,
+                &paint,
+                FillRule::EvenOdd,
+                Transform::identity(),
+                None,
+            );
+            let mut body =
+                RgbaImage::from_raw(pixmap.width(), pixmap.height(), pixmap.data().to_vec())
+                    .ok_or(ImgGenRendererError::RasterBufferConversionFailed {
+                        shape: "shape",
+                        width: pixmap.width(),
+                        height: pixmap.height(),
+                    })?;
+            Self::colorize(layer_color, &mut body, true);
+            overlay(canvas, &body, layer_offset.x.into(), layer_offset.y.into());
+        }
+        if let Some(b) = border
+            && !b.color.is_transparent()
+        {
             let stroke = Stroke {
                 width: b.width.get() as f32,
                 ..Default::default()
             };
-            pixmap = Pixmap::new(shape_size.width, shape_size.height).ok_or(
+            let mut pixmap = Pixmap::new(shape_size.width, shape_size.height).ok_or(
                 ImgGenRendererError::PixmapAllocationFailed {
                     shape: "shape border",
                     width: shape_size.width,

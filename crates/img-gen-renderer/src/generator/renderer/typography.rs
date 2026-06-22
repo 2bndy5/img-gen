@@ -27,6 +27,8 @@ impl Default for TextBrush {
     }
 }
 
+const WBR: char = '\u{200B}';
+
 #[derive(Clone, Copy)]
 pub(super) struct TextMeasureParams<'a> {
     pub(super) max_width: Option<f32>,
@@ -107,7 +109,7 @@ impl Renderer<'_> {
             let max_height = size.height;
             let layout_max_width = max_width.saturating_sub(border_width).max(1);
             let alignment = Self::horizontal_alignment(&l.align);
-            let text = Self::preprocess_text_for_layout(&l.content);
+            let text = Self::inject_word_breaks(&l.content);
             let params = OverflowLayoutParams {
                 text: &text,
                 max_width: layout_max_width as f32,
@@ -198,7 +200,6 @@ impl Renderer<'_> {
 
         self.ensure_font_available(params.font).await?;
 
-        let (r, g, b, a) = params.color.get_color_tuple_at(0, 0);
         let layout_params = TextLayoutParams {
             max_width: Some(params.max_width),
             font: Some(params.font),
@@ -206,33 +207,30 @@ impl Renderer<'_> {
             alignment: params.alignment,
             wrap_mode: params.wrap_mode,
             overflow_wrap: OverflowWrap::Anywhere,
-            brush: TextBrush {
-                color: Color::from_rgba8(r, g, b, a),
-            },
+            brush: TextBrush::default(),
             font_size: params.font_size,
         };
         let layout = self.build_text_layout(text, layout_params);
         let border_width = params.border.map_or(0, |b| b.width.get());
-        let stroke_padding = border_width.div_ceil(2);
         // Use max_width as the image width when available: after alignment (center/end),
         // glyph run offsets are already relative to the full max_advance container, so
         // layout.width() (the natural content width) would be too narrow to hold them.
-        let width = params.max_width.ceil().max(1.0) as u32 + stroke_padding * 2;
+        let width = params.max_width.ceil().max(1.0) as u32 + border_width;
         // Use block_max_coord of the last line so descenders are not clipped.
         let num_lines = layout.lines().len();
         let true_height = Self::layout_true_height(&layout);
         // Distribute any remaining vertical space evenly between lines so that
         // multi-line text fills the full layer height (like CSS justify for vertical).
-        let gap_per_line = if num_lines > 1 {
-            let available = params.max_height.saturating_sub(stroke_padding * 2) as f32;
-            (available - true_height).max(0.0) / (num_lines - 1) as f32
+        let gap_per_line = if params.line.height.get() > 1.0 && num_lines > 1 {
+            let available = params.max_height.saturating_sub(border_width) as f32;
+            (available - true_height) / (num_lines - 1) as f32
         } else {
             0.0
         };
         let height = if gap_per_line > 0.0 {
-            params.max_height + stroke_padding * 2
+            params.max_height + border_width
         } else {
-            true_height.ceil().max(1.0) as u32 + stroke_padding * 2
+            true_height.ceil().max(1.0) as u32 + border_width
         };
         let mut text_img = RgbaImage::new(width, height);
         let mut fill_mask = vec![0u8; (width * height) as usize];
@@ -246,7 +244,7 @@ impl Renderer<'_> {
                         &mut self.scale_cx,
                         &mut text_img,
                         &mut fill_mask,
-                        stroke_padding,
+                        border_width / 2,
                         y_offset,
                     )?;
                 }
@@ -255,7 +253,7 @@ impl Renderer<'_> {
 
         // Compose the fill into `text_img` by sampling the color source per-pixel.
         // Reuse the renderer colorize helper which handles optional masks.
-        super::Renderer::colorize_masked(
+        Self::colorize_masked(
             params.color,
             &mut text_img,
             Some(fill_mask.as_slice()),
@@ -441,8 +439,7 @@ impl Renderer<'_> {
     /// Inject zero-width spaces (`\u{200B}`) at probable word-break points so the
     /// layout engine can wrap long API-style identifiers (e.g. `camelCase`,
     /// `snake_case`, `module.Class`) more naturally.
-    fn preprocess_text_for_layout(text: &str) -> String {
-        const WBR: char = '\u{200B}';
+    fn inject_word_breaks(text: &str) -> String {
         let mut result = String::with_capacity(text.len() + 16);
         let mut iter = text.chars().peekable();
         while let Some(c) = iter.next() {

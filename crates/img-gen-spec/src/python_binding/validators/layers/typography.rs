@@ -4,7 +4,6 @@ use crate::{
     Border, ColorKind, Font, Line, Typography, TypographyAlign, Weight, validators::LineHeight,
 };
 use pyo3::{exceptions::PyValueError, prelude::*};
-use serde_saphyr::options::DuplicateKeyPolicy;
 
 #[pymethods]
 impl Line {
@@ -59,29 +58,23 @@ impl Line {
     /// Deserialize a `Line` object from a YAML string.
     #[staticmethod]
     pub fn from_yaml_str(yaml_str: String) -> PyResult<Self> {
-        serde_saphyr::from_str_with_options(
-            &yaml_str,
-            serde_saphyr::options! {
-                duplicate_keys: DuplicateKeyPolicy::LastWins,
-            },
-        )
-        .map_err(|e| PyValueError::new_err(e.to_string()))
+        crate::python_binding::parse_yaml_last_wins(&yaml_str)
     }
 
     /// Deserialize a `Line` object from a JSON string.
     #[staticmethod]
     pub fn from_json_str(json_str: String) -> PyResult<Self> {
-        serde_json::from_str(&json_str).map_err(|e| PyValueError::new_err(e.to_string()))
+        serde_json::from_str(&json_str).map_err(crate::python_binding::map_to_value_err)
     }
 
     /// Serialize the `Line` object to a JSON string.
     pub fn as_json_str(&self) -> PyResult<String> {
-        serde_json::to_string(self).map_err(|e| PyValueError::new_err(e.to_string()))
+        serde_json::to_string(self).map_err(crate::python_binding::map_to_value_err)
     }
 
     /// Serialize the `Line` object to a YAML string.
     pub fn as_yaml_str(&self) -> PyResult<String> {
-        serde_saphyr::to_string(self).map_err(|e| PyValueError::new_err(e.to_string()))
+        serde_saphyr::to_string(self).map_err(crate::python_binding::map_to_value_err)
     }
 }
 
@@ -107,29 +100,23 @@ impl Font {
     /// Deserialize a `Font` object from a YAML string.
     #[staticmethod]
     pub fn from_yaml_str(yaml_str: String) -> PyResult<Self> {
-        serde_saphyr::from_str_with_options(
-            &yaml_str,
-            serde_saphyr::options! {
-                duplicate_keys: DuplicateKeyPolicy::LastWins,
-            },
-        )
-        .map_err(|e| PyValueError::new_err(e.to_string()))
+        crate::python_binding::parse_yaml_last_wins(&yaml_str)
     }
 
     /// Deserialize a `Font` object from a JSON string.
     #[staticmethod]
     pub fn from_json_str(json_str: String) -> PyResult<Self> {
-        serde_json::from_str(&json_str).map_err(|e| PyValueError::new_err(e.to_string()))
+        serde_json::from_str(&json_str).map_err(crate::python_binding::map_to_value_err)
     }
 
     /// Serialize the `Font` object to a JSON string.
     pub fn as_json_str(&self) -> PyResult<String> {
-        serde_json::to_string(self).map_err(|e| PyValueError::new_err(e.to_string()))
+        serde_json::to_string(self).map_err(crate::python_binding::map_to_value_err)
     }
 
     /// Serialize the `Font` object to a YAML string.
     pub fn as_yaml_str(&self) -> PyResult<String> {
-        serde_saphyr::to_string(self).map_err(|e| PyValueError::new_err(e.to_string()))
+        serde_saphyr::to_string(self).map_err(crate::python_binding::map_to_value_err)
     }
 }
 
@@ -169,28 +156,22 @@ impl Typography {
     /// Deserialize a `Typography` object from a YAML string.
     #[staticmethod]
     pub fn from_yaml_str(yaml_str: String) -> PyResult<Self> {
-        serde_saphyr::from_str_with_options(
-            &yaml_str,
-            serde_saphyr::options! {
-                duplicate_keys: DuplicateKeyPolicy::LastWins,
-            },
-        )
-        .map_err(|e| PyValueError::new_err(e.to_string()))
+        crate::python_binding::parse_yaml_last_wins(&yaml_str)
     }
 
     /// Deserialize a `Typography` object from a JSON string.
     #[staticmethod]
     pub fn from_json_str(json_str: String) -> PyResult<Self> {
-        serde_json::from_str(&json_str).map_err(|e| PyValueError::new_err(e.to_string()))
+        serde_json::from_str(&json_str).map_err(crate::python_binding::map_to_value_err)
     }
 
     /// Serialize the `Typography` object to a JSON string.
     pub fn as_json_str(&self) -> PyResult<String> {
-        serde_json::to_string(self).map_err(|e| PyValueError::new_err(e.to_string()))
+        serde_json::to_string(self).map_err(crate::python_binding::map_to_value_err)
     }
 
     /// Serialize the `Typography` object to a YAML string.
     pub fn as_yaml_str(&self) -> PyResult<String> {
-        serde_saphyr::to_string(self).map_err(|e| PyValueError::new_err(e.to_string()))
+        serde_saphyr::to_string(self).map_err(crate::python_binding::map_to_value_err)
     }
 }

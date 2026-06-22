@@ -1,5 +1,4 @@
 use pyo3::{exceptions::PyValueError, prelude::*};
-use serde_saphyr::options::DuplicateKeyPolicy;
 
 use crate::{
     ColorGradient, ColorKind, ConicalGradient, LayerOffset, LinearGradient, Presets,
@@ -91,28 +90,49 @@ impl ColorKind {
     /// Deserialize a `ColorKind` object from a YAML string.
     #[staticmethod]
     pub fn from_yaml_str(yaml_str: String) -> PyResult<Self> {
-        serde_saphyr::from_str_with_options(
-            &yaml_str,
-            serde_saphyr::options! {
-                duplicate_keys: DuplicateKeyPolicy::LastWins,
-            },
-        )
-        .map_err(|e| PyValueError::new_err(e.to_string()))
+        crate::python_binding::parse_yaml_last_wins(&yaml_str)
     }
 
     /// Deserialize a `ColorKind` object from a JSON string.
     #[staticmethod]
     pub fn from_json_str(json_str: String) -> PyResult<Self> {
-        serde_json::from_str(&json_str).map_err(|e| PyValueError::new_err(e.to_string()))
+        serde_json::from_str(&json_str).map_err(crate::python_binding::map_to_value_err)
     }
 
     /// Serialize the `ColorKind` object to a JSON string.
     pub fn as_json_str(&self) -> PyResult<String> {
-        serde_json::to_string(self).map_err(|e| PyValueError::new_err(e.to_string()))
+        serde_json::to_string(self).map_err(crate::python_binding::map_to_value_err)
     }
 
     /// Serialize the `ColorKind` object to a YAML string.
     pub fn as_yaml_str(&self) -> PyResult<String> {
-        serde_saphyr::to_string(self).map_err(|e| PyValueError::new_err(e.to_string()))
+        serde_saphyr::to_string(self).map_err(crate::python_binding::map_to_value_err)
+    }
+}
+
+#[pymethods]
+impl Presets {
+    /// Factory method to create a `Presets` object from a preset name string.
+    ///
+    /// The preset name must exactly match the enum variant name (case-sensitive).
+    #[staticmethod]
+    #[pyo3(name = "from_str", text_signature = "(preset_name: str) -> Presets")]
+    #[allow(
+        clippy::should_implement_trait,
+        reason = "Its a python bound method, generics aren't allowed for pyo3 pyclass"
+    )]
+    pub fn from_str(preset_name: &str) -> PyResult<Self> {
+        Self::try_from_str(preset_name)
+            .ok_or_else(|| PyValueError::new_err(format!("Invalid preset name: {preset_name}")))
+    }
+
+    /// Factory method to create a `Presets` object from its declaration-order index.
+    ///
+    /// The preset index must be a valid integer corresponding to a preset (0-based).
+    #[staticmethod]
+    #[pyo3(name = "from_index", text_signature = "(preset_index: int) -> Presets")]
+    pub fn from_index(preset_index: i32) -> PyResult<Self> {
+        Self::try_from_index(preset_index.clamp(0, u8::MAX as i32) as u8)
+            .ok_or_else(|| PyValueError::new_err(format!("Invalid preset index: {preset_index}")))
     }
 }

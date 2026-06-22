@@ -1,6 +1,5 @@
 use crate::{Border, ColorKind, Corners, Rectangle};
-use pyo3::{exceptions::PyValueError, prelude::*};
-use serde_saphyr::options::DuplicateKeyPolicy;
+use pyo3::prelude::*;
 
 #[pymethods]
 impl Corners {
@@ -13,29 +12,23 @@ impl Corners {
     /// Deserialize a `Corners` object from a YAML string.
     #[staticmethod]
     pub fn from_yaml_str(yaml_str: String) -> PyResult<Self> {
-        serde_saphyr::from_str_with_options(
-            &yaml_str,
-            serde_saphyr::options! {
-                duplicate_keys: DuplicateKeyPolicy::LastWins,
-            },
-        )
-        .map_err(|e| PyValueError::new_err(e.to_string()))
+        crate::python_binding::parse_yaml_last_wins(&yaml_str)
     }
 
     /// Deserialize a `Corners` object from a JSON string.
     #[staticmethod]
     pub fn from_json_str(json_str: String) -> PyResult<Self> {
-        serde_json::from_str(&json_str).map_err(|e| PyValueError::new_err(e.to_string()))
+        serde_json::from_str(&json_str).map_err(crate::python_binding::map_to_value_err)
     }
 
     /// Serialize the `Corners` object to a JSON string.
     pub fn as_json_str(&self) -> PyResult<String> {
-        serde_json::to_string(self).map_err(|e| PyValueError::new_err(e.to_string()))
+        serde_json::to_string(self).map_err(crate::python_binding::map_to_value_err)
     }
 
     /// Serialize the `Corners` object to a YAML string.
     pub fn as_yaml_str(&self) -> PyResult<String> {
-        serde_saphyr::to_string(self).map_err(|e| PyValueError::new_err(e.to_string()))
+        serde_saphyr::to_string(self).map_err(crate::python_binding::map_to_value_err)
     }
 }
 
@@ -75,28 +68,22 @@ impl Rectangle {
     /// Deserialize a `Rectangle` object from a YAML string.
     #[staticmethod]
     pub fn from_yaml_str(yaml_str: String) -> PyResult<Self> {
-        serde_saphyr::from_str_with_options(
-            &yaml_str,
-            serde_saphyr::options! {
-                duplicate_keys: DuplicateKeyPolicy::LastWins,
-            },
-        )
-        .map_err(|e| PyValueError::new_err(e.to_string()))
+        crate::python_binding::parse_yaml_last_wins(&yaml_str)
     }
 
     /// Deserialize a `Rectangle` object from a JSON string.
     #[staticmethod]
     pub fn from_json_str(json_str: String) -> PyResult<Self> {
-        serde_json::from_str(&json_str).map_err(|e| PyValueError::new_err(e.to_string()))
+        serde_json::from_str(&json_str).map_err(crate::python_binding::map_to_value_err)
     }
 
     /// Serialize the `Rectangle` object to a JSON string.
     pub fn as_json_str(&self) -> PyResult<String> {
-        serde_json::to_string(self).map_err(|e| PyValueError::new_err(e.to_string()))
+        serde_json::to_string(self).map_err(crate::python_binding::map_to_value_err)
     }
 
     /// Serialize the `Rectangle` object to a YAML string.
     pub fn as_yaml_str(&self) -> PyResult<String> {
-        serde_saphyr::to_string(self).map_err(|e| PyValueError::new_err(e.to_string()))
+        serde_saphyr::to_string(self).map_err(crate::python_binding::map_to_value_err)
     }
 }

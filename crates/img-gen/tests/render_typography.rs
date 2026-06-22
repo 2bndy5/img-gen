@@ -208,7 +208,7 @@ async fn render_local_font_path() {
             height: LineHeight::new(1.0).unwrap(),
         },
         overflow: true,
-        color: SolidColor::from_string("black").unwrap().into(),
+        color: SolidColor::from_string("white").unwrap().into(),
         ..Default::default()
     };
 

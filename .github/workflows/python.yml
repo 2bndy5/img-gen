@@ -33,11 +33,12 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' && !startsWith(github.ref, 'refs/tags/') }}
 
 jobs:
-  linux:
-    runs-on: ${{ matrix.platform.runner }}
+  wheels:
+    runs-on: ${{ matrix.runner }}
     strategy:
+      fail-fast: false
       matrix:
-        platform:
+        include:
           - runner: ubuntu-latest
             target: x86_64
           - runner: ubuntu-latest
@@ -50,117 +51,29 @@ jobs:
             target: s390x
           - runner: ubuntu-latest
             target: ppc64le
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          persist-credentials: false
-      - uses: actions/setup-python@v6
-        with:
-          python-version: 3.x
-      - name: Build wheels
-        uses: PyO3/maturin-action@e83996d129638aa358a18fbd1dfb82f0b0fb5d3b # v1.51.0
-        with:
-          target: ${{ matrix.platform.target }}
-          # Use the zig toolchain for all targets except ppc64le.
-          # Note, this is meant to avoid build errors in aws-lc-sys crate, which compiles C code.
-          # For using reqwest v0.13 with `default-tls` feature.
-          args: >-
-            --release --out dist --find-interpreter
-            ${{ matrix.platform.target != 'ppc64le' && '--zig' || ''}}
-          sccache: ${{ !startsWith(github.ref, 'refs/tags/v') }} # zizmor: ignore[cache-poisoning]
-          manylinux: auto
-          # here we either install the ppc64le compiler/toolchain or install zig on all others
-          # spell-checker: disable
-          before-script-linux: |
-            case "${{ matrix.platform.target }}" in
-              ppc64le)
-                apt-get update
-                apt-get install -y \
-                  pkg-config \
-                  gcc-powerpc64le-linux-gnu \
-                  g++-powerpc64le-linux-gnu \
-                  binutils-powerpc64le-linux-gnu \
-                  libc6-dev-ppc64el-cross \
-                  libfontconfig1-dev
-                ;;
-              *)
-                pip install ziglang
-                ;;
-            esac
-          # spell-checker: enable
-      - name: Upload wheels
-        uses: actions/upload-artifact@v7
-        with:
-          name: wheels-linux-${{ matrix.platform.target }}
-          path: dist
-
-  musllinux:
-    runs-on: ${{ matrix.platform.runner }}
-    strategy:
-      matrix:
-        platform:
           - runner: ubuntu-latest
             target: x86_64
+            manylinux: musllinux_1_2
           - runner: ubuntu-latest
             target: x86
+            manylinux: musllinux_1_2
           - runner: ubuntu-latest
             target: aarch64
+            manylinux: musllinux_1_2
           - runner: ubuntu-latest
             target: armv7
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          persist-credentials: false
-      - uses: actions/setup-python@v6
-        with:
-          python-version: 3.x
-      - name: Build wheels
-        uses: PyO3/maturin-action@e83996d129638aa358a18fbd1dfb82f0b0fb5d3b # v1.51.0
-        with:
-          target: ${{ matrix.platform.target }}
-          args: --release --out dist --find-interpreter
-          sccache: ${{ !startsWith(github.ref, 'refs/tags/v') }} # zizmor: ignore[cache-poisoning]
-          manylinux: musllinux_1_2
-      - name: Upload wheels
-        uses: actions/upload-artifact@v7
-        with:
-          name: wheels-musllinux-${{ matrix.platform.target }}
-          path: dist
-
-  windows:
-    runs-on: ${{ matrix.platform.runner }}
-    strategy:
-      matrix:
-        platform:
+            manylinux: musllinux_1_2
           - runner: windows-latest
             target: x64
+            py-arch: x64
           - runner: windows-latest
             target: x86
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          persist-credentials: false
-      - uses: actions/setup-python@v6
-        with:
-          python-version: 3.x
-          architecture: ${{ matrix.platform.target }}
-      - name: Build wheels
-        uses: PyO3/maturin-action@e83996d129638aa358a18fbd1dfb82f0b0fb5d3b # v1.51.0
-        with:
-          target: ${{ matrix.platform.target }}
-          args: --release --out dist --find-interpreter
-          sccache: ${{ !startsWith(github.ref, 'refs/tags/v') }} # zizmor: ignore[cache-poisoning]
-      - name: Upload wheels
-        uses: actions/upload-artifact@v7
-        with:
-          name: wheels-windows-${{ matrix.platform.target }}
-          path: dist
-
-  macos:
-    runs-on: ${{ matrix.platform.runner }}
-    strategy:
-      matrix:
-        platform:
+            py-arch: x86
+          - runner: windows-11-arm
+            target: aarch64
+            py-arch: arm64
+            # python 3.11 is the minimum version available for arm64 on windows.
+            pyo3-feature: pyo3/abi3-py311
           - runner: macos-15-intel
             target: x86_64
           - runner: macos-15
@@ -171,17 +84,43 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-python@v6
         with:
-          python-version: 3.x
+          python-version: '3.x'
+          architecture: ${{ matrix.py-arch || null }}
       - name: Build wheels
         uses: PyO3/maturin-action@e83996d129638aa358a18fbd1dfb82f0b0fb5d3b # v1.51.0
         with:
-          target: ${{ matrix.platform.target }}
-          args: --release --out dist --find-interpreter
-          sccache: ${{ !startsWith(github.ref, 'refs/tags/v') }} # zizmor: ignore[cache-poisoning]
+          target: ${{ matrix.target }}
+          # Use the zig toolchain for all targets except linux ppc64le.
+          # Note, this is meant to avoid build errors in aws-lc-sys crate, which compiles C code.
+          # For using reqwest v0.13 with `default-tls` feature.
+          args: >-
+            --release
+            --out dist
+            --find-interpreter
+            --features ${{ matrix.pyo3-feature || 'pyo3/abi3-py310' }}
+            ${{ runner.os == 'Linux' && matrix.target != 'ppc64le' && '--zig' || '' }}
+          sccache: ${{ !startsWith(github.ref, 'refs/tags/') }} # zizmor: ignore[cache-poisoning]
+          manylinux: ${{ matrix.manylinux || 'auto' }}
+          # here we either install the ppc64le compiler/toolchain or install zig on all others
+          # spell-checker: disable
+          before-script-linux: |
+            case "${{ matrix.target }}" in
+              ppc64le)
+                apt-get update
+                apt-get install -y \
+                  pkg-config \
+                  gcc-powerpc64le-linux-gnu \
+                  g++-powerpc64le-linux-gnu \
+                  binutils-powerpc64le-linux-gnu \
+                  libc6-dev-ppc64el-cross \
+                  libfontconfig1-dev
+                ;;
+            esac
+          # spell-checker: enable
       - name: Upload wheels
         uses: actions/upload-artifact@v7
         with:
-          name: wheels-macos-${{ matrix.platform.target }}
+          name: wheels-${{ runner.os }}-${{ matrix.target }}_${{ matrix.manylinux || '' }}
           path: dist
 
   sdist:
@@ -231,7 +170,7 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/img-gen-py/v')
-    needs: [linux, musllinux, windows, macos, sdist]
+    needs: [wheels, sdist]
     permissions:
       id-token: write
     steps:
@@ -287,7 +226,7 @@ jobs:
         id: deploy-pages
 
   check-dist:
-    needs: [linux, musllinux, windows, macos, sdist]
+    needs: [wheels, sdist]
     if: ${{ !startsWith(github.ref, 'refs/tags/img-gen-py/v') }}
     name: Check package dist
     runs-on: ubuntu-latest

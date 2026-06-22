@@ -29,11 +29,25 @@ pub struct Icon {
     /// which defaults to the current working directory if unspecified or an empty list.
     pub image: String,
     /// A color used to replace the [`Icon::image`]'s original coloring.
+    #[serde(
+        alias = "linear_gradient",
+        alias = "radial_gradient",
+        alias = "conical_gradient",
+        alias = "linear-gradient",
+        alias = "radial-gradient",
+        alias = "conical-gradient"
+    )]
     pub color: Option<ColorKind>,
     /// This controls how the original image is rendered into the layer.
     ///
     /// The default is to preserve the original image's width and height
     /// ([`PreserveAspect::On`]).
-    #[serde(default)]
+    #[serde(default = "Icon::default_preserve_aspect")]
     pub preserve_aspect: PreserveAspect,
+}
+
+impl Icon {
+    const fn default_preserve_aspect() -> PreserveAspect {
+        PreserveAspect::On
+    }
 }

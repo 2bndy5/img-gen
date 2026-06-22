@@ -76,7 +76,15 @@ pub struct Typography {
     pub align: TypographyAlign,
 
     /// The color used to fill the rendered text.
-    #[serde(default)]
+    #[serde(
+        default,
+        alias = "linear_gradient",
+        alias = "radial_gradient",
+        alias = "conical_gradient",
+        alias = "linear-gradient",
+        alias = "radial-gradient",
+        alias = "conical-gradient"
+    )]
     pub color: ColorKind,
 
     /// The `Line` property used to describe the text's size.

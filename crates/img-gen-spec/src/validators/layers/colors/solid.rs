@@ -119,6 +119,41 @@ impl SolidColor {
     pub fn set_a(&mut self, val: u8) {
         self.inner.a = val as f32 / 255.0;
     }
+
+    /// Calculate a black or white foreground color using [`Debug::color`] as a background.
+    pub fn get_foreground_color(&self) -> SolidColor {
+        let luminance = {
+            let mut result = 0.0f32;
+            for (index, c) in vec![&self.inner.r, &self.inner.g, &self.inner.b]
+                .into_iter()
+                .take(3)
+                .enumerate()
+            {
+                let new_component = if *c <= 0.03928 {
+                    *c / 12.92
+                } else {
+                    ((*c + 0.055) / 1.055).powf(2.4)
+                };
+                match index {
+                    0 => {
+                        result += 0.2126 * new_component;
+                    }
+                    1 => {
+                        result += 0.7152 * new_component;
+                    }
+                    _ => {
+                        result += 0.0722 * new_component;
+                    }
+                }
+            }
+            result
+        };
+        if luminance > 0.451 {
+            SolidColor::new(0, 0, 0, 255)
+        } else {
+            SolidColor::new(255, 255, 255, 255)
+        }
+    }
 }
 
 impl Serialize for SolidColor {

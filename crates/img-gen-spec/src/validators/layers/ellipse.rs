@@ -28,7 +28,15 @@ pub struct Ellipse {
     /// The [`Border`] (if specified) ro render around the ellipse.
     pub border: Option<Border>,
     /// The color used to fill the ellipse.
-    #[serde(default = "ColorKind::transparent_default")]
+    #[serde(
+        default = "ColorKind::transparent_default",
+        alias = "linear_gradient",
+        alias = "radial_gradient",
+        alias = "conical_gradient",
+        alias = "linear-gradient",
+        alias = "radial-gradient",
+        alias = "conical-gradient"
+    )]
     pub color: ColorKind,
     /// The Arc (if specified) to render instead of a full ellipse.
     pub arc: Option<Arc>,

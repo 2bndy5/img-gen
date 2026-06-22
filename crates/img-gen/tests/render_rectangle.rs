@@ -37,7 +37,7 @@ async fn render() {
         LayerOffset { x: 100, y: 0 },
         LayerOffset { x: 100, y: 100 },
     ];
-    let radiuses = [0.0, 50.0, 100.0, 50.0];
+    let radiuses = [25.0, 50.0, 100.0, 50.0];
     let corners = [
         vec![],
         vec![Corners::TopLeft, Corners::BottomRight],

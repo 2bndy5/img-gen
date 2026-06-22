@@ -1143,7 +1143,7 @@ checksum = "09e54e57b4c48b40f7aec75635392b12b3421fa26fe8b4332e63138ed278459c"
 
 [[package]]
 name = "img-gen"
-version = "0.2.2"
+version = "0.2.3"
 dependencies = [
  "img-gen-renderer",
  "img-gen-spec",

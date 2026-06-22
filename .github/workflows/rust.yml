@@ -29,7 +29,7 @@ jobs:
     name: Lint and format
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.3
         with:
           persist-credentials: false
       - run: rustup update --no-self-update
@@ -45,7 +45,7 @@ jobs:
     name: Rust docs
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.3
         with:
           persist-credentials: false
       - run: rustup update --no-self-update
@@ -65,7 +65,7 @@ jobs:
     name: Rust tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.3
         with:
           persist-credentials: false
       - run: rustup update --no-self-update
@@ -75,7 +75,7 @@ jobs:
         with:
           path: "~/.cargo"
           key: cargo-test-${{ hashFiles('Cargo.lock') }}
-      - uses: cargo-bins/cargo-binstall@aaa84a43aec4955a42c5ffc65d258961e39f276e # v1.19.1
+      - uses: cargo-bins/cargo-binstall@30b5ca8b54e1dcffd9548bc87ede1531310fdc67 # v1.20.0
       - name: Install cargo-nextest, cargo-llvm-cov, and nur
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -97,7 +97,7 @@ jobs:
       name: test-coverage
       url: https://app.codecov.io/gh/2bndy5/img-gen
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.3
         with:
           persist-credentials: false
       - uses: actions/download-artifact@v8
@@ -118,12 +118,12 @@ jobs:
     environment: release
     name: Release ${{ github.ref_name }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.3
         with:
           persist-credentials: false
       - run: rustup update --no-self-update
       - name: Setup nushell
-        uses: hustcer/setup-nu@92c296ba1ba2ba04cc948ab64ddefe192dc13f0c # v3.23
+        uses: hustcer/setup-nu@ccd5bb5426b05a32009c2ba967946231f3919c97 # v3.25
         with:
           version: ${{ vars.NUSHELL_VERSION || '*' }}
       - name: Get package name
@@ -156,7 +156,7 @@ jobs:
     name: Check package dist
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.3
         with:
           persist-credentials: false
       - run: rustup update --no-self-update

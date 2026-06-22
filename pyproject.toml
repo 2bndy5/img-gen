@@ -1,5 +1,5 @@
 [build-system]
-requires = ["maturin>=1.13.3,<2.0"]
+requires = ["maturin<2.0,>=1.13.3"]
 build-backend = "maturin"
 
 [project]
@@ -34,11 +34,9 @@ addopts = "-vv --durations=5"
 
 [dependency-groups]
 dev = [
-    "maturin==1.13.3",
     "mypy==2.1.0",
     "pre-commit==4.6.0",
-    "ruff==0.15.14",
-    "asyncio>=4.0.0",
+    "ruff==0.15.17",
 ]
 docs = [
     "myst-parser>=4.0.1",

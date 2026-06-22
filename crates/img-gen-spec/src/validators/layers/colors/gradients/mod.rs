@@ -211,4 +211,10 @@ mod tests {
         assert_eq!(domain, vec![0.0, 0.1, 0.5, 0.9, 1.0]);
         assert_eq!(colors, vec!["red", "red", "green", "blue", "blue"]);
     }
+
+    #[test]
+    fn preset_to_index() {
+        assert_eq!(Presets::MonoChrome.index(), 0);
+        assert_eq!(Presets::try_from_index(255), None);
+    }
 }

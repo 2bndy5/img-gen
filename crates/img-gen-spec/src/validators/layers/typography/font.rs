@@ -291,9 +291,12 @@ mod tests {
     fn convert_weight() {
         assert_eq!(FsWeight::from(Weight::Thin), FsWeight::Thin);
         assert_eq!(FsWeight::from(Weight::Light), FsWeight::Light);
+        assert_eq!(FsWeight::from(Weight::ExtraLight), FsWeight::ExtraLight);
         assert_eq!(FsWeight::from(Weight::Regular), FsWeight::Normal);
         assert_eq!(FsWeight::from(Weight::Medium), FsWeight::Medium);
+        assert_eq!(FsWeight::from(Weight::SemiBold), FsWeight::SemiBold);
         assert_eq!(FsWeight::from(Weight::Bold), FsWeight::Bold);
+        assert_eq!(FsWeight::from(Weight::ExtraBold), FsWeight::ExtraBold);
         assert_eq!(FsWeight::from(Weight::Black), FsWeight::Black);
     }
 

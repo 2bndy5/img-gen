@@ -299,6 +299,11 @@ colors:
             color_gradient.get_color_at(0.0, &Spread::Pad).to_tuple(),
             (0, 0, 0, 255)
         );
+
+        // now trigger an error by using an out-of-range index.
+        let gradient_str = "255";
+        let err = serde_saphyr::from_str::<ColorGradient>(gradient_str).unwrap_err();
+        assert!(err.to_string().contains("invalid value: integer `255`"));
     }
 
     #[test]

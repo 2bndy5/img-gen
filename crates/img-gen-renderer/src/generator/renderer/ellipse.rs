@@ -247,3 +247,63 @@ impl Renderer<'_> {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    #![allow(clippy::unwrap_used)]
+
+    use std::num::NonZeroU32;
+
+    use fontsource_downloader::FontSourceClient;
+    use img_gen_spec::{Border, SolidColor};
+
+    use super::*;
+
+    #[test]
+    fn non_op_render_arc() {
+        let ellipse = Ellipse::default();
+        let fontsource_client = FontSourceClient::new().unwrap();
+        let renderer = Renderer::new(resvg::usvg::Options::default(), &fontsource_client, &[]);
+        let mut canvas = RgbaImage::new(100, 100);
+        renderer
+            .render_arc_with_border(
+                &ellipse,
+                ConcreteSize::default(),
+                &LayerOffset::default(),
+                &mut canvas,
+            )
+            .unwrap();
+        // rendering an arc with no arc or border should be a no-op and not modify the canvas.
+        assert!(canvas.pixels().all(|p| *p == image::Rgba([0, 0, 0, 0])));
+    }
+
+    #[test]
+    fn render_transparent_arc() {
+        let transparent_color = SolidColor::new(0, 0, 0, 0);
+        let ellipse = Ellipse {
+            arc: Some(Arc {
+                start: 0.0,
+                end: 90.0,
+            }),
+            color: transparent_color.clone().into(),
+            border: Some(Border {
+                width: NonZeroU32::new(10).unwrap(),
+                color: transparent_color.into(),
+            }),
+            ..Default::default()
+        };
+        let fontsource_client = FontSourceClient::new().unwrap();
+        let renderer = Renderer::new(resvg::usvg::Options::default(), &fontsource_client, &[]);
+        let mut canvas = RgbaImage::new(100, 100);
+        renderer
+            .render_arc_with_border(
+                &ellipse,
+                ConcreteSize::default(),
+                &LayerOffset::default(),
+                &mut canvas,
+            )
+            .unwrap();
+        // rendering an arc with a transparent border and fill color should modify the canvas.
+        assert!(canvas.pixels().all(|p| *p == image::Rgba([0, 0, 0, 0])));
+    }
+}

@@ -79,7 +79,7 @@ jobs:
           - runner: macos-15
             target: aarch64
     steps:
-      - uses: actions/checkout@v6.0.3
+      - uses: actions/checkout@v7.0.0
         with:
           persist-credentials: false
       - uses: actions/setup-python@v6
@@ -126,7 +126,7 @@ jobs:
   sdist:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6.0.3
+      - uses: actions/checkout@v7.0.0
         with:
           persist-credentials: false
       - name: Build sdist
@@ -146,7 +146,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
-      - uses: actions/checkout@v6.0.3
+      - uses: actions/checkout@v7.0.0
         with:
           persist-credentials: false
       - run: rustup update
@@ -158,7 +158,7 @@ jobs:
         # zizmor: ignore[cache-poisoning]
         with:
           python-version: ${{ steps.python-setup.outputs.python-version }}
-      - uses: cargo-bins/cargo-binstall@30b5ca8b54e1dcffd9548bc87ede1531310fdc67 # v1.20.0
+      - uses: cargo-bins/cargo-binstall@732870f031d2fb36309d0deaf36abcc704a7be65 # v1.20.1
       - name: Install nur
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -188,13 +188,13 @@ jobs:
     name: Build docs
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6.0.3
+      - uses: actions/checkout@v7.0.0
         with:
           persist-credentials: false
       - uses: actions/setup-python@v6
         with:
           python-version: 3.x
-      - uses: cargo-bins/cargo-binstall@30b5ca8b54e1dcffd9548bc87ede1531310fdc67 # v1.20.0
+      - uses: cargo-bins/cargo-binstall@732870f031d2fb36309d0deaf36abcc704a7be65 # v1.20.1
       - name: Install nur
         env:
           GITHUB_TOKEN: ${{ github.token }}

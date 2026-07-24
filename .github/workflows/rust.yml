@@ -29,7 +29,7 @@ jobs:
     name: Lint and format
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7.0.0
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
       - run: rustup update --no-self-update
@@ -45,7 +45,7 @@ jobs:
     name: Rust docs
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7.0.0
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
       - run: rustup update --no-self-update
@@ -65,7 +65,7 @@ jobs:
     name: Rust tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7.0.0
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
       - run: rustup update --no-self-update
@@ -75,7 +75,7 @@ jobs:
         with:
           path: "~/.cargo"
           key: cargo-test-${{ hashFiles('Cargo.lock') }}
-      - uses: cargo-bins/cargo-binstall@732870f031d2fb36309d0deaf36abcc704a7be65 # v1.20.1
+      - uses: cargo-bins/cargo-binstall@ead08b90bd7b2e6d81963fb9cf0b7239f66d5db4 # v1.21.0
       - name: Install cargo-nextest, cargo-llvm-cov, and nur
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -97,7 +97,7 @@ jobs:
       name: test-coverage
       url: https://app.codecov.io/gh/2bndy5/img-gen
     steps:
-      - uses: actions/checkout@v7.0.0
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
       - uses: actions/download-artifact@v8
@@ -118,7 +118,7 @@ jobs:
     environment: release
     name: Release ${{ github.ref_name }}
     steps:
-      - uses: actions/checkout@v7.0.0
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
       - run: rustup update --no-self-update
@@ -156,7 +156,7 @@ jobs:
     name: Check package dist
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7.0.0
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
       - run: rustup update --no-self-update

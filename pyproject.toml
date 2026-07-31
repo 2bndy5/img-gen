@@ -35,8 +35,8 @@ addopts = "-vv --durations=5"
 [dependency-groups]
 dev = [
     "mypy==2.3.0",
-    "pre-commit==4.6.0",
-    "ruff==0.15.22",
+    "pre-commit==4.6.1",
+    "ruff==0.16.0",
 ]
 docs = [
     "myst-parser>=4.0.1",

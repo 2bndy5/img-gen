@@ -22,6 +22,6 @@ thiserror = "2.0"
 tokio = { version = "1.52.3", features = ["macros"] }
 
 [workspace.dependencies.serde-saphyr]
-version = "0.0.29"
+version = "1.0.0"
 # git = "https://github.com/bourumir-wyngs/serde-saphyr.git"
 # rev = "4973d226f6130391f0330480cd8d64903517375c"

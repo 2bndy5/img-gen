@@ -158,7 +158,7 @@ jobs:
         # zizmor: ignore[cache-poisoning]
         with:
           python-version: ${{ steps.python-setup.outputs.python-version }}
-      - uses: cargo-bins/cargo-binstall@ead08b90bd7b2e6d81963fb9cf0b7239f66d5db4 # v1.21.0
+      - uses: cargo-bins/cargo-binstall@e00d2c94cc0067b77737821097a62d91c0301baa # v1.21.1
       - name: Install nur
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -180,7 +180,7 @@ jobs:
           path: dist
           merge-multiple: true
       - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@ba38be9e461d3875417946c167d0b5f3d385a247 # v1.14.1
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
         with:
           skip-existing: true
 
@@ -194,7 +194,7 @@ jobs:
       - uses: actions/setup-python@v7.0.0
         with:
           python-version: 3.x
-      - uses: cargo-bins/cargo-binstall@ead08b90bd7b2e6d81963fb9cf0b7239f66d5db4 # v1.21.0
+      - uses: cargo-bins/cargo-binstall@e00d2c94cc0067b77737821097a62d91c0301baa # v1.21.1
       - name: Install nur
         env:
           GITHUB_TOKEN: ${{ github.token }}

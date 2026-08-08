@@ -11,6 +11,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 <!-- markdownlint-disable MD024 -->
 
+## [img-gen/v0.2.4] - 2026-08-08
+
+### <!-- 6 --> 📦 Dependency updates
+
+- Bump several crates with `cargo upgrade` by @2bndy5 in [#38](https://github.com/2bndy5/img-gen/pull/38)
+- Bump version to img-gen-spec/v0.2.3 by @2bndy5 in [`c7ad2fe`](https://github.com/2bndy5/img-gen/commit/c7ad2fe3bae709b30cb3e606b79b140467b6aa66)
+- Bump version to img-gen-renderer/v0.2.3 by @2bndy5 in [`08add09`](https://github.com/2bndy5/img-gen/commit/08add093110ef05a1021bac4b7953f76ff1bd16f)
+
+[img-gen/v0.2.4]: https://github.com/2bndy5/img-gen/compare/img-gen/v0.2.3...img-gen/v0.2.4
+
+Full commit diff: [`19dce6e...img-gen/v0.2.4`][img-gen/v0.2.4]
+
 ## [img-gen/v0.2.3] - 2026-06-22
 
 ### <!-- 1 --> 🚀 Added
@@ -21,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Bump version to img-gen-spec/v0.2.2 by @2bndy5 in [`51a5b49`](https://github.com/2bndy5/img-gen/commit/51a5b499d1dd85a30218a9d0804a00319a7dba8a)
 - Bump version to img-gen-renderer/v0.2.2 by @2bndy5 in [`694546f`](https://github.com/2bndy5/img-gen/commit/694546fcd01b68fab83e5d10c9d18abcc35a848f)
+- Bump version to img-gen/v0.2.3 by @2bndy5 in [`129d2b2`](https://github.com/2bndy5/img-gen/commit/129d2b207ce3a7a4fdbd42500169724906687556)
 
 [img-gen/v0.2.3]: https://github.com/2bndy5/img-gen/compare/img-gen/v0.2.2...img-gen/v0.2.3
 

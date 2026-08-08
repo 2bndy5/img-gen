@@ -16,20 +16,20 @@ keywords = [
 
 [dependencies]
 directories = "6.0"
-fontawesome-free-pack = "7.2.0"
+fontawesome-free-pack = "7.3.1"
 fontsource_downloader = { workspace = true }
 image = "0.25.10"
 img-gen-spec = { path = "../img-gen-spec", version = "0.2.2" }
 material-design-icons-pack = "7.4.47"
-octicons-pack = "19.27.0"
+octicons-pack = "19.33.0"
 parley = { workspace = true }
 pyo3 = { workspace = true, optional = true }
 pyo3-async-runtimes = { version = "0.29.0", features = ["tokio-runtime"], optional = true }
 # spell-checker: disable-next-line
-resvg = { version = "0.47.0", default-features = false, features = ["text", "memmap-fonts", "raster-images"] }
+resvg = { version = "0.48.1", default-features = false, features = ["text", "memmap-fonts", "raster-images"] }
 sha2 = "0.11.0"
-simple-icons-pack = "16.21.0"
-swash = "0.2.7"
+simple-icons-pack = "16.28.0"
+swash = "0.2.10"
 thiserror = { workspace = true }
 tokio = { workspace = true, optional = true }
 

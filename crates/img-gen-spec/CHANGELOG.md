@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Address various kinks by @2bndy5 in [#11](https://github.com/2bndy5/img-gen/pull/11)
 
+### <!-- 6 --> 📦 Dependency updates
+
+- Bump version to img-gen-spec/v0.2.2 by @2bndy5 in [`51a5b49`](https://github.com/2bndy5/img-gen/commit/51a5b499d1dd85a30218a9d0804a00319a7dba8a)
+
 [img-gen-spec/v0.2.2]: https://github.com/2bndy5/img-gen/compare/img-gen-spec/v0.2.1...img-gen-spec/v0.2.2
 
 Full commit diff: [`19dce6e...img-gen-spec/v0.2.2`][img-gen-spec/v0.2.2]

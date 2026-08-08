@@ -23,7 +23,7 @@ crate-type = ["cdylib", "lib"]
 
 [dependencies]
 img-gen-renderer = { path = "../img-gen-renderer", version = "0.2.2" }
-img-gen-spec = { path = "../img-gen-spec", version = "0.2.2" }
+img-gen-spec = { path = "../img-gen-spec", version = "0.2.3" }
 pyo3 = { workspace = true, optional = true, features = ["extension-module"] }
 reqwest = { version = "0.13", optional = true, features = ["default-tls"] }
 tokio = { workspace = true, optional = true }

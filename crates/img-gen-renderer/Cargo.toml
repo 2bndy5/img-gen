@@ -19,7 +19,7 @@ directories = "6.0"
 fontawesome-free-pack = "7.3.1"
 fontsource_downloader = { workspace = true }
 image = "0.25.10"
-img-gen-spec = { path = "../img-gen-spec", version = "0.2.2" }
+img-gen-spec = { path = "../img-gen-spec", version = "0.2.3" }
 material-design-icons-pack = "7.4.47"
 octicons-pack = "19.33.0"
 parley = { workspace = true }

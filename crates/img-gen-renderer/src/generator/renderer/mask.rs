@@ -1,4 +1,4 @@
-use image::RgbaImage;
+use image::{Pixel, RgbaImage};
 
 use super::{ConcreteSize, Renderer};
 use crate::{Layer, LayerOffset, Mask, Result};
@@ -30,11 +30,8 @@ impl Renderer<'_> {
         self.render_layer_unmasked(&mask_layer, mask_size, &mut mask_canvas)
             .await?;
 
-        let layer_raw = canvas.as_mut();
-        let mask_raw = mask_canvas.as_raw();
-
-        for (layer_px, mask_px) in layer_raw.chunks_exact_mut(4).zip(mask_raw.chunks_exact(4)) {
-            let raw_mask_alpha = mask_px[3];
+        for (layer_px, mask_px) in canvas.pixels_mut().zip(mask_canvas.pixels()) {
+            let raw_mask_alpha = mask_px.alpha();
             let mask_alpha = if mask.invert {
                 255u8.saturating_sub(raw_mask_alpha)
             } else {
@@ -45,12 +42,14 @@ impl Renderer<'_> {
                 continue;
             }
             if mask_alpha == 0 {
-                layer_px[3] = 0;
+                if let Some(alpha) = layer_px.0.get_mut(3) {
+                    *alpha = 0;
+                }
                 continue;
             }
 
-            let layer_alpha = layer_px[3] as u16;
-            layer_px[3] = ((layer_alpha * mask_alpha as u16) / 255) as u8;
+            let layer_alpha = layer_px.alpha() as u16;
+            layer_px.0[3] = ((layer_alpha * mask_alpha as u16) / 255) as u8;
         }
 
         Ok(())

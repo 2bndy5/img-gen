@@ -158,7 +158,7 @@ jobs:
         # zizmor: ignore[cache-poisoning]
         with:
           python-version: ${{ steps.python-setup.outputs.python-version }}
-      - uses: cargo-bins/cargo-binstall@e00d2c94cc0067b77737821097a62d91c0301baa # v1.21.1
+      - uses: cargo-bins/cargo-binstall@75b4bfae1b2c753a6806bbce6e6cb89b602de33c # v1.22.0
       - name: Install nur
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -194,7 +194,7 @@ jobs:
       - uses: actions/setup-python@v7.0.0
         with:
           python-version: 3.x
-      - uses: cargo-bins/cargo-binstall@e00d2c94cc0067b77737821097a62d91c0301baa # v1.21.1
+      - uses: cargo-bins/cargo-binstall@75b4bfae1b2c753a6806bbce6e6cb89b602de33c # v1.22.0
       - name: Install nur
         env:
           GITHUB_TOKEN: ${{ github.token }}

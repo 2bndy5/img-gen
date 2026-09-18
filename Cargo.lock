@@ -1553,9 +1553,9 @@ dependencies = [
 
 [[package]]
 name = "octicons-pack"
-version = "19.33.0"
+version = "19.36.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "83927b8a178ed4e5a3215f7c02c771e2639ec7690981dc83692918128d1b824e"
+checksum = "e5ba7baa806527b081e314d74c6df088fd66235daeb448278009dce0d462b6d7"
 
 [[package]]
 name = "once_cell"
@@ -2078,11 +2078,11 @@ dependencies = [
 
 [[package]]
 name = "reqwest"
-version = "0.13.4"
+version = "0.13.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "219c5811de6525e5416c7d5d53bb656d3afdbc6c5af816e0802bcfa42dbdc1c3"
+checksum = "16a1cfa75cc186dd73d5818e510e042e40927bccc9c236b061cea97e1eb08029"
 dependencies = [
- "base64 0.22.1",
+ "base64 0.23.1",
  "bytes",
  "encoding_rs",
  "futures-core",
@@ -2417,9 +2417,9 @@ checksum = "e3a9fe34e3e7a50316060351f37187a3f546bce95496156754b601a5fa71b76e"
 
 [[package]]
 name = "simple-icons-pack"
-version = "16.29.0"
+version = "16.30.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7c9eeca3eee03854ac374d5f2e22bae5e07401e4d885f9663080ba9482d05b21"
+checksum = "0698c3a04801a954ae06aaf25538e776efaa598900029a49e6780d7b8cbccf55"
 
 [[package]]
 name = "simplecss"

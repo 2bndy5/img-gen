@@ -154,11 +154,11 @@ jobs:
         id: python-setup
         with:
           python-version: 3.x
-      - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+      - uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
         # zizmor: ignore[cache-poisoning]
         with:
           python-version: ${{ steps.python-setup.outputs.python-version }}
-      - uses: cargo-bins/cargo-binstall@75b4bfae1b2c753a6806bbce6e6cb89b602de33c # v1.22.0
+      - uses: cargo-bins/cargo-binstall@b874e25ea559687bec77e281e9b271aa1367b624 # v1.23.0
       - name: Install nur
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -194,14 +194,14 @@ jobs:
       - uses: actions/setup-python@v7.0.0
         with:
           python-version: 3.x
-      - uses: cargo-bins/cargo-binstall@75b4bfae1b2c753a6806bbce6e6cb89b602de33c # v1.22.0
+      - uses: cargo-bins/cargo-binstall@b874e25ea559687bec77e281e9b271aa1367b624 # v1.23.0
       - name: Install nur
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: cargo binstall -y nur
       - name: Install uv
         # zizmor: ignore[cache-poisoning]
-        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
       - name: Build docs
         run: nur docs
       - name: Upload docs

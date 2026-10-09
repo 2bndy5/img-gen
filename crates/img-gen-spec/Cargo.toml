@@ -15,7 +15,7 @@ keywords = [
 ]
 
 [dependencies]
-colorgrad = { version = "0.8.0", features = ["named-colors"] }
+colorgrad = { version = "0.9.0", features = ["named-colors"] }
 fontsource_downloader = { workspace = true }
 parley = { workspace = true }
 pyo3 = { workspace = true, optional = true }

@@ -208,7 +208,7 @@ mod test {
         let parsed: SolidColor = serde_saphyr::from_str(r#""rgb(255, 0, 0)""#).unwrap();
         assert_eq!(parsed.to_tuple(), expected_tuple);
 
-        let parsed: SolidColor = serde_saphyr::from_str(r#""hsla(0, 1.0, 0.5, 1.0)""#).unwrap();
+        let parsed: SolidColor = serde_saphyr::from_str(r#""hsla(0, 100%, 50%, 1.0)""#).unwrap();
         assert_eq!(parsed.to_tuple(), expected_tuple);
     }
 }

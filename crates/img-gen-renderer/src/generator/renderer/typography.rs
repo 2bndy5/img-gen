@@ -577,7 +577,10 @@ impl Renderer<'_> {
 
     fn layout_true_height(layout: &Layout<TextBrush>) -> f32 {
         layout.lines().last().map_or(layout.height(), |l| {
-            l.metrics().block_max_coord.max(layout.height())
+            let m = l.metrics();
+            m.block_max_coord
+                .max(m.content_block_max_coord)
+                .max(layout.height())
         })
     }
 
@@ -636,7 +639,7 @@ impl Renderer<'_> {
             .builder(font_ref)
             .size(font_size)
             .hint(true)
-            .normalized_coords(normalized_coords)
+            .normalized_coords(normalized_coords.iter().map(|coord| coord.to_bits()))
             .build();
         let img_w = img.width();
         let img_h = img.height();

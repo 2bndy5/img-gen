@@ -636,7 +636,7 @@ impl Renderer<'_> {
             .builder(font_ref)
             .size(font_size)
             .hint(true)
-            .normalized_coords(normalized_coords)
+            .normalized_coords(normalized_coords.iter().map(|coord| coord.to_bits()))
             .build();
         let img_w = img.width();
         let img_h = img.height();

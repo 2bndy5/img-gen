@@ -577,7 +577,10 @@ impl Renderer<'_> {
 
     fn layout_true_height(layout: &Layout<TextBrush>) -> f32 {
         layout.lines().last().map_or(layout.height(), |l| {
-            l.metrics().block_max_coord.max(layout.height())
+            let m = l.metrics();
+            m.block_max_coord
+                .max(m.content_block_max_coord)
+                .max(layout.height())
         })
     }
 

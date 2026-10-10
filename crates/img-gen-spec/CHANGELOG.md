@@ -11,6 +11,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 <!-- markdownlint-disable MD024 -->
 
+## [img-gen-spec/v0.2.4] - 2026-10-10
+
+### <!-- 6 --> 📦 Dependency updates
+
+- Bump the cargo group across 1 directory with 6 updates by @dependabot[bot] in [#60](https://github.com/2bndy5/img-gen/pull/60)
+
+[img-gen-spec/v0.2.4]: https://github.com/2bndy5/img-gen/compare/img-gen-spec/v0.2.3...img-gen-spec/v0.2.4
+
+Full commit diff: [`19dce6e...img-gen-spec/v0.2.4`][img-gen-spec/v0.2.4]
+
+## [img-gen-spec/v0.2.3] - 2026-08-08
+
+### <!-- 6 --> 📦 Dependency updates
+
+- Bump version to img-gen-spec/v0.2.3 by @2bndy5 in [`c7ad2fe`](https://github.com/2bndy5/img-gen/commit/c7ad2fe3bae709b30cb3e606b79b140467b6aa66)
+
+[img-gen-spec/v0.2.3]: https://github.com/2bndy5/img-gen/compare/img-gen-spec/v0.2.2...img-gen-spec/v0.2.3
+
+Full commit diff: [`19dce6e...img-gen-spec/v0.2.3`][img-gen-spec/v0.2.3]
+
 ## [img-gen-spec/v0.2.2] - 2026-06-22
 
 ### <!-- 1 --> 🚀 Added

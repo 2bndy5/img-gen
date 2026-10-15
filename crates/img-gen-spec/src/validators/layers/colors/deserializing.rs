@@ -112,10 +112,6 @@ impl<'de> Visitor<'de> for ColorKindVisitor {
             .map_err(de::Error::custom)
     }
 
-    fn visit_string<E: de::Error>(self, v: String) -> Result<ColorKind, E> {
-        self.visit_str(&v)
-    }
-
     fn visit_map<A: MapAccess<'de>>(self, mut map: A) -> Result<ColorKind, A::Error> {
         // Here, we'll use `serde_json::Value` as a temporary holder for map values.
         // The idea is to identify which ColorKind we're looking at based on the map keys.

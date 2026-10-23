@@ -77,7 +77,7 @@ jobs:
         with:
           path: "~/.cargo"
           key: cargo-test-${{ hashFiles('Cargo.lock') }}
-      - uses: cargo-bins/cargo-binstall@c06f6a0003f7c6165a00c89d1697731c9e8a5c72 # v1.25.2
+      - uses: cargo-bins/cargo-binstall@3be4ad2b146f3302f92e5956c54fedbb6ae8cccc # v1.25.3
       - name: Install cargo-nextest, cargo-llvm-cov, and nur
         env:
           GITHUB_TOKEN: ${{ github.token }}

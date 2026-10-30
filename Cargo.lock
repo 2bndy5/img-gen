@@ -1590,9 +1590,9 @@ dependencies = [
 
 [[package]]
 name = "octicons-pack"
-version = "19.40.0"
+version = "19.41.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6f819c27690776bcb52458e3ea790e149ca67bd6ebc5f9d09de7f9ebf9dd8cb7"
+checksum = "b58c8fdc5c92b5c65f2f5c60360e676f7d99f62f3276fb70e2158a3648993c3b"
 
 [[package]]
 name = "once_cell"
@@ -2776,9 +2776,9 @@ checksum = "fd3ca314f692efd6c868f8408f53fe444634a845f96c028b97d35f6a1f79f0ee"
 
 [[package]]
 name = "tokio"
-version = "1.53.3"
+version = "1.54.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ce3335fa71841cda333a58d7615b03901380ecf09d59b3296d21f8bbac0dde4e"
+checksum = "b52fd3255258d26fac7264ab5a76b53c13367136dc011d3d6ad4f8ed070396a3"
 dependencies = [
  "bytes",
  "libc",

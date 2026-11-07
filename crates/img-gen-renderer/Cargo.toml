@@ -26,7 +26,7 @@ parley = { workspace = true }
 pyo3 = { workspace = true, optional = true }
 pyo3-async-runtimes = { version = "0.29.0", features = ["tokio-runtime"], optional = true }
 # spell-checker: disable-next-line
-resvg = { version = "0.48.1", default-features = false, features = ["text", "memmap-fonts", "raster-images"] }
+resvg = { version = "0.49.0", default-features = false, features = ["text", "memmap-fonts", "raster-images"] }
 sha2 = "0.11.0"
 simple-icons-pack = "16.34.0"
 swash = "0.2.10"

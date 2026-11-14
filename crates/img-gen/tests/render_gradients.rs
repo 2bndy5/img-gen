@@ -178,3 +178,18 @@ async fn conical_gradient() {
     let img = generator.render(layout).await.unwrap();
     img.save("tests/out/conical_gradient.png").unwrap();
 }
+
+#[test]
+fn conical_angle_normalization() {
+    let colors = ColorGradient::new(Some(vec![(0.0, "red"), (1.0, "blue")]), None).unwrap();
+    let mut gradient = ConicalGradient::new(colors, LayerOffset { x: 1, y: 1 }, Some(765.0));
+    assert_eq!(gradient.get_angle(), 45.0);
+
+    gradient.set_angle(-450.0);
+    assert_eq!(gradient.get_angle(), 270.0);
+    assert_eq!(gradient.get_color_at(1, 2).to_tuple(), (0, 0, 255, 255));
+
+    gradient.set_angle(720.0);
+    assert_eq!(gradient.get_angle(), 0.0);
+    assert_eq!(gradient.get_color_at(2, 1).to_tuple(), (0, 0, 255, 255));
+}

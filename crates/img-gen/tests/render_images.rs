@@ -1,7 +1,8 @@
 use std::{num::NonZeroU32, path::PathBuf};
 
 use img_gen::{
-    Background, Generator, Icon, Layer, LayerOffset, Layout, PreserveAspect, Size, SolidColor,
+    Background, Generator, Icon, ImgGenRendererError, Layer, LayerOffset, Layout, PreserveAspect,
+    Size, SolidColor,
 };
 
 mod support;
@@ -188,4 +189,62 @@ async fn preserve_tall() {
     let generator = Generator::new(vec![PathBuf::from(".")], None).unwrap();
     let img = generator.render(layout).await.unwrap();
     img.save("tests/out/test_preserve_tall.png").unwrap();
+}
+
+#[tokio::test]
+async fn image_loading_reports_open_and_decode_errors() {
+    let generator = Generator::new(vec![], None).unwrap();
+    let missing = "tests/nonexistent-image.png";
+    let error = generator
+        .render(mk_layout(Some(missing), None))
+        .await
+        .err()
+        .unwrap();
+    assert!(matches!(error, ImgGenRendererError::OpenImageFailed { path, .. } if path == missing));
+
+    let invalid = "tests/noto-sans-latin-400-normal.ttf";
+    let error = generator
+        .render(mk_layout(None, Some(invalid)))
+        .await
+        .err()
+        .unwrap();
+    assert!(
+        matches!(error, ImgGenRendererError::DecodeImageFailed { path, .. } if path == invalid)
+    );
+
+    let missing_svg = "tests/nonexistent-image.svg";
+    let error = generator
+        .render(mk_layout(Some(missing_svg), None))
+        .await
+        .err()
+        .unwrap();
+    assert!(
+        matches!(error, ImgGenRendererError::ReadSvgFailed { path, .. } if path == missing_svg)
+    );
+}
+
+#[tokio::test]
+async fn svg_loading_reports_xml_and_svg_errors() {
+    let generator = Generator::new(vec![], None).unwrap();
+    let path = PathBuf::from(env!("CARGO_TARGET_TMPDIR")).join("invalid-render-image.svg");
+    let name = path.to_str().unwrap();
+
+    std::fs::write(&path, "<svg").unwrap();
+    let xml_error = generator
+        .render(mk_layout(None, Some(name)))
+        .await
+        .err()
+        .unwrap();
+    std::fs::write(&path, "<html/>").unwrap();
+    let svg_error = generator
+        .render(mk_layout(None, Some(name)))
+        .await
+        .err()
+        .unwrap();
+    std::fs::remove_file(&path).unwrap();
+
+    assert!(
+        matches!(xml_error, ImgGenRendererError::ParseSvgXmlFailed { path, .. } if path == name)
+    );
+    assert!(matches!(svg_error, ImgGenRendererError::ParseSvgFailed { path, .. } if path == name));
 }

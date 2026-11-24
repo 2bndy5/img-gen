@@ -387,8 +387,8 @@ impl Renderer<'_> {
         builder.push_default(StyleProperty::OverflowWrap(params.overflow_wrap));
 
         let mut layout: Layout<TextBrush> = builder.build(text);
+        layout.set_alignment(params.alignment, AlignmentOptions::default());
         layout.break_all_lines(params.max_width);
-        layout.align(params.alignment, AlignmentOptions::default());
         layout
     }
 
